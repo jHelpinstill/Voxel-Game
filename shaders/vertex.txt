@@ -5,8 +5,13 @@ layout (location=1) in vec3 vertexColor;
 
 out vec3 fragmentColor;
 
+uniform float angle;
+
 void main()
 {
-	gl_Position = vec4(vertexPos, 0.0, 1.0);
+	float sin_theta = sin(angle);
+	float cos_theta = cos(angle);
+	vec2 new_pos = vec2(vertexPos.x * cos_theta - vertexPos.y * sin_theta, vertexPos.x * sin_theta + vertexPos.y * cos_theta);
+	gl_Position = vec4(new_pos, 0.0, 1.0);
 	fragmentColor = vertexColor;
 }

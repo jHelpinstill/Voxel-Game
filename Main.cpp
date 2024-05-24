@@ -13,7 +13,9 @@ int main()
 		return -1;
 	}
 	GLFWwindow* window;
-	
+#ifndef LOCK_FRAMERATE
+	glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
+#endif
 	window = glfwCreateWindow(640, 480, "Voxel Game", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
@@ -25,7 +27,18 @@ int main()
 	}
 	//printFileToTerminal("shaders/fragment.txt", true);
 
-	TriangleMesh* tri = new TriangleMesh();
+	float r = 1.0f;
+	float verts[9] = {
+		0.0f, r, 0.0f,
+		-r * sqrt(3) * 0.5, -0.5 * r, 0.0f,
+		r * sqrt(3) * 0.5, -0.5 * r, 0.0f
+	};
+	float colors[9] = {
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f
+	};
+	TriangleMesh* tri = new TriangleMesh(verts, colors);
 
 	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
 
@@ -33,16 +46,32 @@ int main()
 		"shaders/vertex.txt",
 		"shaders/fragment.txt"
 	);
-
+	double prev_time = 0;
+	int c = 0;
 	while (!glfwWindowShouldClose(window))
 	{
+		double time = glfwGetTime();
+		double dt = time - prev_time;
+		prev_time = time;
+
 		glfwPollEvents();
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shader);
+
+		float speed = 3.14159;
+		float angle = speed * time;
+		int vertexAngleLocation = glGetUniformLocation(shader, "angle");
+		glUniform1f(vertexAngleLocation, angle);
+
 		tri->draw();
+
+#ifdef LOCK_FRAMERATE
 		glfwSwapBuffers(window);
+#else
+		glFlush();
+#endif
 	}
 
 	glDeleteProgram(shader);
