@@ -134,12 +134,14 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="TriangleMesh.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Config.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="dependencies\include\glad\glad.h" />
     <ClInclude Include="dependencies\include\KHR\khrplatform.h" />
+    <ClInclude Include="TriangleMesh.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>

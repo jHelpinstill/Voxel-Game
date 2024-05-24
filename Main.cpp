@@ -1,29 +1,31 @@
-#include "Config.h"
+#include "config.h"
 #include "util.h"
+#include "TriangleMesh.h"
 
 unsigned int makeShader(const std::string& vertex_filepath, const std::string& fragment_filepath);
 unsigned int makeModule(const std::string& filepath, unsigned int module_type);
 
 int main()
 {
-	//printFileToTerminal("shaders/fragment.txt", true);
-
-	GLFWwindow* window;
-
-	if (!glfwInit())
+	if (!glfwInit())	// MUST RUN BEFORE GLAD INIT
 	{
 		std::cout << "GLFW couldn't start" << std::endl;
 		return -1;
 	}
-
+	GLFWwindow* window;
+	
 	window = glfwCreateWindow(640, 480, "Voxel Game", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))	// MUST RUN BEFORE ANY OTHER OPENGL FUNCTION
 	{
 		glfwTerminate();
+		std::cout << "Glad couldn't start" << std::endl;
 		return -1;
 	}
+	//printFileToTerminal("shaders/fragment.txt", true);
+
+	TriangleMesh* tri = new TriangleMesh();
 
 	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
 
@@ -39,6 +41,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shader);
+		tri->draw();
 		glfwSwapBuffers(window);
 	}
 
