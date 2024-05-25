@@ -132,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -139,11 +140,8 @@
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="dependencies\include\glad\glad.h" />
-    <ClInclude Include="dependencies\include\GLFW\glfw3.h" />
-    <ClInclude Include="dependencies\include\GLFW\glfw3native.h" />
-    <ClInclude Include="dependencies\include\KHR\khrplatform.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="TriangleMesh.h" />
     <ClInclude Include="util.h" />

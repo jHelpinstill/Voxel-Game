@@ -2,6 +2,7 @@
 #include "util.h"
 #include "TriangleMesh.h"
 #include "Shader.h"
+#include "Camera.h"
 
 int main()
 {
@@ -10,11 +11,11 @@ int main()
 		std::cout << "GLFW couldn't start" << std::endl;
 		return -1;
 	}
-	GLFWwindow* window;
+	//GLFWwindow* window;
 #ifndef LOCK_FRAMERATE
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
 #endif
-	window = glfwCreateWindow(640, 480, "Voxel Game", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(640, 480, "Voxel Game", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))	// MUST RUN BEFORE ANY OTHER OPENGL FUNCTION
@@ -25,11 +26,14 @@ int main()
 	}
 	//printFileToTerminal("shaders/fragment.txt", true);
 
-	float r = 1.0f;
+	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
+
+	Shader tri_shader("shaders/vertex.txt", "shaders/fragment.txt");
+
 	float verts[9] = {
-		0.0f, r, 0.0f,
-		-r * sqrt(3) * 0.5, -0.5 * r, 0.0f,
-		r * sqrt(3) * 0.5, -0.5 * r, 0.0f
+		1.0f, 0.0f, -5.0f,
+		0.0f, 1.0f, -5.0f,
+		0.0f, 0.0f, -5.0f
 	};
 	float colors[9] = {
 		1.0f, 0.0f, 0.0f,
@@ -38,17 +42,10 @@ int main()
 	};
 	TriangleMesh* tri = new TriangleMesh(verts, colors);
 
-	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
+	Camera camera(window);
 
-	//unsigned int shader = makeShader(
-	//	"shaders/vertex.txt",
-	//	"shaders/fragment.txt"
-	//);
-
-	Shader tri_shader("shaders/vertex.txt", "shaders/fragment.txt");
 
 	double prev_time = 0;
-	int c = 0;
 	while (!glfwWindowShouldClose(window))
 	{
 		double time = glfwGetTime();
@@ -59,11 +56,15 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		tri_shader.use();
-
-		float speed = 3.14159;
-		float angle = speed * time;
+		float speed = 45;
+		float angle = speed* time;
 		tri_shader.setFloat("angle", angle);
+
+		camera.setRotation(sin(time), glm::vec3(0, 1, 0));
+
+		tri_shader.use();
+		unsigned int camera_mat_location = glGetUniformLocation(tri_shader.ID, "camera_mat");
+		glUniformMatrix4fv(camera_mat_location, 1, GL_FALSE, glm::value_ptr(camera.getMat()));
 
 		tri->draw();
 
