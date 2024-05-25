@@ -135,6 +135,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="TriangleMesh.cpp" />
     <ClCompile Include="util.cpp" />
@@ -142,12 +143,15 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="TriangleMesh.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\fragment.txt" />
+    <Text Include="shaders\meshFragment.txt" />
+    <Text Include="shaders\meshVertex.txt" />
     <Text Include="shaders\vertex.txt" />
   </ItemGroup>
   <ItemGroup>
