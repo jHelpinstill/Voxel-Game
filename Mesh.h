@@ -11,6 +11,8 @@ class Mesh
 public:
 	Camera* camera;
 	Shader* shader;
+	glm::mat4 transform;
+	glm::vec4 color = glm::vec4(0.9, 0.9, 0.0, 1.0);
 
 	struct Tri
 	{
@@ -25,13 +27,14 @@ public:
 	};
 	std::vector<Tri> tris;
 
-	Mesh() {}
 	Mesh(std::vector<Tri>& tris);
 
 	void draw();
 
 	void attachShader(Shader& shader);
 	void attachCamera(Camera& camera);
+
+	~Mesh();
 
 private:
 	unsigned int VAO, VBO, vertex_count;

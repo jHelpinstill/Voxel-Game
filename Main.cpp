@@ -5,7 +5,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 
-Mesh* makeBox(float l, float w, float h);
+Mesh* makeBox(float l, float w, float h, glm::vec3 pos);
 
 int main()
 {
@@ -31,21 +31,12 @@ int main()
 
 	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
 
-	Shader tri_shader("shaders/vertex.txt", "shaders/fragment.txt");
-
-	float verts[9] = {
-		1.0f, 0.0f, -5.0f,
-		0.0f, 1.0f, -5.0f,
-		0.0f, 0.0f, -5.0f
-	};
-	float colors[9] = {
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f
-	};
-	TriangleMesh* tri = new TriangleMesh(verts, colors);
-
+	Shader mesh_shader("shaders/MeshVertex.txt", "shaders/MeshFragment.txt");
 	Camera camera(window);
+
+	Mesh* box_mesh = makeBox(1, 1, 0.5, glm::vec3(-0.5, -0.75, -2.0));
+	box_mesh->attachCamera(camera);
+	box_mesh->attachShader(mesh_shader);
 
 
 	double prev_time = 0;
@@ -59,18 +50,8 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		float speed = 45;
-		float angle = speed* time;
-		tri_shader.setFloat("angle", angle);
-
-		camera.setRotation(sin(time), glm::vec3(0, 1, 0));
-
-		tri_shader.use();
-		tri_shader.setMat4("camera_mat", camera.getMat());
-		//unsigned int camera_mat_location = glGetUniformLocation(tri_shader.ID, "camera_mat");
-		//glUniformMatrix4fv(camera_mat_location, 1, GL_FALSE, glm::value_ptr(camera.getMat()));
-
-		tri->draw();
+		camera.setRotation(0.5*sin(time), glm::vec3(0, 1, 0));
+		box_mesh->draw();
 
 #ifdef LOCK_FRAMERATE
 		glfwSwapBuffers(window);
@@ -83,7 +64,7 @@ int main()
 	return 0;
 }
 
-Mesh* makeBox(float l, float w, float h)
+Mesh* makeBox(float l, float w, float h, glm::vec3 pos)
 {
 	glm::vec3 v000(0.0f, 0.0f, 0.0f);
 	glm::vec3 v00l(0.0f, 0.0f, l);
@@ -115,5 +96,7 @@ Mesh* makeBox(float l, float w, float h)
 		Mesh::Tri(v000, vw00, vw0l)
 	};
 
-	return new Mesh(tris);
+	Mesh* mesh = new Mesh(tris);
+	mesh->transform = glm::translate(glm::mat4(1.0f), pos);
+	return mesh;
 }

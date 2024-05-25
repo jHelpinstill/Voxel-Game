@@ -1,14 +1,15 @@
 #version 330 core
 
 layout (location=0) in vec3 vertex_pos;
-layout (location=1) in vec3 vertex_color;
 
-out vec3 fragmentColor;
+out vec4 fragmentColor;
 
-uniform mat4 camera_mat;
+uniform mat4 projection;
+uniform mat4 transform;
+uniform vec4 color;
 
 void main()
 {
-	gl_Position = camera_mat * vec4(vertex_pos, 1.0);
-	fragmentColor = vertexColor;
+	gl_Position = projection * transform * vec4(vertex_pos, 1.0);
+	fragmentColor = color;
 }

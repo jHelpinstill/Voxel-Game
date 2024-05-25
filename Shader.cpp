@@ -54,6 +54,11 @@ void Shader::setMat4(const std::string& name, glm::mat4 mat) const
 	glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
+void Shader::setVec4(const std::string& name, glm::vec3 vec) const
+{
+	glUniform4fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
+}
+
 unsigned int Shader::makeModule(const std::string& filepath, unsigned int module_type)
 {
 	std::ifstream file;
@@ -80,7 +85,7 @@ unsigned int Shader::makeModule(const std::string& filepath, unsigned int module
 	{
 		char error_log[1024];
 		glGetShaderInfoLog(shader_module, 1024, NULL, error_log);
-		std::cout << "Shader Module compilation error:\n" << error_log << std::endl;
+		std::cout << "Shader Module \"" << filepath << "\" compilation error : \n" << error_log << std::endl;
 	}
 
 	return shader_module;
