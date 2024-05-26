@@ -70,3 +70,40 @@ void Mesh::createVAO()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
 }
+
+Mesh* Mesh::makeBox(float l, float w, float h, glm::vec3 pos)
+{
+	glm::vec3 v000(0.0f, 0.0f, 0.0f);
+	glm::vec3 v00l(0.0f, 0.0f, l);
+	glm::vec3 v0h0(0.0f, h, 0.0f);
+	glm::vec3 v0hl(0.0f, h, l);
+	glm::vec3 vw00(w, 0.0f, 0.0f);
+	glm::vec3 vw0l(w, 0.0f, l);
+	glm::vec3 vwh0(w, h, 0.0f);
+	glm::vec3 vwhl(w, h, l);
+
+	std::vector<Mesh::Tri> tris{
+		//-x face
+		Mesh::Tri(v000, v00l, v0h0),
+		Mesh::Tri(v00l, v0hl, v0h0),
+		//+z face
+		Mesh::Tri(v00l, vw0l, v0hl),
+		Mesh::Tri(vw0l, vwhl, v0hl),
+		//+x face
+		Mesh::Tri(vw0l, vw00, vwhl),
+		Mesh::Tri(vw00, vwh0, vwhl),
+		//-z face
+		Mesh::Tri(vw00, v000, vwh0),
+		Mesh::Tri(v000, v0h0, vwh0),
+		//+y face
+		Mesh::Tri(v0h0, v0hl, vwh0),
+		Mesh::Tri(v0hl, vwhl, vwh0),
+		//-y face
+		Mesh::Tri(v000, vw0l, v00l),
+		Mesh::Tri(v000, vw00, vw0l)
+	};
+
+	Mesh* mesh = new Mesh(tris);
+	mesh->transform = glm::translate(glm::mat4(1.0f), pos);
+	return mesh;
+}

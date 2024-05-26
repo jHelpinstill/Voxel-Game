@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="TriangleMesh.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
@@ -153,9 +155,6 @@
     <Text Include="shaders\meshFragment.txt" />
     <Text Include="shaders\meshVertex.txt" />
     <Text Include="shaders\vertex.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="dependencies\lib\glfw3.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

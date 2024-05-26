@@ -36,6 +36,8 @@ public:
 
 	~Mesh();
 
+	static Mesh* makeBox(float l, float w, float h, glm::vec3 pos);
+
 private:
 	unsigned int VAO, VBO, vertex_count;
 
