@@ -17,10 +17,28 @@ glm::mat4 Camera::getMat()
 
 void Camera::rotate(float angle, glm::vec3 axis)
 {
+
+}
+
+void Camera::rotate(glm::vec3 euler)
+{
+
+}
+
+void Camera::rotateWorld(float angle, glm::vec3 axis)
+{
 	view = glm::rotate(view, angle, axis);
 }
 
-void Camera::setRotation(float angle, glm::vec3 axis)
+void Camera::rotateWorld(glm::vec3 euler)
+{
+	//view = glm::rotate(view, euler.z, glm::vec3(0, 0, 1)) * glm::rotate(view, euler.y, )
+	rotateWorld(euler.x, view * glm::vec4(1, 0, 0, 1));
+	rotateWorld(euler.y, view * glm::vec4(0, 1, 0, 1));
+	rotateWorld(euler.z, view * glm::vec4(0, 0, 1, 1));
+}
+
+void Camera::setRotationWorld(float angle, glm::vec3 axis)
 {
 	glm::vec3 pos = view[3];
 	view = glm::rotate(glm::translate(glm::mat4(1.0f), pos), angle, axis);

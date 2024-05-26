@@ -6,10 +6,22 @@
 
 class Input
 {
+private:
+	GLFWwindow* window;
 public:
+	struct {
+		double x, y;
+		glm::vec2 delta;
+		bool right_pressed;
+		bool left_pressed;
+	} mouse;
+
 	Input(GLFWwindow* window);
 
-	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	void update();
+
+	void lockCursor();
+	void unlockCursor();
 };
 
 #endif

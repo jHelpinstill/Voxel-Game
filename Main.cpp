@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Mesh.h"
+#include "Input.h"
 
 int main()
 {
@@ -25,6 +26,9 @@ int main()
 		std::cout << "Glad couldn't start" << std::endl;
 		return -1;
 	}
+
+	Input input(window);
+	input.lockCursor();
 	//printFileToTerminal("shaders/fragment.txt", true);
 
 	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
@@ -45,10 +49,11 @@ int main()
 		prev_time = time;
 
 		glfwPollEvents();
+		input.update();
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		camera.setRotation(0.5*sin(time), glm::vec3(0, 1, 0));
+		camera.rotate(glm::vec3(input.mouse.delta.y * 0.01, input.mouse.delta.x * 0.01, 0));
 		box_mesh->draw();
 
 #ifdef LOCK_FRAMERATE
