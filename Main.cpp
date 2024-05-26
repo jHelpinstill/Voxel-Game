@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "Input.h"
+#include "CameraController.h"
 
 int main()
 {
@@ -36,6 +37,9 @@ int main()
 	Shader mesh_shader("shaders/MeshVertex.txt", "shaders/MeshFragment.txt");
 	Camera camera(window);
 
+	CameraController player(camera, input);
+	player.constrainLook(glm::vec3(0, 1, 0));
+
 	Mesh* box_mesh = Mesh::makeBox(1, 1, 0.5, glm::vec3(-0.5, -0.75, -2.0));
 	box_mesh->attachCamera(camera);
 	box_mesh->attachShader(mesh_shader);
@@ -53,7 +57,8 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		camera.rotate(glm::vec3(input.mouse.delta.y * 0.01, input.mouse.delta.x * 0.01, 0));
+		//camera.rotateLocal(glm::vec3(input.mouse.delta.y * 0.01, input.mouse.delta.x * 0.01, 0));
+		player.update();
 		box_mesh->draw();
 
 #ifdef LOCK_FRAMERATE
