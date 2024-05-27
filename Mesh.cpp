@@ -20,7 +20,7 @@ Mesh::~Mesh()
 void Mesh::draw()
 {
 	shader->use();
-	shader->setMat4("projection", camera->getMat());
+	shader->setMat4("projection", camera->getProjectionMat());
 	shader->setMat4("transform", transform);
 	shader->setVec4("color", color);
 
@@ -45,16 +45,21 @@ void Mesh::setNorm(Tri& tri)
 
 void Mesh::createVAO()
 {
+	vertex_count = 0;
 	std::vector<float> data;
 	for (Tri& tri : tris)
 	{
-		for (int i = 0; i < 3; i++)
-		{
-			data.push_back(tri.verts[i].x);
-			data.push_back(tri.verts[i].y);
-			data.push_back(tri.verts[i].z);
-			vertex_count += 3;
-		}
+
+		data.push_back(tri.verts[0].x); data.push_back(tri.verts[0].y); data.push_back(tri.verts[0].z);
+		data.push_back(1.0f); data.push_back(0.0f); data.push_back(0.0f);
+
+		data.push_back(tri.verts[1].x); data.push_back(tri.verts[1].y); data.push_back(tri.verts[1].z);
+		data.push_back(0.0f); data.push_back(1.0f); data.push_back(0.0f);
+
+		data.push_back(tri.verts[2].x); data.push_back(tri.verts[2].y); data.push_back(tri.verts[2].z);
+		data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f);
+		
+		vertex_count += 3;
 	}
 
 	glGenVertexArrays(1, &VAO);
@@ -64,11 +69,15 @@ void Mesh::createVAO()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
-	int stride = 3 * sizeof(float);
+	int stride = 6 * sizeof(float);
 
 	//position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
+
+	//color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)stride);
+	glEnableVertexAttribArray(1);
 }
 
 Mesh* Mesh::makeBox(float l, float w, float h, glm::vec3 pos)
@@ -102,6 +111,10 @@ Mesh* Mesh::makeBox(float l, float w, float h, glm::vec3 pos)
 		Mesh::Tri(v000, vw0l, v00l),
 		Mesh::Tri(v000, vw00, vw0l)
 	};
+
+	pos.x -= w / 2;
+	pos.y -= h / 2;
+	pos.z -= l / 2;
 
 	Mesh* mesh = new Mesh(tris);
 	mesh->transform = glm::translate(glm::mat4(1.0f), pos);

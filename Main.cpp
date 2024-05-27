@@ -27,25 +27,26 @@ int main()
 		std::cout << "Glad couldn't start" << std::endl;
 		return -1;
 	}
-
+	glEnable(GL_CULL_FACE);
 	Input input(window);
-	input.lockCursor();
 	//printFileToTerminal("shaders/fragment.txt", true);
 
 	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
 
 	Shader mesh_shader("shaders/MeshVertex.txt", "shaders/MeshFragment.txt");
 	Camera camera(window);
+	//camera.setPos(glm::vec3(0, 1, 0));
 
 	CameraController player(camera, input);
 	player.constrainLook(glm::vec3(0, 1, 0));
 
-	Mesh* box_mesh = Mesh::makeBox(1, 1, 0.5, glm::vec3(-0.5, -0.75, -2.0));
+	Mesh* box_mesh = Mesh::makeBox(1, 1, 0.5, glm::vec3(0, -0.75, -2.0));
 	box_mesh->attachCamera(camera);
 	box_mesh->attachShader(mesh_shader);
 
 
 	double prev_time = 0;
+	bool paused = true;
 	while (!glfwWindowShouldClose(window))
 	{
 		double time = glfwGetTime();
@@ -54,13 +55,31 @@ int main()
 
 		glfwPollEvents();
 		input.update();
+		if (input.keyPressed(GLFW_KEY_ESCAPE) && paused)
+		{
+			paused = false;
+			input.lockCursor();
+			std::cout << "UNPAUSED" << std::endl;
+		}
+		else if (input.keyPressed(GLFW_KEY_ESCAPE) && !paused)
+		{
+			paused = true;
+			input.freeCursor();
+			std::cout << "PAUSED" << std::endl;
+		}
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//camera.rotateLocal(glm::vec3(input.mouse.delta.y * 0.01, input.mouse.delta.x * 0.01, 0));
-		player.update();
+		if(!paused)
+			player.update(dt);
 		box_mesh->draw();
 
+		glm::vec3 c_pos = camera.getPos();
+		if (!paused)
+		{
+			std::cout << "camera pos:\t" << camera.pos.x << "\t" << camera.pos.y << "\t" << camera.pos.z << std::endl;
+			//std::cout << "camera col4:\t" << c_pos.x << "\t" << c_pos.y << "\t" << c_pos.z << std::endl;
+		}
 #ifdef LOCK_FRAMERATE
 		glfwSwapBuffers(window);
 #else

@@ -11,19 +11,33 @@ class CameraController
 private:
 	Input* input;
 	Camera* camera;
-
-public:
+	
 	bool constrain_up = false;
 	glm::vec3 up_vec;
 
-	float mouse_sensitivity = 0.01;
+	struct
+	{
+		int forward = 'W';
+		int backward = 'S';
+		int left = 'A';
+		int right = 'D';
+		int up = ' ';
+		int down = GLFW_KEY_LEFT_CONTROL;
+	} inputs;
+
+public:
+	float move_speed = 1.0;
+
+	float mouse_sensitivity = 1;
 
 	CameraController(Camera& camera, Input& input);
 
-	void update();
+	void update(float dt);
 
 	void constrainLook(glm::vec3 up);
 	void freeLook();
+
+	glm::vec3 getInputVector();
 };
 
 #endif

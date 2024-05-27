@@ -8,6 +8,15 @@ class Input
 {
 private:
 	GLFWwindow* window;
+	struct Key
+	{
+		int state, prev_state;
+		bool pressed, held, released;
+	};
+	Key keys[GLFW_KEY_LAST];
+
+	static std::vector<Input*> objects;
+
 public:
 	struct {
 		double x, y;
@@ -20,8 +29,14 @@ public:
 
 	void update();
 
+	bool keyPressed(int key);
+	bool keyHeld(int key);
+	bool keyReleased(int key);
+
 	void lockCursor();
-	void unlockCursor();
+	void freeCursor();
+
+	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
 
 #endif
