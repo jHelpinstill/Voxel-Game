@@ -7,7 +7,6 @@ Mesh::Mesh(std::vector<Tri>& tris)
 		setNorm(tri);
 		this->tris.push_back(tri);
 	}
-	transform = glm::mat4(1.0f);
 	createVAO();
 }
 
@@ -21,7 +20,7 @@ void Mesh::draw()
 {
 	shader->use();
 	shader->setMat4("projection", camera->getProjectionMat());
-	shader->setMat4("transform", transform);
+	shader->setMat4("transform", transform.getMat());
 	shader->setVec4("color", color);
 
 	glBindVertexArray(VAO);
@@ -43,6 +42,13 @@ void Mesh::setNorm(Tri& tri)
 	tri.norm = glm::cross(tri.verts[0], tri.verts[1]);
 }
 
+void Mesh::updateVAO()
+{
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	createVAO();
+}
+
 void Mesh::createVAO()
 {
 	vertex_count = 0;
@@ -51,13 +57,34 @@ void Mesh::createVAO()
 	{
 
 		data.push_back(tri.verts[0].x); data.push_back(tri.verts[0].y); data.push_back(tri.verts[0].z);
-		data.push_back(1.0f); data.push_back(0.0f); data.push_back(0.0f);
+		if (use_color)
+		{
+			data.push_back(color.x); data.push_back(color.y); data.push_back(color.z);
+		}
+		else
+		{
+			data.push_back(1.0f); data.push_back(0.0f); data.push_back(0.0f);
+		}
 
 		data.push_back(tri.verts[1].x); data.push_back(tri.verts[1].y); data.push_back(tri.verts[1].z);
-		data.push_back(0.0f); data.push_back(1.0f); data.push_back(0.0f);
+		if (use_color)
+		{
+			data.push_back(color.x); data.push_back(color.y); data.push_back(color.z);
+		}
+		else
+		{
+			data.push_back(0.0f); data.push_back(1.0f); data.push_back(0.0f);
+		}
 
 		data.push_back(tri.verts[2].x); data.push_back(tri.verts[2].y); data.push_back(tri.verts[2].z);
-		data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f);
+		if (use_color)
+		{
+			data.push_back(color.x); data.push_back(color.y); data.push_back(color.z);
+		}
+		else
+		{
+			data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f);
+		}
 		
 		vertex_count += 3;
 	}
@@ -76,7 +103,7 @@ void Mesh::createVAO()
 	glEnableVertexAttribArray(0);
 
 	//color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)stride);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 }
 
@@ -117,6 +144,6 @@ Mesh* Mesh::makeBox(float l, float w, float h, glm::vec3 pos)
 	pos.z -= l / 2;
 
 	Mesh* mesh = new Mesh(tris);
-	mesh->transform = glm::translate(glm::mat4(1.0f), pos);
+	mesh->transform.translate(pos);
 	return mesh;
 }

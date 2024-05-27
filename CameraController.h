@@ -27,8 +27,7 @@ private:
 
 public:
 	float move_speed = 1.0;
-
-	float mouse_sensitivity = 1;
+	float mouse_sensitivity = 2;
 
 	CameraController(Camera& camera, Input& input);
 

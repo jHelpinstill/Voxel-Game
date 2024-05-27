@@ -10,8 +10,8 @@ void CameraController::update(float dt)
 {
 	if (constrain_up)
 	{
-		camera->rotate(input->mouse.delta.x * mouse_sensitivity * dt, up_vec, false);
-		camera->rotate(input->mouse.delta.y * mouse_sensitivity * dt, glm::vec3(1, 0, 0), true);
+		camera->transform.rotate(input->mouse.delta.x * mouse_sensitivity / 1000.0, up_vec, false);
+		camera->transform.rotate(input->mouse.delta.y * mouse_sensitivity / 1000.0, glm::vec3(1, 0, 0), true);
 
 		glm::vec3 move = getInputVector();
 		move.x *= -1;
@@ -19,17 +19,17 @@ void CameraController::update(float dt)
 
 		move *= move_speed * dt;
 
-		glm::mat4 inv_view = glm::inverse(camera->view);
+		glm::mat4 inv_view = glm::inverse(camera->transform.view);
 
 		glm::vec3 move_up = move.y * up_vec;
 		glm::vec3 move_fwd = glm::cross(glm::vec3(inv_view * glm::vec4(1, 0, 0, 1)), up_vec) * move.z;
 		glm::vec3 move_left = inv_view * glm::vec4(move.x, 0, 0, 1);
 
-		camera->translate(move_up + move_left + move_fwd);
+		camera->transform.translate(move_up + move_left + move_fwd);
 	}
 	else
 	{
-		camera->rotate(glm::vec3(input->mouse.delta.y * mouse_sensitivity * dt, input->mouse.delta.x * mouse_sensitivity * dt, 0));
+		camera->transform.rotate(glm::vec3(input->mouse.delta.y * mouse_sensitivity * dt, input->mouse.delta.x * mouse_sensitivity, 0));
 	}
 	
 

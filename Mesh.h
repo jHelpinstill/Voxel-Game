@@ -5,14 +5,16 @@
 #include "config.h"
 #include "Camera.h"
 #include "Shader.h"
+#include "Transform.h"
 
 class Mesh
 {
 public:
 	Camera* camera;
 	Shader* shader;
-	glm::mat4 transform;
-	glm::vec4 color = glm::vec4(0.9, 0.9, 0.0, 1.0);
+	Transform transform;
+	glm::vec3 color = glm::vec3(0.9, 0.9, 0.0);
+	bool use_color = false;
 
 	struct Tri
 	{
@@ -33,10 +35,11 @@ public:
 
 	void attachShader(Shader& shader);
 	void attachCamera(Camera& camera);
+	void updateVAO();
 
 	~Mesh();
 
-	static Mesh* makeBox(float l, float w, float h, glm::vec3 pos);
+	static Mesh* makeBox(float l, float w, float h, glm::vec3 pos = glm::vec3(0, 0, 0));
 
 private:
 	unsigned int VAO, VBO, vertex_count;
