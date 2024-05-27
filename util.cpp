@@ -21,3 +21,23 @@ void printFileToTerminal(const std::string& filename, bool printname)
 
 	file.close();
 }
+
+double getDeltaTime(double fps_limit)
+{
+	static double prev_time = 0;
+	double dt = 0;
+
+	if (fps_limit == 0.0)
+	{
+		double time = glfwGetTime();
+		dt = time - prev_time;
+		prev_time = time;
+		return dt;
+	}
+
+	double time;
+	while ((dt = (time = glfwGetTime()) - prev_time) < 1.0 / fps_limit)
+		;
+	prev_time = time;
+	return dt;
+}

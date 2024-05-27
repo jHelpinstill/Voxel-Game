@@ -1,7 +1,8 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Tri>& tris)
+Mesh::Mesh(const std::string& name, std::vector<Tri>& tris)
 {
+	this->name = name;
 	for (Tri tri : tris)
 	{
 		setNorm(tri);
@@ -107,7 +108,7 @@ void Mesh::createVAO()
 	glEnableVertexAttribArray(1);
 }
 
-Mesh* Mesh::makeBox(float l, float w, float h, glm::vec3 pos)
+Mesh* Mesh::makeBox(const std::string& name, float l, float w, float h, glm::vec3 pos)
 {
 	glm::vec3 v000(0.0f, 0.0f, 0.0f);
 	glm::vec3 v00l(0.0f, 0.0f, l);
@@ -143,7 +144,7 @@ Mesh* Mesh::makeBox(float l, float w, float h, glm::vec3 pos)
 	pos.y -= h / 2;
 	pos.z -= l / 2;
 
-	Mesh* mesh = new Mesh(tris);
+	Mesh* mesh = new Mesh(name, tris);
 	mesh->transform.translate(pos);
 	return mesh;
 }

@@ -10,6 +10,8 @@
 class Mesh
 {
 public:
+	std::string name;
+
 	Camera* camera;
 	Shader* shader;
 	Transform transform;
@@ -29,7 +31,7 @@ public:
 	};
 	std::vector<Tri> tris;
 
-	Mesh(std::vector<Tri>& tris);
+	Mesh(const std::string& name, std::vector<Tri>& tris);
 
 	void draw();
 
@@ -39,7 +41,7 @@ public:
 
 	~Mesh();
 
-	static Mesh* makeBox(float l, float w, float h, glm::vec3 pos = glm::vec3(0, 0, 0));
+	static Mesh* makeBox(const std::string& name, float l, float w, float h, glm::vec3 pos = glm::vec3(0, 0, 0));
 
 private:
 	unsigned int VAO, VBO, vertex_count;

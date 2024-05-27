@@ -11,8 +11,13 @@ private:
 
 public:
 	unsigned int ID;
+	std::string name;
 
-	Shader(const std::string& vertex_filepath, const std::string& fragment_filepath);
+	Shader(
+		const std::string& name,
+		const std::string& vertex_filepath,
+		const std::string& fragment_filepath		
+	);
 
 	void use();
 

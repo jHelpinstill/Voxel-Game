@@ -1,7 +1,12 @@
 #include "Shader.h"
 
-Shader::Shader(const std::string & vertex_filepath, const std::string& fragment_filepath)
-{
+Shader::Shader(
+	const std::string& name,
+	const std::string& vertex_filepath,
+	const std::string& fragment_filepath
+){
+	this->name = name;
+
 	unsigned int vertex_module = makeModule(vertex_filepath, GL_VERTEX_SHADER);
 	unsigned int fragment_module = makeModule(fragment_filepath, GL_FRAGMENT_SHADER);
 
