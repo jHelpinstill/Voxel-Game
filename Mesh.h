@@ -33,7 +33,7 @@ public:
 
 	Mesh(const std::string& name, std::vector<Tri>& tris);
 
-	void draw();
+	void draw(unsigned int texture);
 
 	void attachShader(Shader& shader);
 	void attachCamera(Camera& camera);

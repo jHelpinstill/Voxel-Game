@@ -1,11 +1,6 @@
 #include "config.h"
 #include "util.h"
 #include "Game.h"
-#include "Shader.h"
-#include "Camera.h"
-#include "Mesh.h"
-#include "Input.h"
-#include "CameraController.h"
 
 bool window_resized = false;
 
@@ -42,8 +37,8 @@ int main()
 
 	Game game(window);
 
-	bool paused = true;
-	float frame_rate = 60;
+	unsigned int texture = createTexture("textures/smiley.png");
+	float frame_rate = 0.0;
 	while (!glfwWindowShouldClose(window))
 	{
 		if (window_resized)
@@ -54,7 +49,7 @@ int main()
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		game.stateMachine(getDeltaTime(frame_rate));
+		game.stateMachine(getDeltaTime(frame_rate), texture);
 
 #ifdef LOCK_FRAMERATE
 		glfwSwapBuffers(window);

@@ -17,13 +17,14 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &VBO);
 }
 
-void Mesh::draw()
+void Mesh::draw(unsigned int texture)
 {
 	shader->use();
 	shader->setMat4("projection", camera->getProjectionMat());
 	shader->setMat4("transform", transform.getMat());
 	shader->setVec4("color", color);
 
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, vertex_count);
 }
@@ -64,7 +65,8 @@ void Mesh::createVAO()
 		}
 		else
 		{
-			data.push_back(1.0f); data.push_back(0.0f); data.push_back(0.0f);
+			//data.push_back(1.0f); data.push_back(0.0f); data.push_back(0.0f);
+			data.push_back(0.0); data.push_back(0.0);
 		}
 
 		data.push_back(tri.verts[1].x); data.push_back(tri.verts[1].y); data.push_back(tri.verts[1].z);
@@ -74,7 +76,8 @@ void Mesh::createVAO()
 		}
 		else
 		{
-			data.push_back(0.0f); data.push_back(1.0f); data.push_back(0.0f);
+			//data.push_back(0.0f); data.push_back(1.0f); data.push_back(0.0f);
+			data.push_back(1.5); data.push_back(0.0);
 		}
 
 		data.push_back(tri.verts[2].x); data.push_back(tri.verts[2].y); data.push_back(tri.verts[2].z);
@@ -84,7 +87,8 @@ void Mesh::createVAO()
 		}
 		else
 		{
-			data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f);
+			//data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f);
+			data.push_back(0.0); data.push_back(1.5);
 		}
 		
 		vertex_count += 3;
@@ -97,14 +101,14 @@ void Mesh::createVAO()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
-	int stride = 6 * sizeof(float);
+	int stride = 5 * sizeof(float);
 
 	//position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+	//color / texture coords
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 }
 

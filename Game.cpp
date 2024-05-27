@@ -40,7 +40,7 @@ void Game::setup()
 
 	Mesh* floor = Mesh::makeBox("floor", 10, 10, 0.1, glm::vec3(0, -0.05, 0));
 	floor->color = glm::vec3(0.0, 0.7, 0.0);
-	floor->use_color = true;
+	floor->use_color = false;
 	floor->updateVAO();
 	floor->attachCamera(*camera);
 	floor->attachShader(*mesh_shader);	
@@ -71,7 +71,7 @@ Mesh* Game::getMeshByName(const std::string& name)
 	return nullptr;
 }
 
-void Game::stateMachine(double dt)
+void Game::stateMachine(double dt, unsigned int texture)
 {
 	input->update();
 	double time = glfwGetTime();
@@ -87,7 +87,7 @@ void Game::stateMachine(double dt)
 			std::cout << "RUNNING" << std::endl;
 		}
 
-		drawMeshes();
+		drawMeshes(texture);
 		break;
 	}
 	case RUNNING:
@@ -110,16 +110,16 @@ void Game::stateMachine(double dt)
 			box_mesh->transform.translate(glm::vec3(0, cos(time * 3) * 1 * dt, 0));
 		}
 
-		drawMeshes();
+		drawMeshes(texture);
 		break;
 	}
 	}
 }
 
-void Game::drawMeshes()
+void Game::drawMeshes(unsigned int texture)
 {
 	for (Mesh* mesh : meshes)
 	{
-		mesh->draw();
+		mesh->draw(texture);
 	}
 }

@@ -25,8 +25,8 @@ public:
 	Game(GLFWwindow* window);
 	~Game();
 
-	void stateMachine(double dt);
-	void drawMeshes();
+	void stateMachine(double dt, unsigned int texture);
+	void drawMeshes(unsigned int texture);
 
 	Shader* getShaderByName(const std::string& name);
 	Mesh* getMeshByName(const std::string& name);
