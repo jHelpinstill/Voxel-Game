@@ -88,10 +88,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="shaders\fragment.txt">
+    <Text Include="shaders\meshColorFragment.txt">
       <Filter>Resource Files\shaders</Filter>
     </Text>
-    <Text Include="shaders\vertex.txt">
+    <Text Include="shaders\meshColorVertex.txt">
       <Filter>Resource Files\shaders</Filter>
     </Text>
     <Text Include="shaders\meshVertex.txt" />

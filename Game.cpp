@@ -30,20 +30,21 @@ void Game::setup()
 	player->constrainLook(glm::vec3(0, 1, 0));
 	player->move_speed = 4;
 
-	Shader* mesh_shader = new Shader("mesh_shader", "shaders/MeshVertex.txt", "shaders/MeshFragment.txt");
-	shaders.push_back(mesh_shader);
+	Shader* mesh_texture_shader = new Shader("mesh_texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
+	Shader* mesh_color_shader = new Shader("mesh_color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
+	shaders.push_back(mesh_texture_shader);
+	shaders.push_back(mesh_color_shader);
 
 	Mesh* box_mesh = Mesh::makeBox("box_mesh", 1, 1, 0.5, glm::vec3(0, 1, 0));
 	box_mesh->attachCamera(*camera);
-	box_mesh->attachShader(*mesh_shader);
+	box_mesh->attachShader(*mesh_texture_shader);
 	meshes.push_back(box_mesh);
 
-	Mesh* floor = Mesh::makeBox("floor", 10, 10, 0.1, glm::vec3(0, -0.05, 0));
+	Mesh* floor = Mesh::makePlane("floor", 10, 10);
 	floor->color = glm::vec3(0.0, 0.7, 0.0);
-	floor->use_color = false;
-	floor->updateVAO();
+	floor->useUVMap("meshes/plane_UV_map.txt");
 	floor->attachCamera(*camera);
-	floor->attachShader(*mesh_shader);	
+	floor->attachShader(*mesh_texture_shader);
 	meshes.push_back(floor);
 }
 

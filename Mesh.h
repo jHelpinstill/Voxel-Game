@@ -20,13 +20,17 @@ public:
 
 	struct Tri
 	{
-		glm::vec3 verts[3];
-		glm::vec3 norm;
+		float verts[3][3];
+		float uv_coords[3][2];
+
 		Tri(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 		{
-			verts[0] = a;
-			verts[1] = b;
-			verts[2] = c;
+			for (int i = 0; i < 3; i++)
+			{
+				verts[0][i] = a[i];
+				verts[1][i] = b[i];
+				verts[2][i] = c[i];
+			}
 		}
 	};
 	std::vector<Tri> tris;
@@ -37,16 +41,24 @@ public:
 
 	void attachShader(Shader& shader);
 	void attachCamera(Camera& camera);
+	void useUVMap(const std::string& filepath);
 	void updateVAO();
+
+	void useTextureMode();
+	void useColorMode();
 
 	~Mesh();
 
 	static Mesh* makeBox(const std::string& name, float l, float w, float h, glm::vec3 pos = glm::vec3(0, 0, 0));
+	static Mesh* makePlane(const std::string& name, float l, float w, glm::vec3 pos = glm::vec3(0, 0, 0));
 
 private:
 	unsigned int VAO, VBO, vertex_count;
+	enum {
+		TEXTURE,
+		COLOR
+	} texture_mode = TEXTURE;
 
-	void setNorm(Tri& tri);
 	void createVAO();
 };
 

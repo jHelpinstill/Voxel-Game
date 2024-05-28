@@ -4,10 +4,7 @@ Mesh::Mesh(const std::string& name, std::vector<Tri>& tris)
 {
 	this->name = name;
 	for (Tri tri : tris)
-	{
-		setNorm(tri);
 		this->tris.push_back(tri);
-	}
 	createVAO();
 }
 
@@ -22,7 +19,8 @@ void Mesh::draw(unsigned int texture)
 	shader->use();
 	shader->setMat4("projection", camera->getProjectionMat());
 	shader->setMat4("transform", transform.getMat());
-	shader->setVec4("color", color);
+	if(texture_mode == COLOR)
+		shader->setVec3("color", color);
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(VAO);
@@ -39,9 +37,47 @@ void Mesh::attachCamera(Camera& camera)
 	this->camera = &camera;
 }
 
-void Mesh::setNorm(Tri& tri)
+void Mesh::useUVMap(const std::string& filepath)
 {
-	tri.norm = glm::cross(tri.verts[0], tri.verts[1]);
+	std::ifstream file;
+	std::string line;
+
+	file.open(filepath);
+	if (!file.is_open())
+	{
+		std::cout << "UV file at \"" << filepath << "\" not found" << std::endl;
+		return;
+	}
+
+	for (Tri& tri : tris)
+	{
+		for (int vert = 0; vert < 3; vert++)
+		{
+			if (!std::getline(file, line))
+				break;
+			std::stringstream buffer;
+			buffer << line;
+			buffer >> tri.uv_coords[vert][0];
+			buffer >> tri.uv_coords[vert][1];
+
+			std::cout << "vert " << vert << "uv: " << tri.uv_coords[vert][0] << ", " << tri.uv_coords[vert][1] << std::endl;
+		}
+	}
+
+	file.close();
+	updateVAO();
+}
+
+void Mesh::useTextureMode()
+{
+	texture_mode = TEXTURE;
+	updateVAO();
+}
+
+void Mesh::useColorMode()
+{
+	texture_mode = COLOR;
+	updateVAO();
 }
 
 void Mesh::updateVAO()
@@ -55,61 +91,92 @@ void Mesh::createVAO()
 {
 	vertex_count = 0;
 	std::vector<float> data;
-	for (Tri& tri : tris)
+
+	switch (texture_mode)
 	{
+	case TEXTURE:
+	{
+		for (Tri& tri : tris)
+		{
+			for (int vert = 0; vert < 3; vert++)
+			{
+				for (int i = 0; i < 3; i++)
+					data.push_back(tri.verts[vert][i]);
+				data.push_back(tri.uv_coords[vert][0]);
+				data.push_back(tri.uv_coords[vert][1]);
+			}
 
-		data.push_back(tri.verts[0].x); data.push_back(tri.verts[0].y); data.push_back(tri.verts[0].z);
-		if (use_color)
-		{
-			data.push_back(color.x); data.push_back(color.y); data.push_back(color.z);
-		}
-		else
-		{
-			//data.push_back(1.0f); data.push_back(0.0f); data.push_back(0.0f);
-			data.push_back(0.0); data.push_back(0.0);
-		}
-
-		data.push_back(tri.verts[1].x); data.push_back(tri.verts[1].y); data.push_back(tri.verts[1].z);
-		if (use_color)
-		{
-			data.push_back(color.x); data.push_back(color.y); data.push_back(color.z);
-		}
-		else
-		{
-			//data.push_back(0.0f); data.push_back(1.0f); data.push_back(0.0f);
-			data.push_back(1.5); data.push_back(0.0);
+			vertex_count += 3;
 		}
 
-		data.push_back(tri.verts[2].x); data.push_back(tri.verts[2].y); data.push_back(tri.verts[2].z);
-		if (use_color)
-		{
-			data.push_back(color.x); data.push_back(color.y); data.push_back(color.z);
-		}
-		else
-		{
-			//data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f);
-			data.push_back(0.0); data.push_back(1.5);
-		}
-		
-		vertex_count += 3;
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+
+		int stride = 5 * sizeof(float);
+
+		//position
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+		glEnableVertexAttribArray(0);
+
+		//color / texture coords
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+		break;
 	}
+	case COLOR:
+	{
+		for (Tri& tri : tris)
+		{
+			for (int vert = 0; vert < 3; vert++)
+			{
+				for (int i = 0; i < 3; i++)
+					data.push_back(tri.verts[vert][i]);
+			}
+			//data.push_back(tri.verts[0].x); data.push_back(tri.verts[0].y); data.push_back(tri.verts[0].z);
+			//data.push_back(tri.verts[1].x); data.push_back(tri.verts[1].y); data.push_back(tri.verts[1].z);
+			//data.push_back(tri.verts[2].x); data.push_back(tri.verts[2].y); data.push_back(tri.verts[2].z);
 
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+			vertex_count += 3;
+		}
 
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
 
-	int stride = 5 * sizeof(float);
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
-	//position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-	glEnableVertexAttribArray(0);
+		int stride = 3 * sizeof(float);
 
-	//color / texture coords
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+		//position
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+		glEnableVertexAttribArray(0);
+	}
+	}
+}
+
+Mesh* Mesh::makePlane(const std::string& name, float l, float w, glm::vec3 pos)
+{
+	glm::vec3 v000(0, 0, 0);
+	glm::vec3 v00l(0, 0, l);
+	glm::vec3 vw00(w, 0, 0);
+	glm::vec3 vw0l(w, 0, l);
+
+	std::vector<Mesh::Tri> tris{
+		Mesh::Tri(v000, v00l, vw0l),
+		Mesh::Tri(v000, vw0l, vw00)
+	};
+
+	pos.x -= w / 2;
+	pos.z -= l / 2;
+
+	Mesh* mesh = new Mesh(name, tris);
+	mesh->transform.translate(pos);
+	return mesh;
 }
 
 Mesh* Mesh::makeBox(const std::string& name, float l, float w, float h, glm::vec3 pos)

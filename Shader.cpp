@@ -59,9 +59,9 @@ void Shader::setMat4(const std::string& name, glm::mat4 mat) const
 	glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void Shader::setVec4(const std::string& name, glm::vec3 vec) const
+void Shader::setVec3(const std::string& name, glm::vec3 vec) const
 {
-	glUniform4fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
+	glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
 }
 
 unsigned int Shader::makeModule(const std::string& filepath, unsigned int module_type)
