@@ -12,9 +12,10 @@ class Mesh
 public:
 	std::string name;
 
-	Camera* camera;
 	Shader* shader;
 	Transform transform;
+
+	unsigned int texture;
 	glm::vec3 color = glm::vec3(0.9, 0.9, 0.0);
 	bool use_color = false;
 
@@ -37,29 +38,31 @@ public:
 
 	Mesh(const std::string& name, std::vector<Tri>& tris);
 
-	void draw(unsigned int texture);
+	void draw(Camera* camera);
 
-	void attachShader(Shader& shader);
-	void attachCamera(Camera& camera);
+	void attachShader(Shader* shader);
 	void useUVMap(const std::string& filepath);
 	void updateVAO();
 
 	void useTextureMode();
+	void useTextureMode(unsigned int texture);
 	void useColorMode();
+	void useColorMode(const glm::vec3& color);
 
 	~Mesh();
 
-	static Mesh* makeBox(const std::string& name, float l, float w, float h, glm::vec3 pos = glm::vec3(0, 0, 0));
-	static Mesh* makePlane(const std::string& name, float l, float w, glm::vec3 pos = glm::vec3(0, 0, 0));
+	static Mesh* makeBox(const std::string& name, float l, float w, float h, const glm::vec3& pos = glm::vec3(0, 0, 0));
+	static Mesh* makePlane(const std::string& name, float l, float w, const glm::vec3& pos = glm::vec3(0, 0, 0));
 
 private:
 	unsigned int VAO, VBO, vertex_count;
 	enum {
 		TEXTURE,
 		COLOR
-	} texture_mode = TEXTURE;
+	} shader_mode = TEXTURE;
 
-	void createVAO();
+	void createTextureVAO();
+	void createSolidColorVAO();
 };
 
 #endif

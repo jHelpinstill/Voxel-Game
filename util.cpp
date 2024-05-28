@@ -45,8 +45,10 @@ double getDeltaTime(double fps_limit)
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-unsigned int createTexture(const std::string& filepath)
+unsigned int createTexture(const std::string& filepath, bool alpha_channel)
 {
+	stbi_set_flip_vertically_on_load(true);
+
 	unsigned int texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -60,12 +62,13 @@ unsigned int createTexture(const std::string& filepath)
 	unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		int image_type = alpha_channel ? GL_RGBA : GL_RGB;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, image_type, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{
-		std::cout << "Failed to load texture" << std::endl;
+		std::cout << "Failed to load texture from \"" << filepath << "\"" << std::endl;
 	}
 	stbi_image_free(data);
 

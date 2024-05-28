@@ -18,7 +18,7 @@ int main()
 		std::cout << "GLFW couldn't start" << std::endl;
 		return -1;
 	}
-	//GLFWwindow* window;
+
 #ifndef LOCK_FRAMERATE
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
 #endif
@@ -37,7 +37,7 @@ int main()
 
 	Game game(window);
 
-	unsigned int texture = createTexture("textures/smiley.png");
+	//unsigned int texture = createTexture("textures/smiley.png");
 	float frame_rate = 0.0;
 	while (!glfwWindowShouldClose(window))
 	{
@@ -49,7 +49,7 @@ int main()
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		game.stateMachine(getDeltaTime(frame_rate), texture);
+		game.stateMachine(getDeltaTime(frame_rate));
 
 #ifdef LOCK_FRAMERATE
 		glfwSwapBuffers(window);

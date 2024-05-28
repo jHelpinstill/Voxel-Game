@@ -1,11 +1,5 @@
 #include "Game.h"
 
-enum
-{
-	PAUSED,
-	RUNNING
-} state;
-
 Game::Game(GLFWwindow* window)
 {
 	this->window = window;
@@ -30,49 +24,54 @@ void Game::setup()
 	player->constrainLook(glm::vec3(0, 1, 0));
 	player->move_speed = 4;
 
-	Shader* mesh_texture_shader = new Shader("mesh_texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
-	Shader* mesh_color_shader = new Shader("mesh_color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
-	shaders.push_back(mesh_texture_shader);
-	shaders.push_back(mesh_color_shader);
+	shaders.push_back(new Shader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt"));
+	shaders.push_back(new Shader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt"));
 
-	Mesh* box_mesh = Mesh::makeBox("box_mesh", 1, 1, 0.5, glm::vec3(0, 1, 0));
-	box_mesh->attachCamera(*camera);
-	box_mesh->attachShader(*mesh_texture_shader);
-	meshes.push_back(box_mesh);
+	textures.push_back(new Texture("smiley", createTexture("textures/smiley.png", true)));
+	textures.push_back(new Texture("crate", createTexture("textures/crate.jpg")));
+
+	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
+	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
 
 	Mesh* floor = Mesh::makePlane("floor", 10, 10);
 	floor->color = glm::vec3(0.0, 0.7, 0.0);
-	floor->useUVMap("meshes/plane_UV_map.txt");
-	floor->attachCamera(*camera);
-	floor->attachShader(*mesh_texture_shader);
+	floor->useColorMode();
+	floor->attachShader(getShaderByName("color_shader"));
+	
 	meshes.push_back(floor);
 }
 
 Shader* Game::getShaderByName(const std::string& name)
 {
 	for (Shader* shader : shaders)
-	{
 		if (shader->name == name)
-		{
 			return shader;
-		}
-	}
+
+	std::cout << "couldn't find shader \"" << name << "\"" << std::endl;
 	return nullptr;
 }
 
 Mesh* Game::getMeshByName(const std::string& name)
 {
 	for (Mesh* mesh : meshes)
-	{
 		if (mesh->name == name)
-		{
 			return mesh;
-		}
-	}
+
+	std::cout << "couldn't find mesh \"" << name << "\"" << std::endl;
 	return nullptr;
 }
 
-void Game::stateMachine(double dt, unsigned int texture)
+unsigned int Game::getTextureByName(const std::string& name)
+{
+	for (Texture* tex : textures)
+		if (tex->name == name)
+			return tex->ID;
+	
+	std::cout << "couldn't find texture \"" << name << "\"" << std::endl;
+	return 0;
+}
+
+void Game::stateMachine(double dt)
 {
 	input->update();
 	double time = glfwGetTime();
@@ -88,7 +87,7 @@ void Game::stateMachine(double dt, unsigned int texture)
 			std::cout << "RUNNING" << std::endl;
 		}
 
-		drawMeshes(texture);
+		drawMeshes();
 		break;
 	}
 	case RUNNING:
@@ -101,26 +100,44 @@ void Game::stateMachine(double dt, unsigned int texture)
 		}
 
 		player->update(dt);
-		std::cout << 1.0 / dt << std::endl;
+		//std::cout << 1.0 / dt << std::endl;
 
-		float box_speed = 120;
-		Mesh* box_mesh = getMeshByName("box_mesh");
-		if (box_mesh != nullptr)
-		{
-			box_mesh->transform.rotate(glm::radians(box_speed) * dt, glm::vec3(0, 1, 0));
-			box_mesh->transform.translate(glm::vec3(0, cos(time * 3) * 1 * dt, 0));
-		}
-
-		drawMeshes(texture);
+		drawMeshes();
 		break;
 	}
 	}
 }
 
-void Game::drawMeshes(unsigned int texture)
+void Game::drawMeshes()
 {
 	for (Mesh* mesh : meshes)
-	{
-		mesh->draw(texture);
-	}
+		mesh->draw(camera);
+}
+
+void Game::createTexturedBox(
+	const std::string& name,
+	glm::vec3 size,
+	glm::vec3 pos,
+	const std::string& tex_name,
+	const std::string& uv_filepath
+) {
+	Mesh* box = Mesh::makeBox(name, size.z, size.x, size.y, pos);
+	box->texture = getTextureByName(tex_name);
+	box->useUVMap(uv_filepath);
+	box->attachShader(getShaderByName("texture_shader"));
+
+	meshes.push_back(box);
+}
+
+void Game::createColoredBox(
+	const std::string& name,
+	glm::vec3 size,
+	glm::vec3 pos,
+	glm::vec3 color
+) {
+	Mesh* box = Mesh::makeBox(name, size.x, size.y, size.z, pos);
+	box->useColorMode(color);
+	box->attachShader(getShaderByName("color_shader"));
+
+	meshes.push_back(box);
 }
