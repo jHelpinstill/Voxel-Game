@@ -71,6 +71,20 @@ unsigned int Game::getTextureByName(const std::string& name)
 	return 0;
 }
 
+struct
+{
+	double history[1000];
+	int index = 0;
+	double sum = 0;
+	double avg() { return sum / 1000; }
+	void update(double fps)
+	{
+		sum += fps;
+		sum -= history[index];
+		history[index] = fps;
+		++index %= 1000;
+	}
+} avg_fps;
 void Game::stateMachine(double dt)
 {
 	input->update();
@@ -97,10 +111,14 @@ void Game::stateMachine(double dt)
 			state = PAUSED;
 			input->freeCursor();
 			std::cout << "PAUSED" << std::endl;
+			std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
+			for (int i = 0; i < 1000; i++)
+				std::cout << avg_fps.history[i] << std::endl;
 		}
 
 		player->update(dt);
-		//std::cout << 1.0 / dt << std::endl;
+		avg_fps.update(1.0 / dt);
+		//std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
 
 		drawMeshes();
 		break;
