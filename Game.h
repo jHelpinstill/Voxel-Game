@@ -10,6 +10,7 @@
 #include "Shader.h"
 #include "util.h"
 #include "ObjectManager.h"
+#include "World.h"
 
 class Game
 {
@@ -26,7 +27,7 @@ public:
 	Input* input;
 	Camera* camera;
 	CameraController* player;
-
+	World world;
 	
 
 	Game(GLFWwindow* window);

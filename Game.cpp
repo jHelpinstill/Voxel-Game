@@ -18,11 +18,12 @@ void Game::setup()
 	input = new Input(window);
 
 	camera = new Camera(window);
-	camera->transform.pos = glm::vec3(0, 1, 3);
+	camera->transform.pos = glm::vec3(0, 50, 30);
+	camera->clip_far = 1000;
 
 	player = new CameraController(*camera, *input);
 	player->constrainLook(glm::vec3(0, 1, 0));
-	player->move_speed = 4;
+	player->move_speed = 15;
 
 	createShader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
 	createShader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
@@ -33,6 +34,8 @@ void Game::setup()
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
 	//createPlane("ground", glm::vec2(10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 0.7, 0));
+
+	world.setup();
 }
 
 struct
@@ -97,5 +100,7 @@ void Game::stateMachine(double dt)
 void Game::drawMeshes()
 {
 	for (auto mesh : meshes)
+	{
 		mesh.second->draw(camera);
+	}
 }

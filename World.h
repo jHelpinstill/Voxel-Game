@@ -11,7 +11,7 @@ class World
 {
 public:
 	float chunk_unit_dimension = 1.0;
-	int max_chunk_radius = 5;
+	int max_chunk_radius = 4;
 
 	std::vector<Chunk*> chunks;
 

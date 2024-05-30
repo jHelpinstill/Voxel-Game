@@ -8,7 +8,6 @@ Mesh::Mesh(
 ) {
 	this->name = name;
 	this->texture = texture;
-	this->uv_filepath = uv_filepath;
 
 	for (const glm::vec3& vert : verts)
 		this->verts.push_back(vert);

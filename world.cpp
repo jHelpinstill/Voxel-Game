@@ -3,19 +3,28 @@
 void World::setup()
 {
 	chunks.push_back(new Chunk(glm::ivec3(0, 0, 0)));
-	for (int r = 1; r < max_chunk_radius; r++)
+	for (int r = 1; r <= max_chunk_radius; r++)
 	{
 		int x, z;
-
 		x = z = r;
-		for (x; x <= r; x++)
+		for (z = r; z > -r; z--)
 			chunks.push_back(new Chunk(glm::ivec3(x, 0, z)));
-		for (z; z >= -r; z--)
+		z = -r;
+		for (x = r; x > -r; x--)
 			chunks.push_back(new Chunk(glm::ivec3(x, 0, z)));
-		for (x; x >= -r; x--)
+		x = -r;
+		for (z = -r; z < r; z++)
 			chunks.push_back(new Chunk(glm::ivec3(x, 0, z)));
-		for (z; z < r; z++)
+		z = r;
+		for (x = -r; x < r; x++)
 			chunks.push_back(new Chunk(glm::ivec3(x, 0, z)));
+	}
+
+	std::cout << "created " << chunks.size() << " chunks" << std::endl;
+	std::cout << "positions:" << std::endl;
+	for (Chunk* chunk : chunks)
+	{
+		std::cout << chunk->pos.x << ", " << chunk->pos.y << ", " << chunk->pos.z << std::endl;
 	}
 
 	generateMesh();
@@ -96,6 +105,8 @@ void addQuad(std::vector<glm::vec3>& verts, glm::vec3 root, int face, float leng
 
 void World::generateMesh()
 {
+	std::cout << "Generating World mesh..." << std::endl;
+
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec2> uv_coords;
 
@@ -109,45 +120,40 @@ void World::generateMesh()
 			{
 				for (int y = CHUNK_SIZE - 1; y >= 0; y--)
 				{
+					glm::vec3 root = glm::vec3(x, y, z) * chunk_unit_dimension + (glm::vec3)(chunk->pos) * (float)CHUNK_SIZE * chunk_unit_dimension;
 					//top
 					if(y != 0) if (chunk->blocks[x][y][z] == BlockType::AIR && chunk->blocks[x][y - 1][z] != BlockType::AIR)
 					{
-						glm::vec3 root = glm::vec3(x, y, z) * chunk_unit_dimension + (glm::vec3)chunk->pos;
 						addQuad(verts, root, 0, chunk_unit_dimension);
 						addQuadUV(uv_coords);
 					}
 					//bottom
 					if (y != CHUNK_SIZE - 1) if (chunk->blocks[x][y][z] == BlockType::AIR && chunk->blocks[x][y + 1][z] != BlockType::AIR)
 					{
-						glm::vec3 root = glm::vec3(x, y, z) * chunk_unit_dimension + (glm::vec3)chunk->pos;
 						addQuad(verts, root, 1, chunk_unit_dimension);
 						addQuadUV(uv_coords);
 					}
 					//left
 					if (x != 0) if (chunk->blocks[x][y][z] == BlockType::AIR && chunk->blocks[x - 1][y][z] != BlockType::AIR)
 					{
-						glm::vec3 root = glm::vec3(x, y, z) * chunk_unit_dimension + (glm::vec3)chunk->pos;
 						addQuad(verts, root, 2, chunk_unit_dimension);
 						addQuadUV(uv_coords);
 					}
 					//right
 					if (x != CHUNK_SIZE - 1) if (chunk->blocks[x][y][z] == BlockType::AIR && chunk->blocks[x + 1][y][z] != BlockType::AIR)
 					{
-						glm::vec3 root = glm::vec3(x, y, z) * chunk_unit_dimension + (glm::vec3)chunk->pos;
 						addQuad(verts, root, 3, chunk_unit_dimension);
 						addQuadUV(uv_coords);
 					}
 					//forward
 					if (z != 0) if (chunk->blocks[x][y][z] == BlockType::AIR && chunk->blocks[x][y][z - 1] != BlockType::AIR)
 					{
-						glm::vec3 root = glm::vec3(x, y, z) * chunk_unit_dimension + (glm::vec3)chunk->pos;
 						addQuad(verts, root, 4, chunk_unit_dimension);
 						addQuadUV(uv_coords);
 					}
 					//back
 					if (z != CHUNK_SIZE - 1) if (chunk->blocks[x][y][z] == BlockType::AIR && chunk->blocks[x][y][z + 1] != BlockType::AIR)
 					{
-						glm::vec3 root = glm::vec3(x, y, z) * chunk_unit_dimension + (glm::vec3)chunk->pos;
 						addQuad(verts, root, 5, chunk_unit_dimension);
 						addQuadUV(uv_coords);
 					}
@@ -156,7 +162,11 @@ void World::generateMesh()
 		}
 	}
 
-	Mesh* world_mesh = new Mesh("world_mesh", verts, getTextureByName("dirt_block"), uv_coords);
+	Mesh* world_mesh = new Mesh("world_mesh", verts, getTextureByName("crate"), uv_coords);
+	world_mesh->attachShader(getShaderByName("texture_shader"));
+	world_mesh->transform.translate(glm::vec3(0, -17, 0));
 	removeMesh("world_mesh");
 	meshes["world_mesh"] = world_mesh;
+
+	std::cout << "Finished world generation. World mesh contains " << verts.size() << " vertices." << std::endl;
 }

@@ -72,7 +72,6 @@ void Shader::makeVAOFromTris(
 	const std::vector<glm::vec2>& uv_coords,
 	const glm::vec3& color
 ) {
-	int vertex_count = 0;
 	std::vector<float> data;
 
 	switch (style)
@@ -81,7 +80,7 @@ void Shader::makeVAOFromTris(
 	{
 		if (verts.size() != uv_coords.size())
 		{
-			std::cout << "Vertex and UV coordinate size mismatch (";
+			std::cout << "Vertex and UV_coords size mismatch (";
 			std::cout << verts.size() << ", " << uv_coords.size() << "), aborting VAO creation" << std::endl;
 			break;
 		}
@@ -93,8 +92,6 @@ void Shader::makeVAOFromTris(
 
 			data.push_back(uv_coords[vert].x);
 			data.push_back(uv_coords[vert].y);
-
-			vertex_count += 3;
 		}
 
 		glGenVertexArrays(1, &VAO);
@@ -122,8 +119,6 @@ void Shader::makeVAOFromTris(
 		{
 			for (int i = 0; i < 3; i++)
 				data.push_back(vert[i]);
-
-			vertex_count += 3;
 		}
 
 		glGenVertexArrays(1, &VAO);
