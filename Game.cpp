@@ -32,7 +32,7 @@ void Game::setup()
 
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
-	createPlane("ground", glm::vec2(10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 0.7, 0));
+	//createPlane("ground", glm::vec2(10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 0.7, 0));
 }
 
 struct
