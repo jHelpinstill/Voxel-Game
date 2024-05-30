@@ -37,7 +37,7 @@ void Game::setup()
 
 struct
 {
-	double history[1000];
+	double history[1000]{};
 	int index = 0;
 	double sum = 0;
 	double avg() { return sum / 1000; }

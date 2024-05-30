@@ -1,6 +1,6 @@
 #include "Game.h"
 
-void Game::createTexturedBox(
+Mesh* Game::createTexturedBox(
 	const std::string& name,
 	glm::vec3 size,
 	glm::vec3 pos,
@@ -11,9 +11,10 @@ void Game::createTexturedBox(
 	box->attachShader(getShaderByName("texture_shader"));
 
 	meshes[name] = box;
+	return box;
 }
 
-void Game::createBox(
+Mesh* Game::createBox(
 	const std::string& name,
 	glm::vec3 size,
 	glm::vec3 pos,
@@ -23,9 +24,10 @@ void Game::createBox(
 	box->attachShader(getShaderByName("color_shader"));
 
 	meshes[name] = box;
+	return box;
 }
 
-void Game::createTexturedPlane(
+Mesh* Game::createTexturedPlane(
 	const std::string& name,
 	glm::vec2 size,
 	glm::vec3 pos,
@@ -36,9 +38,10 @@ void Game::createTexturedPlane(
 	plane->attachShader(getShaderByName("texture_shader"));
 
 	meshes[name] = plane;
+	return plane;
 }
 
-void Game::createPlane(
+Mesh* Game::createPlane(
 	const std::string& name,
 	glm::vec2 size,
 	glm::vec3 pos,
@@ -48,4 +51,5 @@ void Game::createPlane(
 	plane->attachShader(getShaderByName("color_shader"));
 
 	meshes[name] = plane;
+	return plane;
 }

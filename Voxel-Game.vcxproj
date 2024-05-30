@@ -162,6 +162,7 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TriangleMesh.h" />
     <ClInclude Include="util.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\meshColorFragment.txt" />

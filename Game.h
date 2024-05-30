@@ -40,41 +40,42 @@ public:
 	Mesh* getMeshByName(const std::string& name);
 	unsigned int getTextureByName(const std::string& name);
 
-	void createShader(
+	Shader* createShader(
 		const std::string& name,
 		const std::string& vertex_filepath,
 		const std::string& fragment_filepath
 	);
 
-	void createTexture(
+	unsigned int createTexture(
 		const std::string& name,
 		const std::string& filepath,
 		bool alpha_channel = false
 	);
 
 	// Tools for creating mesh primatives
-	void createTexturedBox(
+	Mesh* createTexturedBox(
 		const std::string& name,
 		glm::vec3 size,
 		glm::vec3 pos,
 		const std::string& tex_filepath,
 		const std::string& uv_filepath = "meshes/box_one_face_UV.txt"
 	);
-	void createBox(
+	Mesh* createBox(
 		const std::string& name,
 		glm::vec3 size,
 		glm::vec3 pos,
 		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5)
 	);
 
-	void createTexturedPlane(
+	Mesh* createTexturedPlane(
 		const std::string& name,
 		glm::vec2 size,
 		glm::vec3 pos,
 		const std::string& tex_filepath,
 		const std::string& uv_filepath = "meshes/box_one_face_UV.txt"
 	);
-	void createPlane(
+
+	Mesh* createPlane(
 		const std::string& name,
 		glm::vec2 size,
 		glm::vec3 pos,

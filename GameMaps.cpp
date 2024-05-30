@@ -17,16 +17,17 @@ unsigned int Game::getTextureByName(const std::string& name)
 	return textures.at(name);
 }
 
-void Game::createShader(
+Shader* Game::createShader(
 	const std::string& name,
 	const std::string& vertex_filepath,
 	const std::string& fragment_filepath
 ) {
 	Shader* shader = new Shader(name, vertex_filepath, fragment_filepath);
 	shaders[name] = shader;
+	return shader;
 }
 
-void Game::createTexture(const std::string& name, const std::string& filepath, bool alpha_channel)
+unsigned int Game::createTexture(const std::string& name, const std::string& filepath, bool alpha_channel)
 {
 	stbi_set_flip_vertically_on_load(true);
 
@@ -54,4 +55,5 @@ void Game::createTexture(const std::string& name, const std::string& filepath, b
 	stbi_image_free(data);
 
 	textures[name] = texture;
+	return texture;
 }
