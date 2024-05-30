@@ -31,10 +31,10 @@ void TriangleMesh::createVAO(float* verts, float* colors)
     for (int i = 0; i < 9; i++)
         data.push_back(colors[i]);
 
-    glGenVertexArrays(1, &VAO);
+    glGenVertexArrays(1,& VAO);
     glBindVertexArray(VAO);
 
-    glGenBuffers(1, &VBO);
+    glGenBuffers(1,& VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
@@ -56,6 +56,6 @@ void TriangleMesh::draw() {
 }
 
 TriangleMesh::~TriangleMesh() {
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1,& VAO);
+    glDeleteBuffers(1,& VBO);
 }

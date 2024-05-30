@@ -2,8 +2,8 @@
 
 CameraController::CameraController(Camera& camera, Input& input)
 {
-	this->camera = &camera;
-	this->input = &input;
+	this->camera =& camera;
+	this->input =& input;
 }
 
 void CameraController::update(float dt)

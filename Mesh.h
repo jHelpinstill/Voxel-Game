@@ -9,60 +9,54 @@
 
 class Mesh
 {
+private:
+	unsigned int VAO, VBO;
+
 public:
 	std::string name;
-
-	Shader* shader;
 	Transform transform;
+	Shader* shader;
 
+	Shader::VAOStyle style;
 	unsigned int texture;
-	glm::vec3 color = glm::vec3(0.9, 0.9, 0.0);
-	bool use_color = false;
+	std::string uv_filepath;
+	glm::vec3 color;
 
-	struct Tri
-	{
-		float verts[3][3];
-		float uv_coords[3][2];
+	std::vector<glm::vec3> verts;
 
-		Tri(glm::vec3 a, glm::vec3 b, glm::vec3 c)
-		{
-			for (int i = 0; i < 3; i++)
-			{
-				verts[0][i] = a[i];
-				verts[1][i] = b[i];
-				verts[2][i] = c[i];
-			}
-		}
-	};
-	std::vector<Tri> tris;
-
-	Mesh(const std::string& name, std::vector<Tri>& tris);
+	Mesh(
+		const std::string& name,
+		const std::vector<glm::vec3>& verts,
+		unsigned int texture,
+		const std::string& uv_filepath
+	);
+	Mesh(
+		const std::string& name,
+		const std::vector<glm::vec3>& verts,
+		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5)
+	);
 
 	void draw(Camera* camera);
-
 	void attachShader(Shader* shader);
-	void useUVMap(const std::string& filepath);
-	void updateVAO();
-
-	void useTextureMode();
-	void useTextureMode(unsigned int texture);
-	void useColorMode();
-	void useColorMode(const glm::vec3& color);
 
 	~Mesh();
 
-	static Mesh* makeBox(const std::string& name, float l, float w, float h, const glm::vec3& pos = glm::vec3(0, 0, 0));
-	static Mesh* makePlane(const std::string& name, float l, float w, const glm::vec3& pos = glm::vec3(0, 0, 0));
-
-private:
-	unsigned int VAO, VBO, vertex_count;
-	enum {
-		TEXTURE,
-		COLOR
-	} shader_mode = TEXTURE;
-
-	void createTextureVAO();
-	void createSolidColorVAO();
+	static Mesh* makeBox(
+		const std::string& name,
+		const glm::vec3& size,
+		unsigned int texture,
+		const std::string& uv_filepath,
+		const glm::vec3& pos = glm::vec3(0, 0, 0),
+		const glm::vec3& color = glm::vec3(0.5, 0.5, 0.5)
+	);
+	static Mesh* makePlane(
+		const std::string& name,
+		const glm::vec2& size,
+		unsigned int texture,
+		const std::string& uv_filepath,
+		const glm::vec3& pos = glm::vec3(0, 0, 0),
+		const glm::vec3& color = glm::vec3(0.5, 0.5, 0.5)
+	);
 };
 
 #endif

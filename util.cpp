@@ -50,7 +50,7 @@ unsigned int createTexture(const std::string& filepath, bool alpha_channel)
 	stbi_set_flip_vertically_on_load(true);
 
 	unsigned int texture;
-	glGenTextures(1, &texture);
+	glGenTextures(1,& texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	// set the texture wrapping/filtering options (on the currently bound texture object)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -59,7 +59,7 @@ unsigned int createTexture(const std::string& filepath, bool alpha_channel)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load(filepath.c_str(),& width,& height,& nrChannels, 0);
 	if (data)
 	{
 		int image_type = alpha_channel ? GL_RGBA : GL_RGB;
