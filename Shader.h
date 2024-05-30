@@ -18,6 +18,7 @@ public:
 		SOLID_COLORED
 	};
 
+	Shader() {}
 	Shader(
 		const std::string& name,
 		const std::string& vertex_filepath,

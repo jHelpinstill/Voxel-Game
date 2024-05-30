@@ -140,23 +140,25 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameMaps.cpp" />
-    <ClCompile Include="GameMeshPrimatives.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TriangleMesh.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BlockType.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="Chunk.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Transform.h" />

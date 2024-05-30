@@ -32,8 +32,7 @@ Mesh::Mesh(
 
 Mesh::~Mesh()
 {
-	glDeleteVertexArrays(1,& VAO);
-	glDeleteBuffers(1,& VBO);
+	deleteVAO();
 }
 
 void Mesh::draw(Camera* camera)
@@ -69,6 +68,12 @@ void Mesh::attachShader(Shader* shader)
 		uv_filepath,
 		color
 	);
+}
+
+void Mesh::deleteVAO()
+{
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
 }
 
 Mesh* Mesh::makePlane(
