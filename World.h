@@ -3,13 +3,14 @@
 #define WORLD_
 
 #include "config.h"
+#include "ObjectManager.h"
 #include "Mesh.h"
 #include "Chunk.h"
 
 class World
 {
 public:
-
+	float chunk_unit_dimenstion = 1.0;
 	int max_chunk_radius = 5;
 
 	std::vector<Chunk*> chunks;
@@ -17,7 +18,7 @@ public:
 	World() {}
 
 	void setup();
-
+	void generateMesh();
 };
 
 #endif

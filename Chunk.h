@@ -11,7 +11,6 @@ class Chunk
 {
 public:
 	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-
 	glm::ivec3 pos;
 
 	Chunk(glm::ivec3 pos);

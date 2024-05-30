@@ -12,6 +12,24 @@ Mesh::Mesh(
 
 	for (const glm::vec3& vert : verts)
 		this->verts.push_back(vert);
+	getUVMap(uv_filepath);
+
+	style = Shader::VAOStyle::TEXTURED;
+}
+
+Mesh::Mesh(
+	const std::string& name,
+	const std::vector<glm::vec3>& verts,
+	unsigned int texture,
+	const std::vector<glm::vec2>& uv_coords
+) {
+	this->name = name;
+	this->texture = texture;
+
+	for (const glm::vec3& vert : verts)
+		this->verts.push_back(vert);
+	for (const glm::vec2& uv_coord : uv_coords)
+		this->uv_coords.push_back(uv_coord);
 
 	style = Shader::VAOStyle::TEXTURED;
 }
@@ -65,7 +83,7 @@ void Mesh::attachShader(Shader* shader)
 		style,
 		VAO,
 		VBO,
-		uv_filepath,
+		uv_coords,
 		color
 	);
 }
@@ -74,6 +92,31 @@ void Mesh::deleteVAO()
 {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+}
+
+void Mesh::getUVMap(const std::string& filepath)
+{
+	std::ifstream file;
+	std::string line;
+
+	file.open(filepath);
+	if (!file.is_open())
+	{
+		std::cout << "UV file at \"" << filepath << "\" not found" << std::endl;
+		return;
+	}
+
+	while (std::getline(file, line))
+	{
+		std::stringstream buffer(line);
+		glm::vec2 coord;
+		buffer >> coord.x;
+		buffer >> coord.y;
+
+		uv_coords.push_back(coord);
+	}
+
+	file.close();
 }
 
 Mesh* Mesh::makePlane(

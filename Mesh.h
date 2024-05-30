@@ -11,6 +11,7 @@ class Mesh
 {
 private:
 	unsigned int VAO, VBO;
+	void getUVMap(const std::string& filepath);
 
 public:
 	std::string name;
@@ -23,12 +24,19 @@ public:
 	glm::vec3 color;
 
 	std::vector<glm::vec3> verts;
+	std::vector<glm::vec2> uv_coords;
 
 	Mesh(
 		const std::string& name,
 		const std::vector<glm::vec3>& verts,
 		unsigned int texture,
 		const std::string& uv_filepath
+	);
+	Mesh(
+		const std::string& name,
+		const std::vector<glm::vec3>& verts,
+		unsigned int texture,
+		const std::vector<glm::vec2>& uv_coords
 	);
 	Mesh(
 		const std::string& name,

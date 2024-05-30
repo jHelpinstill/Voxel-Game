@@ -64,37 +64,12 @@ void Shader::setVec3(const std::string& name, glm::vec3 vec) const
 	glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
 }
 
-void Shader::getUVMap(const std::string& filepath, std::vector<glm::vec2>& coords)
-{
-	std::ifstream file;
-	std::string line;
-
-	file.open(filepath);
-	if (!file.is_open())
-	{
-		std::cout << "UV file at \"" << filepath << "\" not found" << std::endl;
-		return;
-	}
-
-	while (std::getline(file, line))
-	{
-		std::stringstream buffer(line);
-		glm::vec2 coord;
-		buffer >> coord.x;
-		buffer >> coord.y;
-
-		coords.push_back(coord);
-	}
-
-	file.close();
-}
-
 void Shader::makeVAOFromTris(
 	const std::vector<glm::vec3>& verts,
 	VAOStyle style,
 	unsigned int& VAO,
 	unsigned int& VBO,
-	const std::string& UV_filepath,
+	const std::vector<glm::vec2>& uv_coords,
 	const glm::vec3& color
 ) {
 	int vertex_count = 0;
@@ -104,9 +79,6 @@ void Shader::makeVAOFromTris(
 	{
 	case TEXTURED:
 	{
-		std::vector<glm::vec2> uv_coords;
-		getUVMap(UV_filepath, uv_coords);
-
 		if (verts.size() != uv_coords.size())
 		{
 			std::cout << "Vertex and UV coordinate size mismatch (";
@@ -121,14 +93,14 @@ void Shader::makeVAOFromTris(
 
 			data.push_back(uv_coords[vert].x);
 			data.push_back(uv_coords[vert].y);
-			
+
 			vertex_count += 3;
 		}
 
-		glGenVertexArrays(1,& VAO);
+		glGenVertexArrays(1, &VAO);
 		glBindVertexArray(VAO);
 
-		glGenBuffers(1,& VBO);
+		glGenBuffers(1, &VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
@@ -141,7 +113,7 @@ void Shader::makeVAOFromTris(
 		// texture coords
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
-		
+
 		break;
 	}
 	case SOLID_COLORED:
@@ -149,15 +121,15 @@ void Shader::makeVAOFromTris(
 		for (const glm::vec3& vert : verts)
 		{
 			for (int i = 0; i < 3; i++)
-					data.push_back(vert[i]);
+				data.push_back(vert[i]);
 
 			vertex_count += 3;
 		}
 
-		glGenVertexArrays(1,& VAO);
+		glGenVertexArrays(1, &VAO);
 		glBindVertexArray(VAO);
 
-		glGenBuffers(1,& VBO);
+		glGenBuffers(1, &VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
@@ -170,18 +142,6 @@ void Shader::makeVAOFromTris(
 		break;
 	}
 	}
-}
-
-void Shader::makeVAOFromVertsFaces(
-	const std::vector<glm::vec3>& verts,
-	const std::vector<int>& faces,
-	VAOStyle style,
-	unsigned int& VAO,
-	unsigned int& VBO,
-	const std::string& UV_filepath,
-	const glm::vec3& color
-) {
-
 }
 
 unsigned int Shader::makeModule(

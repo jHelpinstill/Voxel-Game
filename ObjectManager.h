@@ -19,7 +19,6 @@ Shader* createShader(
 	const std::string& fragment_filepath
 );
 
-
 unsigned int createTexture(
 	const std::string& name,
 	const std::string& filepath,
