@@ -59,7 +59,7 @@ void Game::stateMachine(double dt)
 	{
 	case PAUSED:
 	{
-		if (input->keyPressed(GLFW_KEY_ESCAPE))
+		if (input->keyPressed(GLFW_KEY_ESCAPE) || input->mouse.left.pressed)
 		{
 			state = RUNNING;
 			input->lockCursor();
