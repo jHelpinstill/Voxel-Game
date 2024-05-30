@@ -140,6 +140,8 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameMaps.cpp" />
+    <ClCompile Include="GameMeshPrimatives.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />

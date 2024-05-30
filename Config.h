@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 
 //#define LOCK_FRAMERATE

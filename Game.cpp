@@ -24,51 +24,15 @@ void Game::setup()
 	player->constrainLook(glm::vec3(0, 1, 0));
 	player->move_speed = 4;
 
-	shaders.push_back(new Shader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt"));
-	shaders.push_back(new Shader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt"));
+	createShader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
+	createShader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
 
-	textures.push_back(new Texture("smiley", createTexture("textures/smiley.png", true)));
-	textures.push_back(new Texture("crate", createTexture("textures/crate.jpg")));
+	createTexture("smiley", "textures/smiley.png", true);
+	createTexture("crate", "textures/crate.jpg");
 
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
-
-	//Mesh* floor = Mesh::makePlane("floor", 10, 10);
-	//floor->color = glm::vec3(0.0, 0.7, 0.0);
-	//floor->useColorMode();
-	//floor->attachShader(getShaderByName("color_shader"));
-	//
-	//meshes.push_back(floor);
-}
-
-Shader* Game::getShaderByName(const std::string& name)
-{
-	for (Shader* shader : shaders)
-		if (shader->name == name)
-			return shader;
-
-	std::cout << "couldn't find shader \"" << name << "\"" << std::endl;
-	return nullptr;
-}
-
-Mesh* Game::getMeshByName(const std::string& name)
-{
-	for (Mesh* mesh : meshes)
-		if (mesh->name == name)
-			return mesh;
-
-	std::cout << "couldn't find mesh \"" << name << "\"" << std::endl;
-	return nullptr;
-}
-
-unsigned int Game::getTextureByName(const std::string& name)
-{
-	for (Texture* tex : textures)
-		if (tex->name == name)
-			return tex->ID;
-	
-	std::cout << "couldn't find texture \"" << name << "\"" << std::endl;
-	return 0;
+	createPlane("ground", glm::vec2(10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 0.7, 0));
 }
 
 struct
@@ -85,6 +49,7 @@ struct
 		++index %= 1000;
 	}
 } avg_fps;
+
 void Game::stateMachine(double dt)
 {
 	input->update();
@@ -126,31 +91,6 @@ void Game::stateMachine(double dt)
 
 void Game::drawMeshes()
 {
-	for (Mesh* mesh : meshes)
-		mesh->draw(camera);
-}
-
-void Game::createTexturedBox(
-	const std::string& name,
-	glm::vec3 size,
-	glm::vec3 pos,
-	const std::string& tex_name,
-	const std::string& uv_filepath
-) {
-	Mesh* box = Mesh::makeBox(name, size, getTextureByName(tex_name), uv_filepath, pos);
-	box->attachShader(getShaderByName("texture_shader"));
-
-	meshes.push_back(box);
-}
-
-void Game::createBox(
-	const std::string& name,
-	glm::vec3 size,
-	glm::vec3 pos,
-	glm::vec3 color
-) {
-	Mesh* box = Mesh::makeBox(name, size, 0, "", pos, color);
-	box->attachShader(getShaderByName("color_shader"));
-
-	meshes.push_back(box);
+	for (auto mesh : meshes)
+		mesh.second->draw(camera);
 }

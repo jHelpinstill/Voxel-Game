@@ -20,26 +20,15 @@ private:
 		RUNNING
 	} state;
 
-	struct Texture
-	{
-		unsigned int ID;
-		std::string name;
-		Texture(const std::string& name, unsigned int ID)
-		{
-			this->name = name;
-			this->ID = ID;
-		}
-	};
-
 public:
 	GLFWwindow* window;
 	Input* input;
 	Camera* camera;
 	CameraController* player;
 
-	std::vector<Mesh*> meshes;
-	std::vector<Shader*> shaders;
-	std::vector<Texture*> textures;
+	std::unordered_map<std::string, Mesh*> meshes;
+	std::unordered_map<std::string, Shader*> shaders;
+	std::unordered_map<std::string, unsigned int> textures;
 
 	Game(GLFWwindow* window);
 	~Game();
@@ -51,6 +40,19 @@ public:
 	Mesh* getMeshByName(const std::string& name);
 	unsigned int getTextureByName(const std::string& name);
 
+	void createShader(
+		const std::string& name,
+		const std::string& vertex_filepath,
+		const std::string& fragment_filepath
+	);
+
+	void createTexture(
+		const std::string& name,
+		const std::string& filepath,
+		bool alpha_channel = false
+	);
+
+	// Tools for creating mesh primatives
 	void createTexturedBox(
 		const std::string& name,
 		glm::vec3 size,
@@ -62,7 +64,21 @@ public:
 		const std::string& name,
 		glm::vec3 size,
 		glm::vec3 pos,
-		glm::vec3 color
+		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5)
+	);
+
+	void createTexturedPlane(
+		const std::string& name,
+		glm::vec2 size,
+		glm::vec3 pos,
+		const std::string& tex_filepath,
+		const std::string& uv_filepath = "meshes/box_one_face_UV.txt"
+	);
+	void createPlane(
+		const std::string& name,
+		glm::vec2 size,
+		glm::vec3 pos,
+		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5)
 	);
 };
 
