@@ -6,11 +6,18 @@ Input::Input(GLFWwindow* window)
 	objects.push_back(this);
 
 	glfwSetKeyCallback(window, keyCallback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 
 	for (Key& key : keys)
 	{
 		key.state = key.prev_state = GLFW_RELEASE;
 		key.pressed = key.held = key.released = false;
+	}
+
+	for (Mouse::Button& button : mouse.buttons)
+	{
+		button.state = button.prev_state = GLFW_RELEASE;
+		button.pressed = button.held = button.released = false;
 	}
 }
 
@@ -22,6 +29,13 @@ void Input::update()
 		key.pressed = (key.state == GLFW_PRESS && key.prev_state == GLFW_RELEASE);
 		key.released = (key.state == GLFW_RELEASE && key.prev_state == GLFW_PRESS);
 		key.prev_state = key.state;
+	}
+	for (Mouse::Button& button : mouse.buttons)
+	{
+		button.held = button.state;
+		button.pressed = (button.state == GLFW_PRESS && button.prev_state == GLFW_RELEASE);
+		button.released = (button.state == GLFW_RELEASE && button.prev_state == GLFW_PRESS);
+		button.prev_state = button.state;
 	}
 
 	double prevx, prevy;
@@ -75,5 +89,18 @@ void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 		}
 	}
 }
+
+void Input::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	for (Input* input : objects)
+	{
+		if (input->window == window)
+		{
+			input->mouse.buttons[button].state = action;
+			break;
+		}
+	}
+}
+
 
 std::vector<Input*> Input::objects;

@@ -8,21 +8,30 @@ class Input
 {
 private:
 	GLFWwindow* window;
-	struct Key
+	struct Key 
 	{
 		int state, prev_state;
 		bool pressed, held, released;
-	};
-	Key keys[GLFW_KEY_LAST];
+	} keys[GLFW_KEY_LAST + 1];
 
 	static std::vector<Input*> objects;
 
 public:
-	struct {
+	struct Mouse
+	{
 		double x, y;
 		glm::vec2 delta;
-		bool right_pressed;
-		bool left_pressed;
+		struct Button
+		{
+			int state, prev_state;
+			bool pressed, held, released;
+		};
+		union
+		{
+			Button buttons[GLFW_MOUSE_BUTTON_LAST + 1];
+			Button left, right;
+		};
+
 	} mouse;
 
 	Input(GLFWwindow* window);
@@ -37,6 +46,7 @@ public:
 	void freeCursor();
 
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 };
 
 #endif

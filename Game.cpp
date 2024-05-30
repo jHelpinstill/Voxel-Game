@@ -81,6 +81,11 @@ void Game::stateMachine(double dt)
 
 		player->update(dt);
 		avg_fps.update(1.0 / dt);
+
+		if (input->mouse.left.pressed)
+		{
+			removeMesh("crate");
+		}
 		//std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
 
 		drawMeshes();

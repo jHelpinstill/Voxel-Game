@@ -19,11 +19,16 @@ Shader* createShader(
 	const std::string& fragment_filepath
 );
 
+
 unsigned int createTexture(
 	const std::string& name,
 	const std::string& filepath,
 	bool alpha_channel = false
 );
+
+void removeShader(const std::string& name);
+void removeMesh(const std::string& name);
+void removeTexture(const std::string& name);
 
 // Tools for creating mesh primatives
 Mesh* createTexturedBox(
