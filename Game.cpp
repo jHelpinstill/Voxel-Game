@@ -18,7 +18,7 @@ void Game::setup()
 	input = new Input(window);
 
 	camera = new Camera(window);
-	camera->transform.pos = glm::vec3(0, 50, 30);
+	camera->transform.pos = glm::vec3(0, 5, 30);
 	camera->clip_far = 1000;
 
 	player = new CameraController(*camera, *input);
@@ -30,6 +30,7 @@ void Game::setup()
 
 	createTexture("smiley", "textures/smiley.png", true);
 	createTexture("crate", "textures/crate.jpg");
+	createTexture("dirt_block", "textures/dirt_block.png", true);
 
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
