@@ -58,7 +58,7 @@ public:
 		const std::string& tex_filepath,
 		const std::string& uv_filepath = "meshes/box_one_face_UV.txt"
 	);
-	void createColoredBox(
+	void createBox(
 		const std::string& name,
 		glm::vec3 size,
 		glm::vec3 pos,

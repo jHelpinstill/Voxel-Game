@@ -33,12 +33,12 @@ void Game::setup()
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
 
-	Mesh* floor = Mesh::makePlane("floor", 10, 10);
-	floor->color = glm::vec3(0.0, 0.7, 0.0);
-	floor->useColorMode();
-	floor->attachShader(getShaderByName("color_shader"));
-	
-	meshes.push_back(floor);
+	//Mesh* floor = Mesh::makePlane("floor", 10, 10);
+	//floor->color = glm::vec3(0.0, 0.7, 0.0);
+	//floor->useColorMode();
+	//floor->attachShader(getShaderByName("color_shader"));
+	//
+	//meshes.push_back(floor);
 }
 
 Shader* Game::getShaderByName(const std::string& name)
@@ -111,9 +111,7 @@ void Game::stateMachine(double dt)
 			state = PAUSED;
 			input->freeCursor();
 			std::cout << "PAUSED" << std::endl;
-			std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
-			for (int i = 0; i < 1000; i++)
-				std::cout << avg_fps.history[i] << std::endl;
+			std::cout << "avg fps: " << avg_fps.avg() << std::endl;
 		}
 
 		player->update(dt);
@@ -139,22 +137,19 @@ void Game::createTexturedBox(
 	const std::string& tex_name,
 	const std::string& uv_filepath
 ) {
-	Mesh* box = Mesh::makeBox(name, size.z, size.x, size.y, pos);
-	box->texture = getTextureByName(tex_name);
-	box->useUVMap(uv_filepath);
+	Mesh* box = Mesh::makeBox(name, size, getTextureByName(tex_name), uv_filepath, pos);
 	box->attachShader(getShaderByName("texture_shader"));
 
 	meshes.push_back(box);
 }
 
-void Game::createColoredBox(
+void Game::createBox(
 	const std::string& name,
 	glm::vec3 size,
 	glm::vec3 pos,
 	glm::vec3 color
 ) {
-	Mesh* box = Mesh::makeBox(name, size.x, size.y, size.z, pos);
-	box->useColorMode(color);
+	Mesh* box = Mesh::makeBox(name, size, 0, "", pos, color);
 	box->attachShader(getShaderByName("color_shader"));
 
 	meshes.push_back(box);

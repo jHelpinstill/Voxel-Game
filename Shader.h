@@ -32,7 +32,7 @@ public:
 	void setMat4(const std::string& name, glm::mat4 mat) const;
 	void setVec3(const std::string& name, glm::vec3 vec) const;
 
-	void getUVMap(const std::string& filepath, std::vector<glm::vec2> coords);
+	void getUVMap(const std::string& filepath, std::vector<glm::vec2>& coords);
 	void makeVAOFromTris(
 		const std::vector<glm::vec3>& verts,
 		VAOStyle style,

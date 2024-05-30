@@ -153,7 +153,6 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="dependencies\include\glad\glad.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />

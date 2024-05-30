@@ -15,6 +15,7 @@ Mesh::Mesh(
 
 	style = Shader::VAOStyle::TEXTURED;
 }
+
 Mesh::Mesh(
 	const std::string& name,
 	const std::vector<glm::vec3>& verts,

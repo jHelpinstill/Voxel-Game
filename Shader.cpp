@@ -64,7 +64,7 @@ void Shader::setVec3(const std::string& name, glm::vec3 vec) const
 	glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
 }
 
-void Shader::getUVMap(const std::string& filepath, std::vector<glm::vec2> coords)
+void Shader::getUVMap(const std::string& filepath, std::vector<glm::vec2>& coords)
 {
 	std::ifstream file;
 	std::string line;
