@@ -48,10 +48,11 @@ BlockType* World::inspectBlock(glm::vec3 pos)
 {
 	Mesh* world_mesh = getMeshByName("world_mesh");
 	pos -= world_mesh->transform.pos;
+	pos /= chunk_unit_dimension;
 	int x, y, z;
-	x = (int)(pos.x / CHUNK_SIZE);
-	y = (int)(pos.y / CHUNK_SIZE);
-	z = (int)(pos.z / CHUNK_SIZE);
+	x = (int)(pos.x / CHUNK_SIZE); if (pos.x < 0) x--;
+	y = (int)(pos.y / CHUNK_SIZE); if (pos.y < 0) y--;
+	z = (int)(pos.z / CHUNK_SIZE); if (pos.z < 0) z--;
 	Chunk* chunk = getChunk(x, y, z);
 
 	x = (int)(pos.x - x * CHUNK_SIZE);

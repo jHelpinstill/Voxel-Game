@@ -82,20 +82,22 @@ void Game::stateMachine(double dt)
 			std::cout << "PAUSED" << std::endl;
 			std::cout << "avg fps: " << avg_fps.avg() << std::endl;
 		}
+		if (input->keyHeld(GLFW_KEY_LEFT_SHIFT))
+			player->move_speed = 15;
+		else
+			player->move_speed = 5;
 
 		player->update(dt);
 		avg_fps.update(1.0 / dt);
 
-		if (input->mouse.left.pressed)
+		if (input->mouse.left.held)
 		{
-			//removeMesh("crate");
-			world.updateBlock(camera->transform.pos + (glm::vec3)(glm::inverse(camera->transform.view) * glm::vec4(0, 0, -2, 1)), BlockType::AIR);
+			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
 			world.generateMesh();
 		}
-		else if (input->keyPressed('E'))
+		else if (input->keyHeld('E'))
 		{
-			//removeMesh("crate");
-			world.updateBlock(camera->transform.pos + (glm::vec3)(glm::inverse(camera->transform.view) * glm::vec4(0, 0, -2, 1)), BlockType::DIRT);
+			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
 			world.generateMesh();
 		}
 		//std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;

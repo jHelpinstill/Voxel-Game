@@ -12,8 +12,8 @@ class World
 private:
 
 public:
-	float chunk_unit_dimension = 1.0;
-	int chunk_radius = 4;
+	float chunk_unit_dimension = 0.5;
+	int chunk_radius = 0;
 
 	std::unordered_map<ChunkKey, Chunk*> chunks;
 

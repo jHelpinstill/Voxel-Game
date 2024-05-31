@@ -21,3 +21,8 @@ glm::mat4 Camera::getProjectionMat()
 
 	return projection * transform.view * glm::translate(glm::mat4(1.0), -transform.pos);
 }
+
+glm::vec3 Camera::getLookDirection()
+{
+	return (glm::vec3)(glm::inverse(this->transform.view) * glm::vec4(0, 0, -1.0f, 1));
+}

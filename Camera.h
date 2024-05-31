@@ -18,6 +18,7 @@ public:
 	Camera(GLFWwindow* window);
 
 	glm::mat4 getProjectionMat();
+	glm::vec3 getLookDirection();
 	void findAspectRatio(GLFWwindow* window);
 };
 
