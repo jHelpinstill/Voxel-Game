@@ -88,7 +88,15 @@ void Game::stateMachine(double dt)
 
 		if (input->mouse.left.pressed)
 		{
-			removeMesh("crate");
+			//removeMesh("crate");
+			world.updateBlock(camera->transform.pos + (glm::vec3)(glm::inverse(camera->transform.view) * glm::vec4(0, 0, -2, 1)), BlockType::AIR);
+			world.generateMesh();
+		}
+		else if (input->keyPressed('E'))
+		{
+			//removeMesh("crate");
+			world.updateBlock(camera->transform.pos + (glm::vec3)(glm::inverse(camera->transform.view) * glm::vec4(0, 0, -2, 1)), BlockType::DIRT);
+			world.generateMesh();
 		}
 		//std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
 

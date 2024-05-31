@@ -93,6 +93,19 @@ void Mesh::deleteVAO()
 	glDeleteBuffers(1, &VBO);
 }
 
+void Mesh::remakeVAO()
+{
+	deleteVAO();
+	shader->makeVAOFromTris(
+		verts,
+		style,
+		VAO,
+		VBO,
+		uv_coords,
+		color
+	);
+}
+
 void Mesh::getUVMap(const std::string& filepath)
 {
 	std::ifstream file;

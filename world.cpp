@@ -2,27 +2,69 @@
 
 void World::setup()
 {
-	chunks[Key(0, 0, 0)] = new Chunk(glm::ivec3(0, 0, 0));
+	addChunk(0, 0, 0);// chunks[Key(0, 0, 0)] = new Chunk(glm::ivec3(0, 0, 0));
 	for (int r = 1; r <= chunk_radius; r++)
 	{
 		int x, z;
 		x = z = r;
 		for (z = r; z > -r; z--)
-			chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
+			addChunk(x, 0, z);// chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
 		z = -r;
 		for (x = r; x > -r; x--)
-			chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
+			addChunk(x, 0, z);//chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
 		x = -r;
 		for (z = -r; z < r; z++)
-			chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
+			addChunk(x, 0, z);//chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
 		z = r;
 		for (x = -r; x < r; x++)
-			chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
+			addChunk(x, 0, z);//chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
 	}
 
 	std::cout << "created " << chunks.size() << " chunks" << std::endl;
 
 	generateMesh();
+}
+
+void World::addChunk(int x, int y, int z)
+{
+	ChunkKey key(x, y, z);
+	if (chunks.find(key) != chunks.end())
+	{
+		delete chunks[key];
+		chunks.erase(key);
+	}
+	chunks[key] = new Chunk(glm::ivec3(x, y, z));
+}
+
+Chunk* World::getChunk(int x, int y, int z)
+{
+	ChunkKey key(x, y, z);
+	if (chunks.find(key) == chunks.end())
+		chunks[key] = new Chunk(glm::ivec3(x, y, z));
+	return chunks[key];
+}
+
+BlockType* World::inspectBlock(glm::vec3 pos)
+{
+	Mesh* world_mesh = getMeshByName("world_mesh");
+	pos -= world_mesh->transform.pos;
+	int x, y, z;
+	x = (int)(pos.x / CHUNK_SIZE);
+	y = (int)(pos.y / CHUNK_SIZE);
+	z = (int)(pos.z / CHUNK_SIZE);
+	Chunk* chunk = getChunk(x, y, z);
+
+	x = (int)(pos.x - x * CHUNK_SIZE);
+	y = (int)(pos.y - y * CHUNK_SIZE);
+	z = (int)(pos.z - z * CHUNK_SIZE);
+
+	std::cout << "inspecting block at " << pos.x << ", " << pos.y << ", " << pos.z << ", block index " << x << ", " << y << ", " << z << std::endl;
+	return &chunk->blocks[x][y][z];
+}
+void World::updateBlock(glm::vec3 pos, BlockType new_type)
+{
+	BlockType* block = inspectBlock(pos);
+	*block = new_type;
 }
 
 void addQuadUV(std::vector<glm::vec2>& uv_coords, bool top_face = false)
@@ -121,7 +163,7 @@ void World::generateMesh()
 	// top
 	for (int chunk_x = -chunk_radius; chunk_x <= chunk_radius; chunk_x++) for(int chunk_z = -chunk_radius; chunk_z <= chunk_radius; chunk_z++)
 	{
-		Chunk* chunk = chunks[Key(chunk_x, 0, chunk_z)];
+		Chunk* chunk = getChunk(chunk_x, 0, chunk_z);// chunks[Key(chunk_x, 0, chunk_z)];
 		/// top
 		for (int x = 0; x < CHUNK_SIZE; x++)
 		{

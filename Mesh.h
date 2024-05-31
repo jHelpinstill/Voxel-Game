@@ -47,6 +47,7 @@ public:
 	void draw(Camera* camera);
 	void attachShader(Shader* shader);
 	void deleteVAO();
+	void remakeVAO();
 
 	~Mesh();
 
