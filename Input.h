@@ -29,7 +29,7 @@ public:
 		union
 		{
 			Button buttons[GLFW_MOUSE_BUTTON_LAST + 1];
-			Button left, right;
+			struct { Button left, right; };
 		};
 
 	} mouse;

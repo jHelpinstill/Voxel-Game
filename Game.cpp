@@ -95,7 +95,7 @@ void Game::stateMachine(double dt)
 			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
 			world.generateMesh();
 		}
-		else if (input->keyHeld('E'))
+		else if (input->keyHeld('E') || input->mouse.right.held)
 		{
 			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
 			world.generateMesh();
