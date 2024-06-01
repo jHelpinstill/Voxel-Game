@@ -12,8 +12,8 @@ class World
 private:
 
 public:
-	float chunk_unit_dimension = 0.5;
-	int chunk_radius = 0;
+	float chunk_unit_dimension = 0.1;
+	int chunk_radius = 5;
 
 	std::unordered_map<ChunkKey, Chunk*> chunks;
 
@@ -25,7 +25,7 @@ public:
 	void addChunk(int x, int y, int z);
 	Chunk* getChunk(int x, int y, int z);
 
-	BlockType* inspectBlock(glm::vec3 pos);
+	void inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at = nullptr);
 	void updateBlock(glm::vec3 pos, BlockType new_type);
 
 };

@@ -27,10 +27,11 @@ void Game::setup()
 
 	createShader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
 	createShader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
+	createShader("chunk_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
 
 	createTexture("smiley", "textures/smiley.png", true);
 	createTexture("crate", "textures/crate.jpg");
-	createTexture("dirt_block", "textures/dirt_block.png", true);
+	createTexture("chunk_texture", "textures/dirt_block.png", true);
 
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
@@ -39,18 +40,19 @@ void Game::setup()
 	world.setup();
 }
 
+#define AVG_FPS_HISTOR_SIZE 100
 struct
 {
-	double history[1000]{};
+	double history[AVG_FPS_HISTOR_SIZE]{};
 	int index = 0;
 	double sum = 0;
-	double avg() { return sum / 1000; }
+	double avg() { return sum / AVG_FPS_HISTOR_SIZE; }
 	void update(double fps)
 	{
 		sum += fps;
 		sum -= history[index];
 		history[index] = fps;
-		++index %= 1000;
+		++index %= AVG_FPS_HISTOR_SIZE;
 	}
 } avg_fps;
 
@@ -75,6 +77,7 @@ void Game::stateMachine(double dt)
 	}
 	case RUNNING:
 	{
+
 		if (input->keyPressed(GLFW_KEY_ESCAPE))
 		{
 			state = PAUSED;
@@ -93,12 +96,12 @@ void Game::stateMachine(double dt)
 		if (input->mouse.left.held)
 		{
 			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
-			world.generateMesh();
+			//world.generateMesh();
 		}
 		else if (input->keyHeld('E') || input->mouse.right.held)
 		{
 			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
-			world.generateMesh();
+			//world.generateMesh();
 		}
 		//std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
 
@@ -110,7 +113,7 @@ void Game::stateMachine(double dt)
 
 void Game::drawMeshes()
 {
-	for (auto mesh : meshes)
+	for (auto& mesh : meshes)
 	{
 		mesh.second->draw(camera);
 	}

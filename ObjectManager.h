@@ -13,6 +13,10 @@ Shader* getShaderByName(const std::string& name);
 Mesh* getMeshByName(const std::string& name);
 unsigned int getTextureByName(const std::string& name);
 
+void removeShader(const std::string& name);
+void removeMesh(const std::string& name);
+void removeTexture(const std::string& name);
+
 Shader* createShader(
 	const std::string& name,
 	const std::string& vertex_filepath,
@@ -24,10 +28,6 @@ unsigned int createTexture(
 	const std::string& filepath,
 	bool alpha_channel = false
 );
-
-void removeShader(const std::string& name);
-void removeMesh(const std::string& name);
-void removeTexture(const std::string& name);
 
 // Tools for creating mesh primatives
 Mesh* createTexturedBox(

@@ -7,7 +7,7 @@ Mesh* createTexturedBox(
 	const std::string& tex_name,
 	const std::string& uv_filepath
 ) {
-	Mesh* box = Mesh::makeBox(name, size, getTextureByName(tex_name), uv_filepath, pos);
+	Mesh* box = Mesh::makeBox(size, getTextureByName(tex_name), uv_filepath, pos);
 	box->attachShader(getShaderByName("texture_shader"));
 
 	meshes[name] = box;
@@ -20,7 +20,7 @@ Mesh* createBox(
 	glm::vec3 pos,
 	glm::vec3 color
 ) {
-	Mesh* box = Mesh::makeBox(name, size, 0, "", pos, color);
+	Mesh* box = Mesh::makeBox(size, 0, "", pos, color);
 	box->attachShader(getShaderByName("color_shader"));
 
 	meshes[name] = box;
@@ -34,7 +34,7 @@ Mesh* createTexturedPlane(
 	const std::string& tex_name,
 	const std::string& uv_filepath
 ) {
-	Mesh* plane = Mesh::makePlane(name, size, getTextureByName(tex_name), uv_filepath, pos);
+	Mesh* plane = Mesh::makePlane(size, getTextureByName(tex_name), uv_filepath, pos);
 	plane->attachShader(getShaderByName("texture_shader"));
 
 	meshes[name] = plane;
@@ -47,7 +47,7 @@ Mesh* createPlane(
 	glm::vec3 pos,
 	glm::vec3 color
 ) {
-	Mesh* plane = Mesh::makePlane(name, size, 0, "", pos, color);
+	Mesh* plane = Mesh::makePlane(size, 0, "", pos, color);
 	plane->attachShader(getShaderByName("color_shader"));
 
 	meshes[name] = plane;

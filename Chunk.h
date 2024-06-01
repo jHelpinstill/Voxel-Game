@@ -3,17 +3,28 @@
 #define CHUNK_
 
 #include "config.h"
+#include "ObjectManager.h"
 #include "BlockType.h"
+#include "Mesh.h"
 
 #define CHUNK_SIZE 32
 
 class Chunk
 {
+private:
+	void addQuad(glm::vec3 root, int face, float length);
+	
 public:
-	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-	glm::ivec3 pos;
+	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};
+	int x, y, z;
 
-	Chunk(glm::ivec3 pos);
+	Mesh* mesh;
+	std::string mesh_name;
+
+	Chunk(int x, int y, int z);
+	
+	glm::vec3 getPosf();
+	Mesh* generateMesh(float block_size);
 };
 
 struct ChunkKey

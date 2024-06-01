@@ -9,24 +9,51 @@ std::unordered_map<std::string, unsigned int> textures;
 
 Shader* getShaderByName(const std::string& name)
 {
-	return shaders.at(name);
+	try
+	{
+		return shaders.at(name);
+	}
+	catch (std::out_of_range)
+	{
+		std::cout << "WARNING: Tried to access nonexistent Shader \"" << name << "\"" << std::endl;
+		while (1)
+			;
+	}
 }
 
 Mesh* getMeshByName(const std::string& name)
 {
-	return meshes.at(name);
+	try
+	{
+		return meshes.at(name);
+	}
+	catch (std::out_of_range)
+	{
+		std::cout << "WARNING: Tried to access nonexistent Shader \"" << name << "\"" << std::endl;
+		while (1)
+			;
+	}
 }
 
 unsigned int getTextureByName(const std::string& name)
 {
-	return textures.at(name);
+	try
+	{
+		return textures.at(name);
+	}
+	catch (std::out_of_range)
+	{
+		std::cout << "WARNING: Tried to access nonexistent Shader \"" << name << "\"" << std::endl;
+		while (1)
+			;
+	}
 }
 
 void removeShader(const std::string& name)
 {
 	if (shaders.find(name) == shaders.end())
 	{
-		std::cout << "Tried to remove nonexistent shader: \"" << name << "\"" << std::endl;
+		//std::cout << "Tried to remove nonexistent shader: \"" << name << "\"" << std::endl;
 		return;
 	}
 
@@ -37,7 +64,7 @@ void removeMesh(const std::string& name)
 {
 	if (meshes.find(name) == meshes.end())
 	{
-		std::cout << "Tried to remove nonexistent mesh: \"" << name << "\"" << std::endl;
+		//std::cout << "Tried to remove nonexistent mesh: \"" << name << "\"" << std::endl;
 		return;
 	}
 
@@ -48,7 +75,7 @@ void removeTexture(const std::string& name)
 {
 	if (textures.find(name) == textures.end())
 	{
-		std::cout << "Tried to remove nonexistent texture: \"" << name << "\"" << std::endl;
+		//std::cout << "Tried to remove nonexistent texture: \"" << name << "\"" << std::endl;
 		return;
 	}
 	textures.erase(name);

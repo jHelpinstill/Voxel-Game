@@ -1,12 +1,16 @@
 #include "Mesh.h"
 
+Mesh::Mesh(unsigned int texture)
+{
+	this->texture = texture;
+	style = Shader::VAOStyle::TEXTURED;
+}
+
 Mesh::Mesh(
-	const std::string& name,
 	const std::vector<glm::vec3>& verts,
 	unsigned int texture,
 	const std::string& uv_filepath
 ) {
-	this->name = name;
 	this->texture = texture;
 
 	for (const glm::vec3& vert : verts)
@@ -17,12 +21,10 @@ Mesh::Mesh(
 }
 
 Mesh::Mesh(
-	const std::string& name,
 	const std::vector<glm::vec3>& verts,
 	unsigned int texture,
 	const std::vector<glm::vec2>& uv_coords
 ) {
-	this->name = name;
 	this->texture = texture;
 
 	for (const glm::vec3& vert : verts)
@@ -34,11 +36,9 @@ Mesh::Mesh(
 }
 
 Mesh::Mesh(
-	const std::string& name,
 	const std::vector<glm::vec3>& verts,
 	glm::vec3 color
 ) {
-	this->name = name;
 	this->color = color;
 
 	for (const glm::vec3& vert : verts)
@@ -132,7 +132,6 @@ void Mesh::getUVMap(const std::string& filepath)
 }
 
 Mesh* Mesh::makePlane(
-	const std::string& name,
 	const glm::vec2& size,
 	unsigned int texture,
 	const std::string& uv_filepath,
@@ -159,16 +158,15 @@ Mesh* Mesh::makePlane(
 
 	Mesh* mesh;
 	if (texture)
-		mesh = new Mesh(name, verts, texture, uv_filepath);
+		mesh = new Mesh(verts, texture, uv_filepath);
 	else
-		mesh = new Mesh(name, verts, color);
+		mesh = new Mesh(verts, color);
 
 	mesh->transform.translate(pos_);
 	return mesh;
 }
 
 Mesh* Mesh::makeBox(
-	const std::string& name,
 	const glm::vec3& size,
 	unsigned int texture,
 	const std::string& uv_filepath,
@@ -212,9 +210,9 @@ Mesh* Mesh::makeBox(
 
 	Mesh* mesh;
 	if (texture)
-		mesh = new Mesh(name, verts, texture, uv_filepath);
+		mesh = new Mesh(verts, texture, uv_filepath);
 	else
-		mesh = new Mesh(name, verts, color);
+		mesh = new Mesh(verts, color);
 
 	mesh->transform.translate(pos);
 	return mesh;

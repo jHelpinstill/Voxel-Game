@@ -14,7 +14,6 @@ private:
 	void getUVMap(const std::string& filepath);
 
 public:
-	std::string name;
 	Transform transform;
 	Shader* shader;
 
@@ -26,20 +25,18 @@ public:
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec2> uv_coords;
 
+	Mesh(unsigned int texture);
 	Mesh(
-		const std::string& name,
 		const std::vector<glm::vec3>& verts,
 		unsigned int texture,
 		const std::string& uv_filepath
 	);
 	Mesh(
-		const std::string& name,
 		const std::vector<glm::vec3>& verts,
 		unsigned int texture,
 		const std::vector<glm::vec2>& uv_coords
 	);
 	Mesh(
-		const std::string& name,
 		const std::vector<glm::vec3>& verts,
 		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5)
 	);
@@ -52,7 +49,6 @@ public:
 	~Mesh();
 
 	static Mesh* makeBox(
-		const std::string& name,
 		const glm::vec3& size,
 		unsigned int texture,
 		const std::string& uv_filepath,
@@ -60,7 +56,6 @@ public:
 		const glm::vec3& color = glm::vec3(0.5, 0.5, 0.5)
 	);
 	static Mesh* makePlane(
-		const std::string& name,
 		const glm::vec2& size,
 		unsigned int texture,
 		const std::string& uv_filepath,
