@@ -18,7 +18,7 @@ void Game::setup()
 	input = new Input(window);
 
 	camera = new Camera(window);
-	camera->transform.pos = glm::vec3(0, 5, 30);
+	camera->transform.pos = glm::vec3(0, 5, 5);
 	camera->clip_far = 1000;
 
 	player = new CameraController(*camera, *input);

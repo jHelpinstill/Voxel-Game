@@ -118,7 +118,9 @@ void Mesh::generateInstancedVAO()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_instanced);
 	glBufferData(GL_ARRAY_BUFFER, instance_data.size() * sizeof(int), instance_data.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(2, 1, GL_INT, GL_FALSE, sizeof(int), (void*)0);
+	std::cout << "sizeof(int): " << sizeof(int) << std::endl;
+
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(int), (void*)0);
 	glVertexAttribDivisor(2, 1);
 	glEnableVertexAttribArray(2);
 }
@@ -171,8 +173,8 @@ void Mesh::getUVMap(const std::string& filepath)
 void Mesh::drawTriangles(Mesh* mesh, Camera* camera)
 {
 	mesh->shader->use();
-	mesh->shader->setMat4("projection", camera->getProjectionMat());
-	mesh->shader->setMat4("transform", mesh->transform.getMat());
+	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
+	//mesh->shader->setMat4("transform", mesh->transform.getMat());
 
 	switch (mesh->style)
 	{

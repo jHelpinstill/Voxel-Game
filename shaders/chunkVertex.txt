@@ -5,18 +5,19 @@ layout (location=1) in vec2 in_tex_coord;
 layout (location=2) in int instance_data;
 
 out vec2 tex_coord;
+//out vec3 fragment_color;
 
 uniform mat4 projection;
-uniform mat4 transform;
 uniform float unit_length;
 
 void main()
 {
-	int xi = instance_data & 31;
-	int yi = (instance_data >> 5) & 31;
-	int zi = (instance_data >> 10) & 31;
-	int face = (instance_data >> 15) & 7;
-	int tex_id = (instance_data >> 18);
+	int data = instance_data;
+	int xi = data & 31;
+	int yi = (data >> 5) & 31;
+	int zi = (data >> 10) & 31;
+	int face = (data >> 15) & 7;
+	int tex_id = (data >> 18) & 1;
 
 	float x = float(xi);
 	float y = float(yi);
@@ -54,9 +55,9 @@ void main()
 	if(tex_id == 1)
 		tc.x += 0.5;
 
-	pos += offset;
+	pos = pos + offset;
 	pos *= unit_length;
 
-	gl_Position = projection * transform * vec4(pos, 1.0);
+	gl_Position = projection * vec4(pos, 1.0);
 	tex_coord = tc;
 }

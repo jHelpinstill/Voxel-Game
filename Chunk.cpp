@@ -10,7 +10,7 @@ Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
 
 	for (int x = 0; x < CHUNK_SIZE; x++) for (int z = 0; z < CHUNK_SIZE; z++) for (int y = 0; y < CHUNK_SIZE; y++)
 	{
-		if(y < CHUNK_SIZE / 2)//if (y < (2 * (sin(x * 6.0 / CHUNK_SIZE) * cos(z * 6.0 / CHUNK_SIZE)) + (CHUNK_SIZE / 2)))
+		if (y < (2 * (sin(x * 6.0 / CHUNK_SIZE) * cos(z * 6.0 / CHUNK_SIZE)) + (CHUNK_SIZE / 2)))
 			blocks[x][y][z] = BlockType::DIRT;
 		else
 			blocks[x][y][z] = BlockType::AIR;
@@ -157,27 +157,27 @@ Mesh* Chunk::generateMesh()
 					continue;
 				//top
 				if (y != 0) if (blocks[x][y - 1][z] != BlockType::AIR)
-					mesh->instance_data.push_back((int)generateVertexData(x, y, z, 0, 1));
+					mesh->instance_data.push_back(generateVertexData(x, y, z, 0, 1));
 
 				//bottom
 				if (y != CHUNK_SIZE - 1) if (blocks[x][y + 1][z] != BlockType::AIR)
-					mesh->instance_data.push_back((int)generateVertexData(x, y, z, 1, 0));
+					mesh->instance_data.push_back(generateVertexData(x, y, z, 1, 0));
 
 				//left
 				if (x != 0) if (blocks[x - 1][y][z] != BlockType::AIR)
-					mesh->instance_data.push_back((int)generateVertexData(x, y, z, 2, 0));
+					mesh->instance_data.push_back(generateVertexData(x, y, z, 2, 0));
 
 				//right
 				if (x != CHUNK_SIZE - 1) if (blocks[x + 1][y][z] != BlockType::AIR)
-					mesh->instance_data.push_back((int)generateVertexData(x, y, z, 3, 0));
+					mesh->instance_data.push_back(generateVertexData(x, y, z, 3, 0));
 
 				//forward
 				if (z != 0) if (blocks[x][y][z - 1] != BlockType::AIR)
-					mesh->instance_data.push_back((int)generateVertexData(x, y, z, 4, 0));
+					mesh->instance_data.push_back(generateVertexData(x, y, z, 4, 0));
 
 				//back
 				if (z != CHUNK_SIZE - 1) if (blocks[x][y][z + 1] != BlockType::AIR)
-					mesh->instance_data.push_back((int)generateVertexData(x, y, z, 5, 0));
+					mesh->instance_data.push_back(generateVertexData(x, y, z, 5, 0));
 			}
 		}
 	}
@@ -202,16 +202,16 @@ int Chunk::generateVertexData(int x, int y, int z, int face, int texture_id)
 	data |= (face & 7) << 15;
 	data |= (texture_id & 1) << 18;
 
-	std::bitset<32> bits(data);
-	std::cout << "instance data: " << bits << " (" << x << ", " << y << ", " << z << ", " << face << ", " << texture_id << ")" << std::endl;
+	//std::bitset<32> bits(data);
+	//std::cout << "instance data: " << bits <<  ", " << data << " (" << x << ", " << y << ", " << z << ", " << face << ", " << texture_id << ")" << std::endl;
 	return data;
 }
 
 void Chunk::drawInstanced(Mesh* mesh, Camera* camera)
 {
 	mesh->shader->use();
-	mesh->shader->setMat4("projection", camera->getProjectionMat());
-	mesh->shader->setMat4("transform", mesh->transform.getMat());
+	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
+	//mesh->shader->setMat4("transform", mesh->transform.getMat());
 	mesh->shader->setFloat("unit_length", unit_length);
 
 	switch (mesh->style)
