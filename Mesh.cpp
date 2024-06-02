@@ -78,10 +78,55 @@ void Mesh::attachShader(Shader* shader)
 	);
 }
 
+void Mesh::generateInstancedVAO()
+{
+	std::vector<float> vert_data;
+	if (verts.size() != uv_coords.size())
+	{
+		std::cout << "Vertex and UV_coords size mismatch (";
+		std::cout << verts.size() << ", " << uv_coords.size() << "), aborting VAO creation" << std::endl;
+		return;
+	}
+
+	for (int vert = 0; vert < verts.size(); vert++)
+	{
+		for (int i = 0; i < 3; i++)
+			vert_data.push_back(verts[vert][i]);
+
+		vert_data.push_back(uv_coords[vert].x);
+		vert_data.push_back(uv_coords[vert].y);
+	}
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vert_data.size() * sizeof(float), vert_data.data(), GL_STATIC_DRAW);
+
+	int stride = 5 * sizeof(float);
+
+	//position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// texture coords
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glGenBuffers(1, &VBO_instanced);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_instanced);
+	glBufferData(GL_ARRAY_BUFFER, instance_data.size() * sizeof(uint32_t), instance_data.data(), GL_STATIC_DRAW);
+
+	glVertexAttribPointer(2, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(uint32_t), (void*)0);
+	glVertexAttribDivisor(2, 1);
+}
+
 void Mesh::deleteVAO()
 {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &VBO_instanced);
 }
 
 void Mesh::remakeVAO()
@@ -122,7 +167,7 @@ void Mesh::getUVMap(const std::string& filepath)
 	file.close();
 }
 
-void Mesh::meshDrawTriangles(Mesh* mesh, Camera* camera)
+void Mesh::drawTriangles(Mesh* mesh, Camera* camera)
 {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat());
@@ -141,6 +186,27 @@ void Mesh::meshDrawTriangles(Mesh* mesh, Camera* camera)
 
 	glBindVertexArray(mesh->VAO);
 	glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
+}
+
+void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera)
+{
+	mesh->shader->use();
+	mesh->shader->setMat4("projection", camera->getProjectionMat());
+	mesh->shader->setMat4("transform", mesh->transform.getMat());
+
+	switch (mesh->style)
+	{
+	case Shader::VAOStyle::TEXTURED:
+		glBindTexture(GL_TEXTURE_2D, mesh->texture);
+		break;
+
+	case Shader::VAOStyle::SOLID_COLORED:
+		mesh->shader->setVec3("color", mesh->color);
+		break;
+	}
+
+	glBindVertexArray(mesh->VAO);
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, mesh->verts.size(), mesh->instance_data.size());
 }
 
 Mesh* Mesh::makePlane(

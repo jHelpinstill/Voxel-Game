@@ -10,10 +10,10 @@
 class Mesh
 {
 private:
-	unsigned int VAO, VBO;
+	unsigned int VAO, VBO, VBO_instanced;
 	void getUVMap(const std::string& filepath);
 
-	static void meshDrawTriangles(Mesh* mesh, Camera* camera);
+	
 
 public:
 	Transform transform;
@@ -26,25 +26,26 @@ public:
 	void (*drawFunction)(Mesh* mesh, Camera* camera);
 
 	std::vector<glm::vec3> verts;
+	std::vector<uint32_t> instance_data;
 	std::vector<glm::vec2> uv_coords;
 
-	Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*) = meshDrawTriangles);
+	Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*) = drawTriangles);
 	Mesh(
 		const std::vector<glm::vec3>& verts,
 		unsigned int texture,
 		const std::string& uv_filepath,
-		void (*drawFunction)(Mesh*, Camera*) = meshDrawTriangles
+		void (*drawFunction)(Mesh*, Camera*) = drawTriangles
 	);
 	Mesh(
 		const std::vector<glm::vec3>& verts,
 		unsigned int texture,
 		const std::vector<glm::vec2>& uv_coords,
-		void (*drawFunction)(Mesh*, Camera*) = meshDrawTriangles
+		void (*drawFunction)(Mesh*, Camera*) = drawTriangles
 	);
 	Mesh(
 		const std::vector<glm::vec3>& verts,
 		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5),
-		void (*drawFunction)(Mesh*, Camera*) = meshDrawTriangles
+		void (*drawFunction)(Mesh*, Camera*) = drawTriangles
 	);
 	
 	~Mesh();
@@ -53,6 +54,7 @@ public:
 	void attachShader(Shader* shader);
 	void deleteVAO();
 	void remakeVAO();
+	void generateInstancedVAO();
 
 	static Mesh* makeBox(
 		const glm::vec3& size,
@@ -68,6 +70,9 @@ public:
 		const glm::vec3& pos = glm::vec3(0, 0, 0),
 		const glm::vec3& color = glm::vec3(0.5, 0.5, 0.5)
 	);
+	
+	static void drawTriangles(Mesh* mesh, Camera* camera);
+	static void drawInstancedStrip(Mesh* mesh, Camera* camera);
 };
 
 #endif
