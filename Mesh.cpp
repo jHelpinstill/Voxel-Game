@@ -116,10 +116,11 @@ void Mesh::generateInstancedVAO()
 
 	glGenBuffers(1, &VBO_instanced);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_instanced);
-	glBufferData(GL_ARRAY_BUFFER, instance_data.size() * sizeof(uint32_t), instance_data.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, instance_data.size() * sizeof(int), instance_data.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(2, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(uint32_t), (void*)0);
+	glVertexAttribPointer(2, 1, GL_INT, GL_FALSE, sizeof(int), (void*)0);
 	glVertexAttribDivisor(2, 1);
+	glEnableVertexAttribArray(2);
 }
 
 void Mesh::deleteVAO()

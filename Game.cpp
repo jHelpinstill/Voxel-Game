@@ -27,7 +27,7 @@ void Game::setup()
 
 	createShader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
 	createShader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
-	createShader("chunk_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
+	createShader("chunk_shader", "shaders/chunkVertex.txt", "shaders/meshFragment.txt");
 
 	createTexture("smiley", "textures/smiley.png", true);
 	createTexture("crate", "textures/crate.jpg");
@@ -38,6 +38,9 @@ void Game::setup()
 	//createPlane("ground", glm::vec2(10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 0.7, 0));
 
 	world.setup();
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 }
 
 #define AVG_FPS_HISTOR_SIZE 100
@@ -113,8 +116,11 @@ void Game::stateMachine(double dt)
 
 void Game::drawMeshes()
 {
+	int c = 0;
 	for (auto& mesh : meshes)
 	{
 		mesh.second->draw(camera);
+		c++;
 	}
+	//std::cout << c << "meshes" << std::endl;
 }

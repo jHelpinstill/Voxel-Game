@@ -1,5 +1,10 @@
 #include "World.h"
 
+World::World()
+{
+	Chunk::unit_length = chunk_unit_length;
+}
+
 void World::setup()
 {
 	addChunk(0, 0, 0);// chunks[Key(0, 0, 0)] = new Chunk(glm::ivec3(0, 0, 0));
@@ -48,7 +53,7 @@ void World::inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at)
 {
 	//Mesh* world_mesh = getMeshByName("world_mesh");
 	//pos -= world_mesh->transform.pos;
-	pos /= chunk_unit_dimension;
+	pos /= chunk_unit_length;
 	int x, y, z;
 	x = (int)(pos.x / CHUNK_SIZE); if (pos.x < 0) x--;
 	y = (int)(pos.y / CHUNK_SIZE); if (pos.y < 0) y--;
@@ -72,7 +77,7 @@ void World::updateBlock(glm::vec3 pos, BlockType new_type)
 
 	*block = new_type;
 
-	chunk->generateMesh(chunk_unit_dimension);
+	chunk->generateMesh();
 }
 
 void World::generateMesh()
@@ -83,10 +88,9 @@ void World::generateMesh()
 	//std::vector<glm::vec2> uv_coords;
 
 	// top
-	for (int chunk_x = -chunk_radius; chunk_x <= chunk_radius; chunk_x++) for(int chunk_z = -chunk_radius; chunk_z <= chunk_radius; chunk_z++)
+	for (auto& chunk : chunks)
 	{
-		Chunk* chunk = getChunk(chunk_x, 0, chunk_z);// chunks[Key(chunk_x, 0, chunk_z)];
-		Mesh* mesh = chunk->generateMesh(chunk_unit_dimension);
+		chunk.second->generateMesh();
 	}
 
 	//Mesh* world_mesh = new Mesh("world_mesh", verts, getTextureByName("dirt_block"), uv_coords);

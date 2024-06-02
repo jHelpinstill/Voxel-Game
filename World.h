@@ -12,12 +12,12 @@ class World
 private:
 
 public:
-	float chunk_unit_dimension = 0.1;
-	int chunk_radius = 5;
+	float chunk_unit_length = 0.1;
+	int chunk_radius = 0;
 
 	std::unordered_map<ChunkKey, Chunk*> chunks;
 
-	World() {}
+	World();
 
 	void setup();
 	void generateMesh();

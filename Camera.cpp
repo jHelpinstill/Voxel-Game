@@ -3,9 +3,6 @@
 Camera::Camera(GLFWwindow* window) : clip_near(0.1f), clip_far(100.f), fov(90.f)
 {
 	findAspectRatio(window);
-
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
 }
 
 void Camera::findAspectRatio(GLFWwindow* window)

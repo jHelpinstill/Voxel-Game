@@ -9,13 +9,10 @@
 
 class Mesh
 {
-private:
+public:
 	unsigned int VAO, VBO, VBO_instanced;
 	void getUVMap(const std::string& filepath);
 
-	
-
-public:
 	Transform transform;
 	Shader* shader;
 
@@ -26,7 +23,7 @@ public:
 	void (*drawFunction)(Mesh* mesh, Camera* camera);
 
 	std::vector<glm::vec3> verts;
-	std::vector<uint32_t> instance_data;
+	std::vector<int> instance_data;
 	std::vector<glm::vec2> uv_coords;
 
 	Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*) = drawTriangles);

@@ -20,11 +20,15 @@ public:
 
 	Mesh* mesh;
 	std::string mesh_name;
+	static float unit_length;
 
 	Chunk(int x, int y, int z);
 	
 	glm::vec3 getPosf();
-	Mesh* generateMesh(float block_size);
+	Mesh* generateMesh();
+	int generateVertexData(int x, int y, int z, int face, int texture_id);
+
+	static void drawInstanced(Mesh* mesh, Camera* camera);
 };
 
 struct ChunkKey

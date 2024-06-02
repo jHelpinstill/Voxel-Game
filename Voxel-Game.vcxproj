@@ -170,6 +170,7 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="shaders\chunkVertex.txt" />
     <Text Include="shaders\meshColorFragment.txt" />
     <Text Include="shaders\meshFragment.txt" />
     <Text Include="shaders\meshVertex.txt" />
