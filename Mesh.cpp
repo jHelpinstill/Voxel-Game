@@ -1,17 +1,20 @@
 #include "Mesh.h"
 
-Mesh::Mesh(unsigned int texture)
+Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*))
 {
 	this->texture = texture;
+	this->drawFunction = drawFunction;
 	style = Shader::VAOStyle::TEXTURED;
 }
 
 Mesh::Mesh(
 	const std::vector<glm::vec3>& verts,
 	unsigned int texture,
-	const std::string& uv_filepath
+	const std::string& uv_filepath,
+	void (*drawFunction)(Mesh*, Camera*)
 ) {
 	this->texture = texture;
+	this->drawFunction = drawFunction;
 
 	for (const glm::vec3& vert : verts)
 		this->verts.push_back(vert);
@@ -23,9 +26,11 @@ Mesh::Mesh(
 Mesh::Mesh(
 	const std::vector<glm::vec3>& verts,
 	unsigned int texture,
-	const std::vector<glm::vec2>& uv_coords
+	const std::vector<glm::vec2>& uv_coords,
+	void (*drawFunction)(Mesh*, Camera*)
 ) {
 	this->texture = texture;
+	this->drawFunction = drawFunction;
 
 	for (const glm::vec3& vert : verts)
 		this->verts.push_back(vert);
@@ -37,9 +42,11 @@ Mesh::Mesh(
 
 Mesh::Mesh(
 	const std::vector<glm::vec3>& verts,
-	glm::vec3 color
+	glm::vec3 color,
+	void (*drawFunction)(Mesh*, Camera*)
 ) {
 	this->color = color;
+	this->drawFunction = drawFunction;
 
 	for (const glm::vec3& vert : verts)
 		this->verts.push_back(vert);
@@ -54,23 +61,7 @@ Mesh::~Mesh()
 
 void Mesh::draw(Camera* camera)
 {
-	shader->use();
-	shader->setMat4("projection", camera->getProjectionMat());
-	shader->setMat4("transform", transform.getMat());
-
-	switch (style)
-	{
-	case Shader::VAOStyle::TEXTURED:
-		glBindTexture(GL_TEXTURE_2D, texture);
-		break;
-
-	case Shader::VAOStyle::SOLID_COLORED:
-		shader->setVec3("color", color);
-		break;
-	}
-		
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, verts.size());
+	drawFunction(this, camera);
 }
 
 void Mesh::attachShader(Shader* shader)
@@ -129,6 +120,27 @@ void Mesh::getUVMap(const std::string& filepath)
 	}
 
 	file.close();
+}
+
+void Mesh::meshDrawTriangles(Mesh* mesh, Camera* camera)
+{
+	mesh->shader->use();
+	mesh->shader->setMat4("projection", camera->getProjectionMat());
+	mesh->shader->setMat4("transform", mesh->transform.getMat());
+
+	switch (mesh->style)
+	{
+	case Shader::VAOStyle::TEXTURED:
+		glBindTexture(GL_TEXTURE_2D, mesh->texture);
+		break;
+
+	case Shader::VAOStyle::SOLID_COLORED:
+		mesh->shader->setVec3("color", mesh->color);
+		break;
+	}
+
+	glBindVertexArray(mesh->VAO);
+	glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
 }
 
 Mesh* Mesh::makePlane(
