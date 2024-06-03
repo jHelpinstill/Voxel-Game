@@ -4,6 +4,7 @@ float Chunk::unit_length = 1;
 
 Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
 {
+	this->ID = newID();
 	std::stringstream buffer;
 	buffer << "chunckmesh" << x << y << z;
 	buffer >> mesh_name;
@@ -22,113 +23,62 @@ glm::vec3 Chunk::getPosf()
 	return glm::vec3(x, y, z);
 }
 
-void addQuadUV(std::vector<glm::vec2>& uv_coords, bool top_face = false)
+int Chunk::generateFaceData(std::vector<int>& data)
 {
-	if (top_face)
+	int instances = 0;
+	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
-		uv_coords.push_back(glm::vec2(0.5, 0));
-		uv_coords.push_back(glm::vec2(1, 0));
-		uv_coords.push_back(glm::vec2(0.5, 1));
-		uv_coords.push_back(glm::vec2(1, 0));
-		uv_coords.push_back(glm::vec2(1, 1));
-		uv_coords.push_back(glm::vec2(0.5, 1));
+		for (int z = 0; z < CHUNK_SIZE; z++)
+		{
+			for (int y = CHUNK_SIZE - 1; y >= 0; y--)
+			{
+				if (blocks[x][y][z] != BlockType::AIR)
+					continue;
+				//top
+				if (y != 0) if (blocks[x][y - 1][z] != BlockType::AIR)
+				{
+					data.push_back(encodeFaceData(x, y, z, 0, 1));
+					instances++;
+				}
+
+				//bottom
+				if (y != CHUNK_SIZE - 1) if (blocks[x][y + 1][z] != BlockType::AIR)
+				{
+					data.push_back(encodeFaceData(x, y, z, 1, 0));
+					instances++;
+				}
+
+				//left
+				if (x != 0) if (blocks[x - 1][y][z] != BlockType::AIR)
+				{
+					data.push_back(encodeFaceData(x, y, z, 2, 0));
+					instances++;
+				}
+
+				//right
+				if (x != CHUNK_SIZE - 1) if (blocks[x + 1][y][z] != BlockType::AIR)
+				{
+					data.push_back(encodeFaceData(x, y, z, 3, 0));
+					instances++;
+				}
+
+				//forward
+				if (z != 0) if (blocks[x][y][z - 1] != BlockType::AIR)
+				{
+					data.push_back(encodeFaceData(x, y, z, 4, 0));
+					instances++;
+				}
+
+				//back
+				if (z != CHUNK_SIZE - 1) if (blocks[x][y][z + 1] != BlockType::AIR)
+				{
+					data.push_back(encodeFaceData(x, y, z, 5, 0));
+					instances++;
+				}
+			}
+		}
 	}
-	else
-	{
-		uv_coords.push_back(glm::vec2(0, 0));
-		uv_coords.push_back(glm::vec2(0.5, 0));
-		uv_coords.push_back(glm::vec2(0, 1));
-		uv_coords.push_back(glm::vec2(0.5, 0));
-		uv_coords.push_back(glm::vec2(0.5, 1));
-		uv_coords.push_back(glm::vec2(0, 1));
-	}
-
-}
-
-void Chunk::addQuad(glm::vec3 root, int face, float length)
-{
-	/*
-		face:
-		0: up
-		1: down
-		2: left
-		3: right
-		4: forward
-		5: back
-	*/
-
-	if (!mesh)
-		return;
-
-	glm::vec3 v[4];
-
-	switch (face)
-	{
-	case 0:	// up (+y)
-		v[0] = v[1] = v[2] = v[3] = root + glm::vec3(0, 0, 0);
-		v[1].z += length;
-		v[2].x += length; v[2].z += length;
-		v[3].x += length;
-		break;
-	case 1:	// down (-y)
-		v[0] = v[1] = v[2] = v[3] = root + glm::vec3(0, length, length);
-		v[1].z -= length;
-		v[2].x += length; v[2].z -= length;
-		v[3].x += length;
-		break;
-	case 2:	// left (+x)
-		v[0] = v[1] = v[2] = v[3] = root + glm::vec3(0, 0, 0);
-		v[1].y += length;
-		v[2].y += length; v[2].z += length;
-		v[3].z += length;
-		break;
-	case 3:	// right (-x)
-		v[0] = v[1] = v[2] = v[3] = root + glm::vec3(length, 0, length);
-		v[1].y += length;
-		v[2].y += length; v[2].z -= length;
-		v[3].z -= length;
-		break;
-	case 4:	// forward (+z)
-		v[0] = v[1] = v[2] = v[3] = root + glm::vec3(length, 0, 0);
-		v[1].y += length;
-		v[2].y += length; v[2].x -= length;
-		v[3].x -= length;
-		break;
-	case 5:	// backward (-z)
-		v[0] = v[1] = v[2] = v[3] = root + glm::vec3(0, 0, length);
-		v[1].y += length;
-		v[2].y += length; v[2].x += length;
-		v[3].x += length;
-		break;
-	}
-
-
-	mesh->verts.push_back(v[0]);
-	mesh->verts.push_back(v[1]);
-	mesh->verts.push_back(v[3]);
-	mesh->verts.push_back(v[1]);
-	mesh->verts.push_back(v[2]);
-	mesh->verts.push_back(v[3]);
-
-	// add uv coords for quad
-	if (face == 0)
-	{
-		mesh->uv_coords.push_back(glm::vec2(0.5, 0));
-		mesh->uv_coords.push_back(glm::vec2(1, 0));
-		mesh->uv_coords.push_back(glm::vec2(0.5, 1));
-		mesh->uv_coords.push_back(glm::vec2(1, 0));
-		mesh->uv_coords.push_back(glm::vec2(1, 1));
-		mesh->uv_coords.push_back(glm::vec2(0.5, 1));
-	}
-	else
-	{
-		mesh->uv_coords.push_back(glm::vec2(0, 0));
-		mesh->uv_coords.push_back(glm::vec2(0.5, 0));
-		mesh->uv_coords.push_back(glm::vec2(0, 1));
-		mesh->uv_coords.push_back(glm::vec2(0.5, 0));
-		mesh->uv_coords.push_back(glm::vec2(0.5, 1));
-		mesh->uv_coords.push_back(glm::vec2(0, 1));
-	}
+	return instances;
 }
 
 Mesh* Chunk::generateMesh()
@@ -147,54 +97,21 @@ Mesh* Chunk::generateMesh()
 	mesh->uv_coords.push_back(glm::vec2(0, 1));
 	mesh->uv_coords.push_back(glm::vec2(0.5, 1));
 
-	for (int x = 0; x < CHUNK_SIZE; x++)
-	{
-		for (int z = 0; z < CHUNK_SIZE; z++)
-		{
-			for (int y = CHUNK_SIZE - 1; y >= 0; y--)
-			{
-				if (blocks[x][y][z] != BlockType::AIR)
-					continue;
-				//top
-				if (y != 0) if (blocks[x][y - 1][z] != BlockType::AIR)
-					mesh->instance_data.push_back(generateVertexData(x, y, z, 0, 1));
-
-				//bottom
-				if (y != CHUNK_SIZE - 1) if (blocks[x][y + 1][z] != BlockType::AIR)
-					mesh->instance_data.push_back(generateVertexData(x, y, z, 1, 0));
-
-				//left
-				if (x != 0) if (blocks[x - 1][y][z] != BlockType::AIR)
-					mesh->instance_data.push_back(generateVertexData(x, y, z, 2, 0));
-
-				//right
-				if (x != CHUNK_SIZE - 1) if (blocks[x + 1][y][z] != BlockType::AIR)
-					mesh->instance_data.push_back(generateVertexData(x, y, z, 3, 0));
-
-				//forward
-				if (z != 0) if (blocks[x][y][z - 1] != BlockType::AIR)
-					mesh->instance_data.push_back(generateVertexData(x, y, z, 4, 0));
-
-				//back
-				if (z != CHUNK_SIZE - 1) if (blocks[x][y][z + 1] != BlockType::AIR)
-					mesh->instance_data.push_back(generateVertexData(x, y, z, 5, 0));
-			}
-		}
-	}
+	generateFaceData(mesh->instance_data);
 
 	mesh->shader = getShaderByName("chunk_shader");
 	mesh->generateInstancedVAO();
 	mesh->drawFunction = drawInstanced;
 	mesh->transform.translate(getPosf() * (float)CHUNK_SIZE * unit_length);
 
-	std::cout << mesh_name << " has " << mesh->verts.size() << " verts and " << mesh->instance_data.size() << " faces" << std::endl;
+	//std::cout << mesh_name << " has " << mesh->verts.size() << " verts and " << mesh->instance_data.size() << " faces" << std::endl;
 
 	return mesh;
 }
 
 #include <bitset>
 
-int Chunk::generateVertexData(int x, int y, int z, int face, int texture_id)
+int Chunk::encodeFaceData(int x, int y, int z, int face, int texture_id)
 {
 	int data = (x & 31);
 	data |= (y & 31) << 5;
@@ -229,4 +146,11 @@ void Chunk::drawInstanced(Mesh* mesh, Camera* camera)
 	//glDisable(GL_CULL_FACE);
 	glBindVertexArray(mesh->VAO);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, mesh->verts.size(), mesh->instance_data.size());
+}
+
+int Chunk::newID()
+{
+	static int ID = 0;
+	int id = ID++;
+	return id;
 }

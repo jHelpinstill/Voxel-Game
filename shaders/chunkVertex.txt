@@ -1,14 +1,22 @@
-#version 330 core
+#version 460 core
 
 layout (location=0) in vec3 vertex_pos;
 layout (location=1) in vec2 in_tex_coord;
 layout (location=2) in int instance_data;
+
+layout (std430, binding=0) buffer chunks_ssbo
+{
+	int chunk_positions[];
+};
 
 out vec2 tex_coord;
 //out vec3 fragment_color;
 
 uniform mat4 projection;
 uniform float unit_length;
+uniform int inst_per_chunk;
+uniform int chunk_size;
+//uniform int chunk_pos[10000];
 
 void main()
 {
@@ -19,9 +27,14 @@ void main()
 	int face = (data >> 15) & 7;
 	int tex_id = (data >> 18) & 1;
 
-	float x = float(xi);
-	float y = float(yi);
-	float z = float(zi);
+	int chunk_data = chunk_positions[gl_DrawID];
+	int xc = ((chunk_data & 1023) - 512) * chunk_size;
+	int yc = (((chunk_data >> 10) & 1023) - 512) * chunk_size;
+	int zc = (((chunk_data >> 20) & 1023) - 512) * chunk_size;
+
+	float x = float(xi + xc);
+	float y = float(yi + yc);
+	float z = float(zi + zc);
 	vec3 offset = vec3(x, y, z);
 	vec3 pos = vertex_pos;
 

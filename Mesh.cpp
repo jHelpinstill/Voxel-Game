@@ -114,11 +114,10 @@ void Mesh::generateInstancedVAO()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	// instance information
 	glGenBuffers(1, &VBO_instanced);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_instanced);
 	glBufferData(GL_ARRAY_BUFFER, instance_data.size() * sizeof(int), instance_data.data(), GL_STATIC_DRAW);
-
-	std::cout << "sizeof(int): " << sizeof(int) << std::endl;
 
 	glVertexAttribIPointer(2, 1, GL_INT, sizeof(int), (void*)0);
 	glVertexAttribDivisor(2, 1);

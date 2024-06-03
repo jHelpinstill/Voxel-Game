@@ -10,7 +10,7 @@
 class Mesh
 {
 public:
-	unsigned int VAO, VBO, VBO_instanced;
+	unsigned int VAO, VBO, VBO_instanced, SSBO;
 	void getUVMap(const std::string& filepath);
 
 	Transform transform;

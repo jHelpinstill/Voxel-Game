@@ -11,12 +11,9 @@
 
 class Chunk
 {
-private:
-	void addQuad(glm::vec3 root, int face, float length);
-	
 public:
 	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};
-	int x, y, z;
+	int x, y, z, ID;
 
 	Mesh* mesh;
 	std::string mesh_name;
@@ -26,9 +23,11 @@ public:
 	
 	glm::vec3 getPosf();
 	Mesh* generateMesh();
-	int generateVertexData(int x, int y, int z, int face, int texture_id);
+	int generateFaceData(std::vector<int>& data);
+	int encodeFaceData(int x, int y, int z, int face, int texture_id);
 
 	static void drawInstanced(Mesh* mesh, Camera* camera);
+	static int newID();
 };
 
 struct ChunkKey
