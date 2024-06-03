@@ -2,6 +2,7 @@
 
 float World::chunk_unit_length = 0.2;
 std::vector<int> World::chunk_pos_data;
+std::vector<Chunk*> World::chunks_vec;
 std::vector<ChunkDrawParams> World::chunk_draw_params;
 
 World::World()
@@ -103,17 +104,20 @@ void World::generateMesh()
 	mesh->uv_coords.push_back(glm::vec2(0, 1));
 	mesh->uv_coords.push_back(glm::vec2(0.5, 1));
 
+	chunks_vec.clear();
 	int c_counter = 0;
 	for (auto& chunk : chunks)
 	{
 		int num_instances = chunk.second->generateFaceData(mesh->instance_data);
 		chunk_draw_params.push_back(ChunkDrawParams(4, num_instances, 0, mesh->instance_data.size() - num_instances));
 		chunk_pos_data.push_back(encodeChunkPos(chunk.second));
+		chunks_vec.push_back(chunk.second);
 	}
 	
 	mesh->shader = getShaderByName("world_shader");
 	mesh->generateInstancedVAO();
 	mesh->drawFunction = drawWorld;
+	mesh->transform.translate(glm::vec3(0, -3, 0));
 
 
 	glGenBuffers(1, &mesh->SSBO);
@@ -145,7 +149,6 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
-
 	mesh->shader->setFloat("unit_length", chunk_unit_length);
 	mesh->shader->setInt("chunk_size", CHUNK_SIZE);
 
@@ -160,7 +163,28 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 		break;
 	}
 
-	//std::cout << "World::drawWorld()" << std::endl;
+	glm::vec3 look_dir = camera->getLookDirection();
+	float dot_criteria = cos(glm::radians(camera->aspect_ratio * camera->fov / 2));
+	for (int i = 0; i < chunk_draw_params.size(); i++)
+	{
+		Chunk* chunk = chunks_vec[i];
+		glm::vec3 a, b, c, d;
+		float length = CHUNK_SIZE * chunk_unit_length;
+		a = chunk->getPosf();
+		b = a + glm::vec3(0, 0, length);
+		c = a + glm::vec3(length, 0, 0);
+		d = a + glm::vec3(length, 0, length);
+		if (
+			glm::dot(look_dir, a - camera->transform.pos) < dot_criteria &&
+			glm::dot(look_dir, b - camera->transform.pos) < dot_criteria &&
+			glm::dot(look_dir, c - camera->transform.pos) < dot_criteria &&
+			glm::dot(look_dir, d - camera->transform.pos) < dot_criteria)
+		{
+			chunk_draw_params[i].instanceCount = 0;
+		}
+		else
+			chunk_draw_params[i].instanceCount = chunk->faces;
+	}
 
 	glBindVertexArray(mesh->VAO);
 	glMultiDrawArraysIndirect(GL_TRIANGLE_STRIP, chunk_draw_params.data(), chunk_draw_params.size(), sizeof(ChunkDrawParams));

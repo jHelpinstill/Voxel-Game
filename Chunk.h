@@ -13,7 +13,7 @@ class Chunk
 {
 public:
 	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};
-	int x, y, z, ID;
+	int x, y, z, ID, faces;
 
 	Mesh* mesh;
 	std::string mesh_name;

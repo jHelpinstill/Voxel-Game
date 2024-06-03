@@ -87,6 +87,7 @@ int Chunk::generateFaceData(std::vector<int>& data)
 			}
 		}
 	}
+	faces = instances;
 	return instances;
 }
 

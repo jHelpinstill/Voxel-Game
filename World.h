@@ -28,9 +28,10 @@ private:
 
 public:
 	static float chunk_unit_length;
-	int chunk_radius = 5;
+	int chunk_radius = 30;
 
 	std::unordered_map<ChunkKey, Chunk*> chunks;
+	static std::vector<Chunk*> chunks_vec;
 	static std::vector<int> chunk_pos_data;
 	static std::vector<ChunkDrawParams> chunk_draw_params;
 

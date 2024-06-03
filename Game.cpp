@@ -36,7 +36,7 @@ void Game::setup()
 
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
-	createTexturedBox("ruler", glm::vec3(1, 1, 100), glm::vec3(0, 0, 0), "crate", "meshes/box_two_face_UV.txt");
+	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 0, 2), "crate", "meshes/box_two_face_UV.txt");
 	//createPlane("ground", glm::vec2(10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 0.7, 0));
 
 	world.setup();
@@ -65,6 +65,11 @@ void Game::stateMachine(double dt)
 {
 	input->update();
 	double time = glfwGetTime();
+
+	std::stringstream buf;
+	avg_fps.update(1.0 / dt);
+	buf << "fps: " << std::setw(7) << avg_fps.avg();
+	glfwSetWindowTitle(window, buf.str().c_str());
 
 	switch (state)
 	{
@@ -96,7 +101,6 @@ void Game::stateMachine(double dt)
 			player->move_speed = 5;
 
 		player->update(dt);
-		avg_fps.update(1.0 / dt);
 
 		//if (input->mouse.left.held)
 		//{
