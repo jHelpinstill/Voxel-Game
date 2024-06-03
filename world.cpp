@@ -63,7 +63,7 @@ bool World::peekChunk(int x, int y, int z, Chunk** chunk_at)
 	if (chunks.find(key) != chunks.end())
 		exists = true;
 	if (exists && chunk_at)
-		chunk_at = &chunks[key];
+		*chunk_at = chunks[key];
 	return exists;
 }
 
@@ -163,6 +163,16 @@ void World::updateBlock(glm::vec3 pos, BlockType new_type)
 	Chunk* chunk;
 	inspectPos(pos, &block, &chunk);
 
+	*block = new_type;
+	remeshChunk(chunk);
+}
+
+void World::updateLookedAtBlock(Camera* camera, BlockType new_type)
+{
+	BlockType* block;
+	Chunk* chunk;
+	if (!inspectRay(camera->transform.pos, camera->getLookDirection(), &block, &chunk))
+		return;
 	*block = new_type;
 	remeshChunk(chunk);
 }

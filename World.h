@@ -50,6 +50,7 @@ public:
 	BlockType* inspectRay(glm::vec3 pos, glm::vec3 dir);
 
 	void updateBlock(glm::vec3 pos, BlockType new_type);
+	void updateLookedAtBlock(Camera* camera, BlockType new_type);
 
 	int encodeChunkPos(Chunk* chunk);
 	static void drawWorld(Mesh* mesh, Camera* camera);

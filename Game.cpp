@@ -104,9 +104,10 @@ void Game::stateMachine(double dt)
 
 		player->update(dt);
 
-		if (input->mouse.left.held)
+		if (input->mouse.left.pressed)
 		{
-			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
+			world.updateLookedAtBlock(camera, BlockType::AIR);
+			//world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
 			//world.generateMesh();
 		}
 		else if (input->keyHeld('E') || input->mouse.right.held)
