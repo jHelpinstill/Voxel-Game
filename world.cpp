@@ -1,8 +1,9 @@
 #include "World.h"
 
 float World::chunk_unit_length = 0.2;
+
+std::unordered_map<ChunkKey, Chunk*> World::chunks;
 std::vector<int> World::chunk_pos_data;
-std::vector<Chunk*> World::chunks_vec;
 std::vector<ChunkDrawParams> World::chunk_draw_params;
 
 World::World()
@@ -57,8 +58,8 @@ Chunk* World::getChunk(int x, int y, int z)
 
 void World::inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at)
 {
-	//Mesh* world_mesh = getMeshByName("world_mesh");
-	//pos -= world_mesh->transform.pos;
+	Mesh* world_mesh = getMeshByName("world_mesh");
+	pos -= world_mesh->transform.pos;
 	glm::vec3 block_pos = pos / chunk_unit_length;
 	int x, y, z;
 	x = (int)(block_pos.x / CHUNK_SIZE); if (block_pos.x < 0) x--;
@@ -75,6 +76,7 @@ void World::inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at)
 	if (chunk_at)
 		*chunk_at = chunk;
 }
+
 void World::updateBlock(glm::vec3 pos, BlockType new_type)
 {
 	BlockType* block;
@@ -82,8 +84,34 @@ void World::updateBlock(glm::vec3 pos, BlockType new_type)
 	inspectPos(pos, &block, &chunk);
 
 	*block = new_type;
+	remeshChunk(chunk);
+}
 
-	chunk->generateMesh();
+void World::remeshChunk(Chunk* chunk)
+{
+	ChunkDrawParams* chunk_params = &chunk_draw_params[chunk->ID];
+
+	std::vector<int> instance_data;
+
+	int face_per_chunk = 4 * CHUNK_SIZE * CHUNK_SIZE;
+	int num_instances = chunk->generateFaceData(instance_data);
+	int padding = face_per_chunk - num_instances;
+	for (int i = 0; i < padding; i++)
+		instance_data.push_back(0);
+	chunk_params->instanceCount = num_instances;
+
+	Mesh* mesh = getMeshByName("world_mesh");
+	unsigned int VBO = mesh->VBO_instanced;
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferSubData(GL_ARRAY_BUFFER, chunk_params->baseInstance * sizeof(int), num_instances * sizeof(int), instance_data.data());
+	//int i = chunk_params->baseInstance;
+	//for (int instance : instance_data)
+	//{
+	//	mesh->instance_data[i++] = instance;
+	//}
+
+	std::cout << "Remeshed chunk " << chunk->ID << ", now has " << num_instances << " faces" << std::endl;
 }
 
 void World::generateMesh()
@@ -104,14 +132,20 @@ void World::generateMesh()
 	mesh->uv_coords.push_back(glm::vec2(0, 1));
 	mesh->uv_coords.push_back(glm::vec2(0.5, 1));
 
-	chunks_vec.clear();
-	int c_counter = 0;
+	chunk_draw_params.clear();
+	chunk_pos_data.clear();
+
+	int chunk_counter = 0;
+	int face_per_chunk = 4 * CHUNK_SIZE * CHUNK_SIZE;
 	for (auto& chunk : chunks)
 	{
 		int num_instances = chunk.second->generateFaceData(mesh->instance_data);
-		chunk_draw_params.push_back(ChunkDrawParams(4, num_instances, 0, mesh->instance_data.size() - num_instances));
+		int padding = face_per_chunk - num_instances;
+		for (int i = 0; i < padding; i++)
+			mesh->instance_data.push_back(0);
+		chunk_draw_params.push_back(ChunkDrawParams(4, num_instances, 0, mesh->instance_data.size() - face_per_chunk));
 		chunk_pos_data.push_back(encodeChunkPos(chunk.second));
-		chunks_vec.push_back(chunk.second);
+		chunk.second->ID = chunk_counter++;
 	}
 	
 	mesh->shader = getShaderByName("world_shader");
@@ -165,9 +199,9 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 
 	glm::vec3 look_dir = camera->getLookDirection();
 	float dot_criteria = cos(glm::radians(camera->aspect_ratio * camera->fov / 2));
-	for (int i = 0; i < chunk_draw_params.size(); i++)
+	for (auto& chunk_obj : chunks)
 	{
-		Chunk* chunk = chunks_vec[i];
+		Chunk* chunk = chunk_obj.second;
 		glm::vec3 a, b, c, d;
 		float length = CHUNK_SIZE * chunk_unit_length;
 		a = chunk->getPosf();
@@ -180,10 +214,10 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 			glm::dot(look_dir, c - camera->transform.pos) < dot_criteria &&
 			glm::dot(look_dir, d - camera->transform.pos) < dot_criteria)
 		{
-			chunk_draw_params[i].instanceCount = 0;
+			chunk_draw_params[chunk->ID].instanceCount = 0;
 		}
 		else
-			chunk_draw_params[i].instanceCount = chunk->faces;
+			chunk_draw_params[chunk->ID].instanceCount = chunk->faces;
 	}
 
 	glBindVertexArray(mesh->VAO);

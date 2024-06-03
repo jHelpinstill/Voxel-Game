@@ -28,10 +28,9 @@ private:
 
 public:
 	static float chunk_unit_length;
-	int chunk_radius = 30;
+	int chunk_radius = 5;
 
-	std::unordered_map<ChunkKey, Chunk*> chunks;
-	static std::vector<Chunk*> chunks_vec;
+	static std::unordered_map<ChunkKey, Chunk*> chunks;
 	static std::vector<int> chunk_pos_data;
 	static std::vector<ChunkDrawParams> chunk_draw_params;
 
@@ -39,6 +38,7 @@ public:
 
 	void setup();
 	void generateMesh();
+	void remeshChunk(Chunk* chunk);
 
 	void addChunk(int x, int y, int z);
 	Chunk* getChunk(int x, int y, int z);

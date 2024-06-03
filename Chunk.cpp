@@ -4,7 +4,7 @@ float Chunk::unit_length = 1;
 
 Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
 {
-	this->ID = newID();
+	this->ID = -1;
 	std::stringstream buffer;
 	buffer << "chunkmesh" << x << y << z;
 	buffer >> mesh_name;
@@ -23,7 +23,10 @@ Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
 			)
 			blocks[xb][yb][zb] = BlockType::DIRT;
 		else
-			blocks[xb][yb][zb] = BlockType::AIR;
+		{
+			for(yb; yb < CHUNK_SIZE; yb++)
+				blocks[xb][yb][zb] = BlockType::AIR;
+		}
 	}
 }
 
@@ -123,11 +126,11 @@ Mesh* Chunk::generateMesh()
 
 int Chunk::encodeFaceData(int x, int y, int z, int face, int texture_id)
 {
-	int data = (x & 31);
-	data |= (y & 31) << 5;
-	data |= (z & 31) << 10;
-	data |= (face & 7) << 15;
-	data |= (texture_id & 1) << 18;
+	int data = (x & 63);
+	data |= (y & 63) << 6;
+	data |= (z & 63) << 12;
+	data |= (face & 7) << 18;
+	data |= (texture_id & 1) << 21;
 
 	//std::bitset<32> bits(data);
 	//std::cout << "instance data: " << bits <<  ", " << data << " (" << x << ", " << y << ", " << z << ", " << face << ", " << texture_id << ")" << std::endl;
@@ -155,11 +158,4 @@ void Chunk::drawInstanced(Mesh* mesh, Camera* camera)
 	//glDisable(GL_CULL_FACE);
 	glBindVertexArray(mesh->VAO);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, mesh->verts.size(), mesh->instance_data.size());
-}
-
-int Chunk::newID()
-{
-	static int ID = 0;
-	int id = ID++;
-	return id;
 }

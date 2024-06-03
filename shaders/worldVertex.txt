@@ -19,11 +19,11 @@ uniform int chunk_size;
 void main()
 {
 	int data = instance_data;
-	int xi = data & 31;
-	int yi = (data >> 5) & 31;
-	int zi = (data >> 10) & 31;
-	int face = (data >> 15) & 7;
-	int tex_id = (data >> 18) & 1;
+	int xi = data & 63;
+	int yi = (data >> 6) & 63;
+	int zi = (data >> 12) & 63;
+	int face = (data >> 18) & 7;
+	int tex_id = (data >> 21) & 1;
 	
 	int chunk_data = chunk_positions[gl_DrawID];
 	xi += ((chunk_data & 1023) - 512) * chunk_size;

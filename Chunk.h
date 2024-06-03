@@ -7,7 +7,7 @@
 #include "BlockType.h"
 #include "Mesh.h"
 
-#define CHUNK_SIZE 32
+#define CHUNK_SIZE 64
 
 class Chunk
 {
@@ -27,7 +27,6 @@ public:
 	int encodeFaceData(int x, int y, int z, int face, int texture_id);
 
 	static void drawInstanced(Mesh* mesh, Camera* camera);
-	static int newID();
 };
 
 struct ChunkKey

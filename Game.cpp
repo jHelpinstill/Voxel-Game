@@ -61,6 +61,7 @@ struct
 	}
 } avg_fps;
 
+int num_meshes = 0;
 void Game::stateMachine(double dt)
 {
 	input->update();
@@ -94,6 +95,7 @@ void Game::stateMachine(double dt)
 			input->freeCursor();
 			std::cout << "PAUSED" << std::endl;
 			std::cout << "avg fps: " << avg_fps.avg() << std::endl;
+			std::cout << num_meshes << " meshes" << std::endl;
 		}
 		if (input->keyHeld(GLFW_KEY_LEFT_SHIFT))
 			player->move_speed = 40;
@@ -102,23 +104,23 @@ void Game::stateMachine(double dt)
 
 		player->update(dt);
 
-		//if (input->mouse.left.held)
-		//{
-		//	world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
-		//	//world.generateMesh();
-		//}
-		//else if (input->keyHeld('E') || input->mouse.right.held)
-		//{
-		//	world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
-		//	//world.generateMesh();
-		//}
-		if (input->mouse.left.pressed)
+		if (input->mouse.left.held)
 		{
-			BlockType* block;
-			glm::vec3 pos = camera->transform.pos;
-			world.inspectPos(pos, &block);
-			std::cout << pos.x << ", " << pos.y << ", " << pos.z << ": " << getBlockName(*block) << std::endl;
+			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
+			//world.generateMesh();
 		}
+		else if (input->keyHeld('E') || input->mouse.right.held)
+		{
+			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
+			//world.generateMesh();
+		}
+		//if (input->mouse.left.pressed)
+		//{
+		//	BlockType* block;
+		//	glm::vec3 pos = camera->transform.pos;
+		//	world.inspectPos(pos, &block);
+		//	std::cout << pos.x << ", " << pos.y << ", " << pos.z << ": " << getBlockName(*block) << std::endl;
+		//}
 		//std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
 
 		drawMeshes();
@@ -129,11 +131,11 @@ void Game::stateMachine(double dt)
 
 void Game::drawMeshes()
 {
-	int c = 0;
+	num_meshes = 0;
 	for (auto& mesh : meshes)
 	{
 		mesh.second->draw(camera);
-		c++;
+		num_meshes++;
 	}
 	//std::cout << c << "meshes" << std::endl;
 }
