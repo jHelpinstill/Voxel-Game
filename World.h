@@ -42,8 +42,13 @@ public:
 
 	void addChunk(int x, int y, int z);
 	Chunk* getChunk(int x, int y, int z);
+	bool peekChunk(int x, int y, int z, Chunk** chunk_at = nullptr);
 
 	void inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at = nullptr);
+	BlockType* inspectPos(glm::vec3 pos);
+	bool inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_at, Chunk** chunk_at = nullptr);
+	BlockType* inspectRay(glm::vec3 pos, glm::vec3 dir);
+
 	void updateBlock(glm::vec3 pos, BlockType new_type);
 
 	int encodeChunkPos(Chunk* chunk);
