@@ -142,6 +142,7 @@
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="HUDElement.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="HUDElement.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TriangleMesh.h" />
     <ClInclude Include="util.h" />
@@ -175,6 +177,8 @@
     <Text Include="shaders\meshFragment.txt" />
     <Text Include="shaders\meshVertex.txt" />
     <Text Include="shaders\meshColorVertex.txt" />
+    <Text Include="shaders\UIColorFragment.txt" />
+    <Text Include="shaders\UIColorVertex.txt" />
     <Text Include="shaders\worldFragment.txt" />
     <Text Include="shaders\worldVertex.txt" />
   </ItemGroup>

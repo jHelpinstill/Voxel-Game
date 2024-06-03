@@ -27,8 +27,8 @@ void Game::setup()
 
 	createShader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
 	createShader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
-	//createShader("world_shader", "shaders/worldVertex.txt", "shaders/meshFragment.txt");
 	createShader("chunk_shader", "shaders/chunkVertex.txt", "shaders/meshFragment.txt");
+	createShader("solid_UI_shader", "shaders/UIColorVertex.txt", "shaders/UIColorFragment.txt");
 
 	createTexture("smiley", "textures/smiley.png", true);
 	createTexture("crate", "textures/crate.jpg");
@@ -37,7 +37,13 @@ void Game::setup()
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
 	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 0, 2), "crate", "meshes/box_two_face_UV.txt");
-	//createPlane("ground", glm::vec2(10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 0.7, 0));
+
+	HUDElement* crosshair = new HUDElement();
+	hud_elements["crosshair"] = crosshair;
+	crosshair->shader = getShaderByName("solid_UI_shader");
+	crosshair->addRect(-0.007, -0.007, 0.014, 0.014);
+	crosshair->createVAO();
+	crosshair->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 
 	world.setup();
 
@@ -45,19 +51,19 @@ void Game::setup()
 	glEnable(GL_DEPTH_TEST);
 }
 
-#define AVG_FPS_HISTOR_SIZE 100
+#define AVG_FPS_HISTORY_SIZE 100
 struct
 {
-	double history[AVG_FPS_HISTOR_SIZE]{};
+	double history[AVG_FPS_HISTORY_SIZE]{};
 	int index = 0;
 	double sum = 0;
-	double avg() { return sum / AVG_FPS_HISTOR_SIZE; }
+	double avg() { return sum / AVG_FPS_HISTORY_SIZE; }
 	void update(double fps)
 	{
 		sum += fps;
 		sum -= history[index];
 		history[index] = fps;
-		++index %= AVG_FPS_HISTOR_SIZE;
+		++index %= AVG_FPS_HISTORY_SIZE;
 	}
 } avg_fps;
 
@@ -82,8 +88,10 @@ void Game::stateMachine(double dt)
 			input->lockCursor();
 			std::cout << "RUNNING" << std::endl;
 		}
-
+		
 		drawMeshes();
+		drawUI();
+
 		break;
 	}
 	case RUNNING:
@@ -123,7 +131,8 @@ void Game::stateMachine(double dt)
 		//	std::cout << pos.x << ", " << pos.y << ", " << pos.z << ": " << getBlockName(*block) << std::endl;
 		//}
 		//std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
-
+		
+		drawUI();
 		drawMeshes();
 		break;
 	}
@@ -139,4 +148,12 @@ void Game::drawMeshes()
 		num_meshes++;
 	}
 	//std::cout << c << "meshes" << std::endl;
+}
+
+void Game::drawUI()
+{
+	for (auto& hud_elem : hud_elements)
+	{
+		hud_elem.second->draw();
+	}
 }

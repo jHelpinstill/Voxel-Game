@@ -63,6 +63,9 @@
     <ClCompile Include="world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HUDElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -107,6 +110,9 @@
     <ClInclude Include="ObjectManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HUDElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\meshColorFragment.txt">
@@ -120,5 +126,7 @@
     <Text Include="shaders\chunkVertex.txt" />
     <Text Include="shaders\worldVertex.txt" />
     <Text Include="shaders\worldFragment.txt" />
+    <Text Include="shaders\UIColorVertex.txt" />
+    <Text Include="shaders\UIColorFragment.txt" />
   </ItemGroup>
 </Project>

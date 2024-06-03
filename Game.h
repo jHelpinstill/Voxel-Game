@@ -11,6 +11,7 @@
 #include "util.h"
 #include "ObjectManager.h"
 #include "World.h"
+#include "HUDElement.h"
 
 class Game
 {
@@ -28,6 +29,7 @@ public:
 	Camera* camera;
 	CameraController* player;
 	World world;
+	std::unordered_map<std::string, HUDElement*> hud_elements;
 	
 
 	Game(GLFWwindow* window);
@@ -35,6 +37,7 @@ public:
 
 	void stateMachine(double dt);
 	void drawMeshes();
+	void drawUI();
 
 };
 

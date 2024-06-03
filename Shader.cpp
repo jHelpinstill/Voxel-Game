@@ -63,6 +63,10 @@ void Shader::setVec3(const std::string& name, glm::vec3 vec) const
 {
 	glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
 }
+void Shader::setVec4(const std::string& name, glm::vec4 vec) const
+{
+	glUniform4fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
+}
 
 void Shader::makeVAOFromTris(
 	const std::vector<glm::vec3>& verts,
