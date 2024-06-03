@@ -27,6 +27,7 @@ void Game::setup()
 
 	createShader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
 	createShader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
+	//createShader("world_shader", "shaders/worldVertex.txt", "shaders/meshFragment.txt");
 	createShader("chunk_shader", "shaders/chunkVertex.txt", "shaders/meshFragment.txt");
 
 	createTexture("smiley", "textures/smiley.png", true);
@@ -35,6 +36,7 @@ void Game::setup()
 
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
+	createTexturedBox("ruler", glm::vec3(1, 1, 100), glm::vec3(0, 0, 0), "crate", "meshes/box_two_face_UV.txt");
 	//createPlane("ground", glm::vec2(10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 0.7, 0));
 
 	world.setup();
@@ -89,22 +91,29 @@ void Game::stateMachine(double dt)
 			std::cout << "avg fps: " << avg_fps.avg() << std::endl;
 		}
 		if (input->keyHeld(GLFW_KEY_LEFT_SHIFT))
-			player->move_speed = 15;
+			player->move_speed = 40;
 		else
 			player->move_speed = 5;
 
 		player->update(dt);
 		avg_fps.update(1.0 / dt);
 
-		if (input->mouse.left.held)
+		//if (input->mouse.left.held)
+		//{
+		//	world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
+		//	//world.generateMesh();
+		//}
+		//else if (input->keyHeld('E') || input->mouse.right.held)
+		//{
+		//	world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
+		//	//world.generateMesh();
+		//}
+		if (input->mouse.left.pressed)
 		{
-			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
-			//world.generateMesh();
-		}
-		else if (input->keyHeld('E') || input->mouse.right.held)
-		{
-			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
-			//world.generateMesh();
+			BlockType* block;
+			glm::vec3 pos = camera->transform.pos;
+			world.inspectPos(pos, &block);
+			std::cout << pos.x << ", " << pos.y << ", " << pos.z << ": " << getBlockName(*block) << std::endl;
 		}
 		//std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
 

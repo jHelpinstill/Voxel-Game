@@ -118,5 +118,7 @@
     <Text Include="shaders\meshVertex.txt" />
     <Text Include="shaders\meshFragment.txt" />
     <Text Include="shaders\chunkVertex.txt" />
+    <Text Include="shaders\worldVertex.txt" />
+    <Text Include="shaders\worldFragment.txt" />
   </ItemGroup>
 </Project>

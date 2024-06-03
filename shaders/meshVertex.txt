@@ -6,7 +6,7 @@ layout (location=1) in vec2 in_tex_coord;
 out vec2 tex_coord;
 
 uniform mat4 projection;
-//uniform mat4 transform;
+uniform mat4 transform;
 uniform vec4 color;
 
 void main()

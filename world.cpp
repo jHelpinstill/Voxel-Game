@@ -1,6 +1,6 @@
 #include "World.h"
 
-float World::chunk_unit_length = 0.1;
+float World::chunk_unit_length = 0.2;
 std::vector<int> World::chunk_pos_data;
 std::vector<ChunkDrawParams> World::chunk_draw_params;
 
@@ -31,6 +31,7 @@ void World::setup()
 
 	std::cout << "created " << chunks.size() << " chunks" << std::endl;
 
+	createShader("world_shader", "shaders/worldVertex.txt", "shaders/worldFragment.txt");
 	generateMesh();
 }
 
@@ -57,16 +58,16 @@ void World::inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at)
 {
 	//Mesh* world_mesh = getMeshByName("world_mesh");
 	//pos -= world_mesh->transform.pos;
-	pos /= chunk_unit_length;
+	glm::vec3 block_pos = pos / chunk_unit_length;
 	int x, y, z;
-	x = (int)(pos.x / CHUNK_SIZE); if (pos.x < 0) x--;
-	y = (int)(pos.y / CHUNK_SIZE); if (pos.y < 0) y--;
-	z = (int)(pos.z / CHUNK_SIZE); if (pos.z < 0) z--;
+	x = (int)(block_pos.x / CHUNK_SIZE); if (block_pos.x < 0) x--;
+	y = (int)(block_pos.y / CHUNK_SIZE); if (block_pos.y < 0) y--;
+	z = (int)(block_pos.z / CHUNK_SIZE); if (block_pos.z < 0) z--;
 	Chunk* chunk = getChunk(x, y, z);
 
-	x = (int)(pos.x - x * CHUNK_SIZE);
-	y = (int)(pos.y - y * CHUNK_SIZE);
-	z = (int)(pos.z - z * CHUNK_SIZE);
+	x = (int)(block_pos.x - x * CHUNK_SIZE);
+	y = (int)(block_pos.y - y * CHUNK_SIZE);
+	z = (int)(block_pos.z - z * CHUNK_SIZE);
 
 	std::cout << "inspecting block at " << pos.x << ", " << pos.y << ", " << pos.z << ", block index " << x << ", " << y << ", " << z << std::endl;
 	*block_at = &chunk->blocks[x][y][z];
@@ -102,34 +103,41 @@ void World::generateMesh()
 	mesh->uv_coords.push_back(glm::vec2(0, 1));
 	mesh->uv_coords.push_back(glm::vec2(0.5, 1));
 
+	int c_counter = 0;
 	for (auto& chunk : chunks)
 	{
-		int instances = chunk.second->generateFaceData(mesh->instance_data);
-		chunk_draw_params.push_back(ChunkDrawParams(4, instances, 0, chunk_pos_data.size()));
+		int num_instances = chunk.second->generateFaceData(mesh->instance_data);
+		chunk_draw_params.push_back(ChunkDrawParams(4, num_instances, 0, mesh->instance_data.size() - num_instances));
 		chunk_pos_data.push_back(encodeChunkPos(chunk.second));
 	}
 	
-	mesh->shader = getShaderByName("chunk_shader");
+	mesh->shader = getShaderByName("world_shader");
 	mesh->generateInstancedVAO();
-	mesh->drawFunction = World::drawWorld;
+	mesh->drawFunction = drawWorld;
 
 
 	glGenBuffers(1, &mesh->SSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, mesh->SSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, chunk_pos_data.size() * sizeof(int), chunk_pos_data.data(), GL_STATIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, mesh->SSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, mesh->SSBO);
 
 	std::cout << "Finished world generation. World contains: " << chunks.size() << " chunks with " << mesh->instance_data.size() * 2 << " triangles" << std::endl;
 }
 
+#include <bitset>
+
 int World::encodeChunkPos(Chunk* chunk)
 {
-	int data = ((chunk->x + 512) & 1023);
-	data |= ((chunk->y + 512) & 1023) << 10;
-	data |= ((chunk->z + 512) & 1023) << 20;
+	int x = chunk->x;
+	int y = chunk->y;
+	int z = chunk->z;
+
+	int data = ((x + 512) & 1023);
+	data |= ((y + 512) & 1023) << 10;
+	data |= ((z + 512) & 1023) << 20;
 
 	//std::bitset<32> bits(data);
-	//std::cout << "instance data: " << bits <<  ", " << data << " (" << x << ", " << y << ", " << z << ", " << face << ", " << texture_id << ")" << std::endl;
+	//std::cout << "chunk data: " << bits <<  ", " << data << " (" << x << ", " << y << ", " << z << ")" << std::endl;
 	return data;
 }
 
@@ -140,8 +148,7 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 
 	mesh->shader->setFloat("unit_length", chunk_unit_length);
 	mesh->shader->setInt("chunk_size", CHUNK_SIZE);
-	mesh->shader->setInt("inst_per_chunk", CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-	//glUniform1iv(glGetUniformLocation(mesh->shader->ID, "chunk_pos"), 10000, chunk_pos_data.data());
+
 	switch (mesh->style)
 	{
 	case Shader::VAOStyle::TEXTURED:

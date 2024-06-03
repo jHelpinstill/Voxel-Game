@@ -6,21 +6,30 @@ Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
 {
 	this->ID = newID();
 	std::stringstream buffer;
-	buffer << "chunckmesh" << x << y << z;
+	buffer << "chunkmesh" << x << y << z;
 	buffer >> mesh_name;
 
-	for (int x = 0; x < CHUNK_SIZE; x++) for (int z = 0; z < CHUNK_SIZE; z++) for (int y = 0; y < CHUNK_SIZE; y++)
+	for (int xb = 0; xb < CHUNK_SIZE; xb++) for (int zb = 0; zb < CHUNK_SIZE; zb++) for (int yb = 0; yb < CHUNK_SIZE; yb++)
 	{
-		if (y < (2 * (sin(x * 6.0 / CHUNK_SIZE) * cos(z * 6.0 / CHUNK_SIZE)) + (CHUNK_SIZE / 2)))
-			blocks[x][y][z] = BlockType::DIRT;
+		glm::vec3 pos = getPosf();
+		pos.x += xb * unit_length;
+		pos.y += yb * unit_length;
+		pos.z += zb * unit_length;
+
+		if (pos.y < 
+			3.2 +
+			2.1 * (sin(pos.x * 3.0 / CHUNK_SIZE) * cos(pos.z * 7.0 / CHUNK_SIZE)) +
+			0.5 * (sin(pos.x * 25.0 / CHUNK_SIZE) * cos(pos.z * 29.0 / CHUNK_SIZE))
+			)
+			blocks[xb][yb][zb] = BlockType::DIRT;
 		else
-			blocks[x][y][z] = BlockType::AIR;
+			blocks[xb][yb][zb] = BlockType::AIR;
 	}
 }
 
 glm::vec3 Chunk::getPosf()
 {
-	return glm::vec3(x, y, z);
+	return glm::vec3(x, y, z) * (float)CHUNK_SIZE * unit_length;
 }
 
 int Chunk::generateFaceData(std::vector<int>& data)
@@ -102,7 +111,7 @@ Mesh* Chunk::generateMesh()
 	mesh->shader = getShaderByName("chunk_shader");
 	mesh->generateInstancedVAO();
 	mesh->drawFunction = drawInstanced;
-	mesh->transform.translate(getPosf() * (float)CHUNK_SIZE * unit_length);
+	mesh->transform.translate(getPosf());
 
 	//std::cout << mesh_name << " has " << mesh->verts.size() << " verts and " << mesh->instance_data.size() << " faces" << std::endl;
 
@@ -128,7 +137,6 @@ void Chunk::drawInstanced(Mesh* mesh, Camera* camera)
 {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
-	//mesh->shader->setMat4("transform", mesh->transform.getMat());
 	mesh->shader->setFloat("unit_length", unit_length);
 
 	switch (mesh->style)

@@ -4,10 +4,17 @@ layout (location=0) in vec3 vertex_pos;
 layout (location=1) in vec2 in_tex_coord;
 layout (location=2) in int instance_data;
 
+layout (std430, binding=3) buffer chunks_ssbo
+{
+	int chunk_positions[];
+};
+
 out vec2 tex_coord;
+//out vec3 fragment_color;
 
 uniform mat4 projection;
 uniform float unit_length;
+uniform int chunk_size;
 
 void main()
 {
@@ -17,7 +24,12 @@ void main()
 	int zi = (data >> 10) & 31;
 	int face = (data >> 15) & 7;
 	int tex_id = (data >> 18) & 1;
-
+	
+	int chunk_data = chunk_positions[gl_DrawID];
+	xi += ((chunk_data & 1023) - 512) * chunk_size;
+	yi += (((chunk_data >> 10) & 1023) - 512) * chunk_size;
+	zi += (((chunk_data >> 20) & 1023) - 512) * chunk_size;
+	
 	float x = float(xi);
 	float y = float(yi);
 	float z = float(zi);
@@ -49,7 +61,7 @@ void main()
 		pos.z++;
 		break;
 	}
-
+	
 	pos = pos + offset;
 	pos *= unit_length;
 
