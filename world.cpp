@@ -6,9 +6,12 @@ std::unordered_map<ChunkKey, Chunk*> World::chunks;
 std::vector<int> World::chunk_pos_data;
 std::vector<ChunkDrawParams> World::chunk_draw_params;
 
+int face_per_chunk;
+
 World::World()
 {
 	Chunk::unit_length = chunk_unit_length;
+	face_per_chunk = 4 * CHUNK_SIZE * CHUNK_SIZE;
 }
 
 void World::setup()
@@ -183,7 +186,6 @@ void World::remeshChunk(Chunk* chunk)
 
 	std::vector<int> instance_data;
 
-	int face_per_chunk = 4 * CHUNK_SIZE * CHUNK_SIZE;
 	int num_instances = chunk->generateFaceData(instance_data);
 	int padding = face_per_chunk - num_instances;
 	for (int i = 0; i < padding; i++)
@@ -226,7 +228,6 @@ void World::generateMesh()
 	chunk_pos_data.clear();
 
 	int chunk_counter = 0;
-	int face_per_chunk = 4 * CHUNK_SIZE * CHUNK_SIZE;
 	for (auto& chunk : chunks)
 	{
 		int num_instances = chunk.second->generateFaceData(mesh->instance_data);
@@ -275,6 +276,7 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
 	mesh->shader->setFloat("unit_length", chunk_unit_length);
 	mesh->shader->setInt("chunk_size", CHUNK_SIZE);
+	//mesh->shader->setInt("inst_per_chunk", face_per_chunk);
 
 	switch (mesh->style)
 	{
@@ -311,5 +313,15 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 	}
 
 	glBindVertexArray(mesh->VAO);
-	glMultiDrawArraysIndirect(GL_TRIANGLE_STRIP, chunk_draw_params.data(), chunk_draw_params.size(), sizeof(ChunkDrawParams));
+
+	unsigned int indirect_command_buffer;
+	glGenBuffers(1, &indirect_command_buffer);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect_command_buffer);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, (unsigned int)(chunk_draw_params.size() * sizeof(ChunkDrawParams)), chunk_draw_params.data(), GL_DYNAMIC_DRAW);
+
+	glMultiDrawArraysIndirect(GL_TRIANGLE_STRIP, nullptr, chunk_draw_params.size(), sizeof(ChunkDrawParams));
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+	glDeleteBuffers(1, &indirect_command_buffer);
 }
