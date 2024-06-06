@@ -18,22 +18,19 @@ uniform int chunk_size;
 
 void main()
 {
-	int data = instance_data;
-	int xi = data & 63;
-	int yi = (data >> 6) & 63;
-	int zi = (data >> 12) & 63;
-	int face = (data >> 18) & 7;
-	int tex_id = (data >> 21) & 1;
+	ivec3 offseti;
+	offseti.x = instance_data & 63;
+	offseti.y = (instance_data >> 6) & 63;
+	offseti.z = (instance_data >> 12) & 63;
+	int face = (instance_data >> 18) & 7;
+	int tex_id = (instance_data >> 21) & 1;
 	
 	int chunk_data = chunk_positions[gl_DrawID];
-	xi += ((chunk_data & 1023) - 512) * chunk_size;
-	yi += (((chunk_data >> 10) & 1023) - 512) * chunk_size;
-	zi += (((chunk_data >> 20) & 1023) - 512) * chunk_size;
+	offseti.x += ((chunk_data & 1023) - 512) * chunk_size;
+	offseti.y += (((chunk_data >> 10) & 1023) - 512) * chunk_size;
+	offseti.z += (((chunk_data >> 20) & 1023) - 512) * chunk_size;
 	
-	float x = float(xi);
-	float y = float(yi);
-	float z = float(zi);
-	vec3 offset = vec3(x, y, z);
+	vec3 offset = vec3(offseti);
 	
 	vec3 pos = vertex_pos;
 	switch(face)
@@ -62,7 +59,7 @@ void main()
 		break;
 	}
 	
-	pos = pos + offset;
+	pos += offset;
 	pos *= unit_length;
 
 	vec2 tc = in_tex_coord;
