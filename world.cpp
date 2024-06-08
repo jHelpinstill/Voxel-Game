@@ -1,21 +1,15 @@
 #include "World.h"
 
-float World::chunk_unit_length = 0.2;
-
-std::unordered_map<ChunkKey, Chunk*> World::chunks;
-std::vector<int> World::chunk_pos_data;
-std::vector<ChunkDrawParams> World::chunk_draw_params;
-
 int face_per_chunk;
 
-World::World()
+World::World(long seed) : seed(seed)
 {
-	Chunk::unit_length = chunk_unit_length;
 	face_per_chunk = 4 * CHUNK_SIZE * CHUNK_SIZE;
 }
 
 void World::setup()
 {
+	std::srand(seed);
 	addChunk(0, 0, 0);// chunks[Key(0, 0, 0)] = new Chunk(glm::ivec3(0, 0, 0));
 	for (int r = 1; r <= chunk_radius; r++)
 	{
@@ -36,7 +30,7 @@ void World::setup()
 
 	std::cout << "created " << chunks.size() << " chunks" << std::endl;
 
-	createShader("world_shader", "shaders/worldVertex.txt", "shaders/worldFragment.txt");
+	createShader("world_shader", "shaders/worldVertex.txt", "shaders/worldColorFragment.txt");
 	generateMesh();
 }
 
@@ -48,14 +42,14 @@ void World::addChunk(int x, int y, int z)
 		delete chunks[key];
 		chunks.erase(key);
 	}
-	chunks[key] = new Chunk(x, y, z);
+	chunks[key] = new Chunk(x, y, z, std::rand(), chunk_unit_length);
 }
 
 Chunk* World::getChunk(int x, int y, int z)
 {
 	ChunkKey key(x, y, z);
 	if (chunks.find(key) == chunks.end())
-		chunks[key] = new Chunk(x, y, z);
+		chunks[key] = new Chunk(x, y, z, std::rand());
 	return chunks[key];
 }
 
@@ -243,6 +237,7 @@ void World::generateMesh()
 	mesh->generateInstancedVAO();
 	mesh->drawFunction = drawWorld;
 	mesh->transform.translate(glm::vec3(0, -3, 0));
+	mesh->parent_obj = this;
 
 
 	glGenBuffers(1, &mesh->SSBO);
@@ -270,11 +265,13 @@ int World::encodeChunkPos(Chunk* chunk)
 	return data;
 }
 
-void World::drawWorld(Mesh* mesh, Camera* camera)
+void World::drawWorld(Mesh* mesh, Camera* camera, void* obj)
 {
+	World* world = (World*)obj;
+
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
-	mesh->shader->setFloat("unit_length", chunk_unit_length);
+	mesh->shader->setFloat("unit_length", world->chunk_unit_length);
 	mesh->shader->setInt("chunk_size", CHUNK_SIZE);
 	//mesh->shader->setInt("inst_per_chunk", face_per_chunk);
 
@@ -291,11 +288,11 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 
 	glm::vec3 look_dir = camera->getLookDirection();
 	float dot_criteria = cos(glm::radians(camera->aspect_ratio * camera->fov / 2));
-	for (auto& chunk_obj : chunks)
+	for (auto& chunk_obj : world->chunks)
 	{
 		Chunk* chunk = chunk_obj.second;
 		glm::vec3 a, b, c, d;
-		float length = CHUNK_SIZE * chunk_unit_length;
+		float length = CHUNK_SIZE * world->chunk_unit_length;
 		a = chunk->getPosf();
 		b = a + glm::vec3(0, 0, length);
 		c = a + glm::vec3(length, 0, 0);
@@ -306,10 +303,10 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 			glm::dot(look_dir, c - camera->transform.pos) < dot_criteria &&
 			glm::dot(look_dir, d - camera->transform.pos) < dot_criteria)
 		{
-			chunk_draw_params[chunk->ID].instanceCount = 0;
+			world->chunk_draw_params[chunk->ID].instanceCount = 0;
 		}
 		else
-			chunk_draw_params[chunk->ID].instanceCount = chunk->faces;
+			world->chunk_draw_params[chunk->ID].instanceCount = chunk->faces;
 	}
 
 	glBindVertexArray(mesh->VAO);
@@ -317,9 +314,9 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 	unsigned int indirect_command_buffer;
 	glGenBuffers(1, &indirect_command_buffer);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect_command_buffer);
-	glBufferData(GL_DRAW_INDIRECT_BUFFER, (unsigned int)(chunk_draw_params.size() * sizeof(ChunkDrawParams)), chunk_draw_params.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, (unsigned int)(world->chunk_draw_params.size() * sizeof(ChunkDrawParams)), world->chunk_draw_params.data(), GL_DYNAMIC_DRAW);
 
-	glMultiDrawArraysIndirect(GL_TRIANGLE_STRIP, nullptr, chunk_draw_params.size(), sizeof(ChunkDrawParams));
+	glMultiDrawArraysIndirect(GL_TRIANGLE_STRIP, nullptr, world->chunk_draw_params.size(), sizeof(ChunkDrawParams));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);

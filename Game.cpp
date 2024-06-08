@@ -112,7 +112,7 @@ void Game::stateMachine(double dt)
 
 		player->update(dt);
 
-		if (input->mouse.left.pressed)
+		if (input->mouse.left.held)
 		{
 			world.updateLookedAtBlock(camera, BlockType::AIR);
 			//world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);

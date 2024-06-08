@@ -17,16 +17,17 @@ public:
 
 	Mesh* mesh;
 	std::string mesh_name;
-	static float unit_length;
+	float unit_length;
+	long seed;
 
-	Chunk(int x, int y, int z);
+	Chunk(int x, int y, int z, long seed, float unit_length = 1);
 	
 	glm::vec3 getPosf();
 	Mesh* generateMesh();
 	int generateFaceData(std::vector<int>& data);
-	int encodeFaceData(int x, int y, int z, int face, int texture_id);
+	int encodeFaceData(int x, int y, int z, int face, glm::vec3 color);// int texture_id);
 
-	static void drawInstanced(Mesh* mesh, Camera* camera);
+	static void drawInstanced(Mesh* mesh, Camera* camera, void* obj);
 };
 
 struct ChunkKey
