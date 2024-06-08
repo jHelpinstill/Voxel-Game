@@ -30,6 +30,8 @@ public:
 	float chunk_unit_length = 0.1;
 	int chunk_radius = 6;
 	long seed;
+
+	float ambient_lighting = 0.1;
 	glm::vec3 sun_dir = glm::vec3(-1);
 
 	std::unordered_map<ChunkKey, Chunk*> chunks;

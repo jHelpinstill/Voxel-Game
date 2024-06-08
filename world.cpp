@@ -273,7 +273,13 @@ void World::drawWorld(Mesh* mesh, Camera* camera, void* obj)
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
 	mesh->shader->setFloat("unit_length", world->chunk_unit_length);
 	mesh->shader->setInt("chunk_size", CHUNK_SIZE);
-	//mesh->shader->setInt("inst_per_chunk", face_per_chunk);
+	mesh->shader->setFloat("ambient", world->ambient_lighting);
+
+	glm::vec3 lighting_dir = world->sun_dir;
+	if (glm::dot(world->sun_dir, glm::vec3(0, 1, 0)) > 0)
+		lighting_dir = glm::vec3(0);
+
+	mesh->shader->setVec3("light_dir", lighting_dir);
 
 	switch (mesh->style)
 	{

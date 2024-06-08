@@ -123,6 +123,8 @@ void Game::stateMachine(double dt)
 			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
 			//world.generateMesh();
 		}
+
+		world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(60 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
 		//if (input->mouse.left.pressed)
 		//{
 		//	BlockType* block;
