@@ -13,7 +13,7 @@ out vec3 fragment_color;
 flat out int face;
 
 uniform mat4 projection;
-uniform float unit_length;
+//uniform float unit_length;
 uniform int chunk_size;
 
 void main()
@@ -64,7 +64,7 @@ void main()
 	}
 	
 	pos += offset;
-	pos *= unit_length;
+	//pos *= unit_length;
 
 	//vec2 tc = in_tex_coord;
 	//if(tex_id == 1)
