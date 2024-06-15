@@ -20,29 +20,6 @@ vec3 norms[6] =
 
 void main()
 {
-	//vec3 norm = vec3(0.0f);
-	//switch(face)
-	//{
-	//case 0:
-	//	norm.y = 1.0f;
-	//	break;
-	//case 1:
-	//	norm.y = -1.0f;
-	//	break;
-	//case 2:
-	//	norm.x = 1.0f;
-	//	break;
-	//case 3:
-	//	norm.x = -1.0f;
-	//	break;
-	//case 4:
-	//	norm.z = 1.0f;
-	//	break;
-	//case 5:
-	//	norm.z = -1.0f;
-	//	break;
-	//}
-
 	vec3 result = fragment_color * (ambient + (1 - ambient) * max(-dot(norms[face], light_dir), 0.0f));
 	screen_color = vec4(result, 1.0);
 }
