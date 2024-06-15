@@ -1,10 +1,25 @@
 #version 460 core
 
 in vec3 fragment_color;
+flat in int face;
 
 out vec4 screen_color;
 
+uniform vec3 light_dir;
+uniform float ambient;
+
+vec3 norms[6] = 
+{
+	vec3(0.0f, 1.0f, 0.0f),
+	vec3(0.0f, -1.0f, 0.0f),
+	vec3(1.0f, 0.0f, 0.0f),
+	vec3(-1.0f, 0.0f, 0.0f),
+	vec3(0.0f, 0.0f, 1.0f),
+	vec3(0.0f, 0.0f, -1.0f)
+};
+
 void main()
 {
-	screen_color = vec4(fragment_color, 1.0);
+	vec3 result = fragment_color * (ambient + (1 - ambient) * max(-dot(norms[face], light_dir), 0.0f));
+	screen_color = vec4(result, 1.0);
 }
