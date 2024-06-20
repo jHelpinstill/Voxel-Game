@@ -41,3 +41,14 @@ double getDeltaTime(double fps_limit)
 	prev_time = time;
 	return dt;
 }
+
+std::string vec2string(const glm::vec3 vec)
+{
+	std::string s;
+	s += std::to_string(vec.x);
+	s += ", ";
+	s += std::to_string(vec.y);
+	s += ", ";
+	s += std::to_string(vec.z);
+	return s;
+}
