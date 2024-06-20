@@ -179,6 +179,7 @@
     <Text Include="shaders\meshColorVertex.txt" />
     <Text Include="shaders\UIColorFragment.txt" />
     <Text Include="shaders\UIColorVertex.txt" />
+    <Text Include="shaders\worldColorFragment.txt" />
     <Text Include="shaders\worldFragment.txt" />
     <Text Include="shaders\worldVertex.txt" />
   </ItemGroup>

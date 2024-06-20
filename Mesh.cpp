@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*))
+Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*, void*))
 {
 	this->texture = texture;
 	this->drawFunction = drawFunction;
@@ -11,7 +11,7 @@ Mesh::Mesh(
 	const std::vector<glm::vec3>& verts,
 	unsigned int texture,
 	const std::string& uv_filepath,
-	void (*drawFunction)(Mesh*, Camera*)
+	void (*drawFunction)(Mesh*, Camera*, void*)
 ) {
 	this->texture = texture;
 	this->drawFunction = drawFunction;
@@ -27,7 +27,7 @@ Mesh::Mesh(
 	const std::vector<glm::vec3>& verts,
 	unsigned int texture,
 	const std::vector<glm::vec2>& uv_coords,
-	void (*drawFunction)(Mesh*, Camera*)
+	void (*drawFunction)(Mesh*, Camera*, void*)
 ) {
 	this->texture = texture;
 	this->drawFunction = drawFunction;
@@ -43,7 +43,7 @@ Mesh::Mesh(
 Mesh::Mesh(
 	const std::vector<glm::vec3>& verts,
 	glm::vec3 color,
-	void (*drawFunction)(Mesh*, Camera*)
+	void (*drawFunction)(Mesh*, Camera*, void*)
 ) {
 	this->color = color;
 	this->drawFunction = drawFunction;
@@ -61,7 +61,7 @@ Mesh::~Mesh()
 
 void Mesh::draw(Camera* camera)
 {
-	drawFunction(this, camera);
+	drawFunction(this, camera, parent_obj);
 }
 
 void Mesh::attachShader(Shader* shader)
@@ -92,9 +92,6 @@ void Mesh::generateInstancedVAO()
 	{
 		for (int i = 0; i < 3; i++)
 			vert_data.push_back(verts[vert][i]);
-
-		vert_data.push_back(uv_coords[vert].x);
-		vert_data.push_back(uv_coords[vert].y);
 	}
 
 	glGenVertexArrays(1, &VAO);
@@ -104,24 +101,20 @@ void Mesh::generateInstancedVAO()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, vert_data.size() * sizeof(float), vert_data.data(), GL_STATIC_DRAW);
 
-	int stride = 5 * sizeof(float);
+	int stride = 3 * sizeof(float);
 
 	//position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
-
-	// texture coords
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
 
 	// instance information
 	glGenBuffers(1, &VBO_instanced);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_instanced);
 	glBufferData(GL_ARRAY_BUFFER, instance_data.size() * sizeof(int), instance_data.data(), GL_STATIC_DRAW);
 
-	glVertexAttribIPointer(2, 1, GL_INT, sizeof(int), (void*)0);
-	glVertexAttribDivisor(2, 1);
-	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(1, 1, GL_INT, sizeof(int), (void*)0);
+	glVertexAttribDivisor(1, 1);
+	glEnableVertexAttribArray(1);
 }
 
 void Mesh::deleteVAO()
@@ -169,7 +162,7 @@ void Mesh::getUVMap(const std::string& filepath)
 	file.close();
 }
 
-void Mesh::drawTriangles(Mesh* mesh, Camera* camera)
+void Mesh::drawTriangles(Mesh* mesh, Camera* camera, void* obj)
 {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
@@ -190,7 +183,7 @@ void Mesh::drawTriangles(Mesh* mesh, Camera* camera)
 	glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
 }
 
-void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera)
+void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera, void* obj)
 {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat());

@@ -27,14 +27,18 @@ class World
 private:
 
 public:
-	static float chunk_unit_length;
-	int chunk_radius = 5;
+	float chunk_unit_length = 0.1;
+	int chunk_radius = 6;
+	long seed;
 
-	static std::unordered_map<ChunkKey, Chunk*> chunks;
-	static std::vector<int> chunk_pos_data;
-	static std::vector<ChunkDrawParams> chunk_draw_params;
+	float ambient_lighting = 0.1;
+	glm::vec3 sun_dir = glm::vec3(-1);
 
-	World();
+	std::unordered_map<ChunkKey, Chunk*> chunks;
+	std::vector<int> chunk_pos_data;
+	std::vector<ChunkDrawParams> chunk_draw_params;
+
+	World(long seed = 0);
 
 	void setup();
 	void generateMesh();
@@ -53,7 +57,7 @@ public:
 	void updateLookedAtBlock(Camera* camera, BlockType new_type);
 
 	int encodeChunkPos(Chunk* chunk);
-	static void drawWorld(Mesh* mesh, Camera* camera);
+	static void drawWorld(Mesh* mesh, Camera* camera, void* obj);
 };
 
 #endif

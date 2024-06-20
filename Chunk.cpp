@@ -1,8 +1,6 @@
 #include "Chunk.h"
 
-float Chunk::unit_length = 1;
-
-Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
+Chunk::Chunk(int x, int y, int z, long seed, float unit_length) : x(x), y(y), z(z), seed(seed), unit_length(unit_length)
 {
 	this->ID = -1;
 	std::stringstream buffer;
@@ -16,10 +14,15 @@ Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
 		pos.y += yb * unit_length;
 		pos.z += zb * unit_length;
 
+		if (pos.y < 2.0)
+		{
+			blocks[xb][yb][zb] = BlockType::STONE;
+			continue;
+		}
 		if (pos.y < 
 			3.2 +
-			2.1 * (sin(pos.x * 3.0 / CHUNK_SIZE) * cos(pos.z * 7.0 / CHUNK_SIZE)) +
-			0.5 * (sin(pos.x * 25.0 / CHUNK_SIZE) * cos(pos.z * 29.0 / CHUNK_SIZE))
+			2.1 * (sin(pos.x * 3.0 / 64) * cos(pos.z * 7.0 / 64)) +
+			0.5 * (sin(pos.x * 25.0 / 64) * cos(pos.z * 29.0 / 64))
 			)
 			blocks[xb][yb][zb] = BlockType::DIRT;
 		else
@@ -38,53 +41,55 @@ glm::vec3 Chunk::getPosf()
 int Chunk::generateFaceData(std::vector<int>& data)
 {
 	int instances = 0;
+	std::srand(seed);
 	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
 		for (int z = 0; z < CHUNK_SIZE; z++)
 		{
 			for (int y = CHUNK_SIZE - 1; y >= 0; y--)
 			{
+				int rand_num = std::rand();
 				if (blocks[x][y][z] != BlockType::AIR)
 					continue;
 				//top
 				if (y != 0) if (blocks[x][y - 1][z] != BlockType::AIR)
 				{
-					data.push_back(encodeFaceData(x, y, z, 0, 1));
+					data.push_back(encodeFaceData(x, y, z, 0, getBlockColor(blocks[x][y - 1][z], 0, rand_num)));
 					instances++;
 				}
 
 				//bottom
 				if (y != CHUNK_SIZE - 1) if (blocks[x][y + 1][z] != BlockType::AIR)
 				{
-					data.push_back(encodeFaceData(x, y, z, 1, 0));
+					data.push_back(encodeFaceData(x, y, z, 1, getBlockColor(blocks[x][y + 1][z], 1, rand_num)));
 					instances++;
 				}
 
 				//left
 				if (x != 0) if (blocks[x - 1][y][z] != BlockType::AIR)
 				{
-					data.push_back(encodeFaceData(x, y, z, 2, 0));
+					data.push_back(encodeFaceData(x, y, z, 2, getBlockColor(blocks[x - 1][y][z], 2, rand_num)));
 					instances++;
 				}
 
 				//right
 				if (x != CHUNK_SIZE - 1) if (blocks[x + 1][y][z] != BlockType::AIR)
 				{
-					data.push_back(encodeFaceData(x, y, z, 3, 0));
+					data.push_back(encodeFaceData(x, y, z, 3, getBlockColor(blocks[x + 1][y][z], 3, rand_num)));
 					instances++;
 				}
 
 				//forward
 				if (z != 0) if (blocks[x][y][z - 1] != BlockType::AIR)
 				{
-					data.push_back(encodeFaceData(x, y, z, 4, 0));
+					data.push_back(encodeFaceData(x, y, z, 4, getBlockColor(blocks[x][y][z - 1], 4, rand_num)));
 					instances++;
 				}
 
 				//back
 				if (z != CHUNK_SIZE - 1) if (blocks[x][y][z + 1] != BlockType::AIR)
 				{
-					data.push_back(encodeFaceData(x, y, z, 5, 0));
+					data.push_back(encodeFaceData(x, y, z, 5, getBlockColor(blocks[x][y][z + 1], 5, rand_num)));
 					instances++;
 				}
 			}
@@ -116,7 +121,6 @@ Mesh* Chunk::generateMesh()
 	mesh->generateInstancedVAO();
 	mesh->drawFunction = drawInstanced;
 	mesh->transform.translate(getPosf());
-
 	//std::cout << mesh_name << " has " << mesh->verts.size() << " verts and " << mesh->instance_data.size() << " faces" << std::endl;
 
 	return mesh;
@@ -124,24 +128,31 @@ Mesh* Chunk::generateMesh()
 
 #include <bitset>
 
-int Chunk::encodeFaceData(int x, int y, int z, int face, int texture_id)
+int Chunk::encodeFaceData(int x, int y, int z, int face, glm::vec3 color)// int texture_id)
 {
+	color *= 7.0f;
 	int data = (x & 63);
 	data |= (y & 63) << 6;
 	data |= (z & 63) << 12;
 	data |= (face & 7) << 18;
-	data |= (texture_id & 1) << 21;
+
+	data |= ((int)color.x & 7) << 21;
+	data |= ((int)color.y & 7) << 24;
+	data |= ((int)color.z & 7) << 27;
+
 
 	//std::bitset<32> bits(data);
 	//std::cout << "instance data: " << bits <<  ", " << data << " (" << x << ", " << y << ", " << z << ", " << face << ", " << texture_id << ")" << std::endl;
 	return data;
 }
 
-void Chunk::drawInstanced(Mesh* mesh, Camera* camera)
+void Chunk::drawInstanced(Mesh* mesh, Camera* camera, void* obj)
 {
+	Chunk* chunk = (Chunk*)obj;
+
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
-	mesh->shader->setFloat("unit_length", unit_length);
+	mesh->shader->setFloat("unit_length", chunk->unit_length);
 
 	switch (mesh->style)
 	{
@@ -154,8 +165,6 @@ void Chunk::drawInstanced(Mesh* mesh, Camera* camera)
 		break;
 	}
 
-	//glEnable(GL_CULL_FACE);
-	//glDisable(GL_CULL_FACE);
 	glBindVertexArray(mesh->VAO);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, mesh->verts.size(), mesh->instance_data.size());
 }

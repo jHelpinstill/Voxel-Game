@@ -1,42 +1,43 @@
 #version 460 core
 
 layout (location=0) in vec3 vertex_pos;
-layout (location=1) in vec2 in_tex_coord;
-layout (location=2) in int instance_data;
+layout (location=1) in int instance_data;
 
 layout (std430, binding=3) buffer chunks_ssbo
 {
 	int chunk_positions[];
 };
 
-out vec2 tex_coord;
-//out vec3 fragment_color;
+//out vec2 tex_coord;
+out vec3 fragment_color;
+flat out int face;
 
 uniform mat4 projection;
-uniform float unit_length;
+//uniform float unit_length;
 uniform int chunk_size;
 
 void main()
 {
-	int data = instance_data;
-	int xi = data & 63;
-	int yi = (data >> 6) & 63;
-	int zi = (data >> 12) & 63;
-	int face = (data >> 18) & 7;
-	int tex_id = (data >> 21) & 1;
+	ivec3 offseti, colori;
+	offseti.x = instance_data & 63;
+	offseti.y = (instance_data >> 6) & 63;
+	offseti.z = (instance_data >> 12) & 63;
+
+	int aface = (instance_data >> 18) & 7;
+
+	colori.r = (instance_data >> 21) & 7;
+	colori.g = (instance_data >> 24) & 7;
+	colori.b = (instance_data >> 27) & 7;
 	
 	int chunk_data = chunk_positions[gl_DrawID];
-	xi += ((chunk_data & 1023) - 512) * chunk_size;
-	yi += (((chunk_data >> 10) & 1023) - 512) * chunk_size;
-	zi += (((chunk_data >> 20) & 1023) - 512) * chunk_size;
+	offseti.x += ((chunk_data & 1023) - 512) * chunk_size;
+	offseti.y += (((chunk_data >> 10) & 1023) - 512) * chunk_size;
+	offseti.z += (((chunk_data >> 20) & 1023) - 512) * chunk_size;
 	
-	float x = float(xi);
-	float y = float(yi);
-	float z = float(zi);
-	vec3 offset = vec3(x, y, z);
+	vec3 offset = vec3(offseti);
 	
 	vec3 pos = vertex_pos;
-	switch(face)
+	switch(aface)
 	{
 	case 0:
 		break;
@@ -62,13 +63,15 @@ void main()
 		break;
 	}
 	
-	pos = pos + offset;
-	pos *= unit_length;
+	pos += offset;
+	//pos *= unit_length;
 
-	vec2 tc = in_tex_coord;
-	if(tex_id == 1)
-		tc.x += 0.5;
+	//vec2 tc = in_tex_coord;
+	//if(tex_id == 1)
+	//	tc.x += 0.5;
 
 	gl_Position = projection * vec4(pos, 1.0);
-	tex_coord = tc;
+	fragment_color = vec3(colori) / 7.0f;
+	face = aface;
+	//tex_coord = tc;
 }
