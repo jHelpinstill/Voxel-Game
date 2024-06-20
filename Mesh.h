@@ -6,11 +6,12 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Transform.h"
+#include "VAO.h"
 
 class Mesh
 {
 public:
-	unsigned int VAO, VBO, VBO_instanced, SSBO;
+	VAO* vao = nullptr;
 	void getUVMap(const std::string& filepath);
 
 	Transform transform;
@@ -50,9 +51,9 @@ public:
 
 	void draw(Camera* camera);
 	void attachShader(Shader* shader);
-	void deleteVAO();
-	void remakeVAO();
-	void generateInstancedVAO();
+	//void deleteVAO();
+	//void remakeVAO();
+	//void generateInstancedVAO();
 
 	static Mesh* makeBox(
 		const glm::vec3& size,

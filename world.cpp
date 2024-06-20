@@ -187,9 +187,8 @@ void World::remeshChunk(Chunk* chunk)
 	chunk_params->instanceCount = num_instances;
 
 	Mesh* mesh = getMeshByName("world_mesh");
-	unsigned int VBO = mesh->VBO_instanced;
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vao->data_VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, chunk_params->baseInstance * sizeof(int), num_instances * sizeof(int), instance_data.data());
 	//int i = chunk_params->baseInstance;
 	//for (int instance : instance_data)
@@ -234,16 +233,16 @@ void World::generateMesh()
 	}
 	
 	mesh->shader = getShaderByName("world_shader");
-	mesh->generateInstancedVAO();
+	mesh->vao->makeInstanced(mesh->verts, mesh->instance_data);
 	mesh->drawFunction = drawWorld;
 	mesh->transform.translate(glm::vec3(0, -3, 0));
 	mesh->parent_obj = this;
 
 
-	glGenBuffers(1, &mesh->SSBO);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, mesh->SSBO);
+	glGenBuffers(1, &chunk_pos_SSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, chunk_pos_SSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, chunk_pos_data.size() * sizeof(int), chunk_pos_data.data(), GL_STATIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, mesh->SSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, chunk_pos_SSBO);
 
 	std::cout << "Finished world generation. World contains: " << chunks.size() << " chunks with " << mesh->instance_data.size() * 2 << " triangles" << std::endl;
 }
@@ -318,7 +317,7 @@ void World::drawWorld(Mesh* mesh, Camera* camera, void* obj)
 			world->chunk_draw_params[chunk->ID].instanceCount = chunk->faces;
 	}
 
-	glBindVertexArray(mesh->VAO);
+	glBindVertexArray(mesh->vao->ID);
 
 	unsigned int indirect_command_buffer;
 	glGenBuffers(1, &indirect_command_buffer);

@@ -99,32 +99,32 @@ int Chunk::generateFaceData(std::vector<int>& data)
 	return instances;
 }
 
-Mesh* Chunk::generateMesh()
-{
-	removeMesh(mesh_name);
-	mesh = new Mesh(getTextureByName("chunk_texture"));
-	meshes[mesh_name] = mesh;
-
-	mesh->verts.push_back(glm::vec3(0, 0, 0));
-	mesh->verts.push_back(glm::vec3(0, 0, 1));
-	mesh->verts.push_back(glm::vec3(1, 0, 0));
-	mesh->verts.push_back(glm::vec3(1, 0, 1));
-
-	mesh->uv_coords.push_back(glm::vec2(0, 0));
-	mesh->uv_coords.push_back(glm::vec2(0.5, 0));
-	mesh->uv_coords.push_back(glm::vec2(0, 1));
-	mesh->uv_coords.push_back(glm::vec2(0.5, 1));
-
-	generateFaceData(mesh->instance_data);
-
-	mesh->shader = getShaderByName("chunk_shader");
-	mesh->generateInstancedVAO();
-	mesh->drawFunction = drawInstanced;
-	mesh->transform.translate(getPosf());
-	//std::cout << mesh_name << " has " << mesh->verts.size() << " verts and " << mesh->instance_data.size() << " faces" << std::endl;
-
-	return mesh;
-}
+//Mesh* Chunk::generateMesh()
+//{
+//	removeMesh(mesh_name);
+//	mesh = new Mesh(getTextureByName("chunk_texture"));
+//	meshes[mesh_name] = mesh;
+//
+//	mesh->verts.push_back(glm::vec3(0, 0, 0));
+//	mesh->verts.push_back(glm::vec3(0, 0, 1));
+//	mesh->verts.push_back(glm::vec3(1, 0, 0));
+//	mesh->verts.push_back(glm::vec3(1, 0, 1));
+//
+//	mesh->uv_coords.push_back(glm::vec2(0, 0));
+//	mesh->uv_coords.push_back(glm::vec2(0.5, 0));
+//	mesh->uv_coords.push_back(glm::vec2(0, 1));
+//	mesh->uv_coords.push_back(glm::vec2(0.5, 1));
+//
+//	generateFaceData(mesh->instance_data);
+//
+//	mesh->shader = getShaderByName("chunk_shader");
+//	mesh->generateInstancedVAO();
+//	mesh->drawFunction = drawInstanced;
+//	mesh->transform.translate(getPosf());
+//	//std::cout << mesh_name << " has " << mesh->verts.size() << " verts and " << mesh->instance_data.size() << " faces" << std::endl;
+//
+//	return mesh;
+//}
 
 #include <bitset>
 
@@ -165,6 +165,6 @@ void Chunk::drawInstanced(Mesh* mesh, Camera* camera, void* obj)
 		break;
 	}
 
-	glBindVertexArray(mesh->VAO);
+	glBindVertexArray(mesh->vao->ID);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, mesh->verts.size(), mesh->instance_data.size());
 }

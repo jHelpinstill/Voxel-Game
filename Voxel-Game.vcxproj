@@ -152,6 +152,7 @@
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TriangleMesh.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClCompile Include="VAO.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +170,7 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TriangleMesh.h" />
     <ClInclude Include="util.h" />
+    <ClInclude Include="VAO.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>

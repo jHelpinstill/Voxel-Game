@@ -23,7 +23,7 @@ public:
 	Chunk(int x, int y, int z, long seed, float unit_length = 1);
 	
 	glm::vec3 getPosf();
-	Mesh* generateMesh();
+	//Mesh* generateMesh();
 	int generateFaceData(std::vector<int>& data);
 	int encodeFaceData(int x, int y, int z, int face, glm::vec3 color);// int texture_id);
 

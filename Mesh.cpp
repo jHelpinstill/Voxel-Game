@@ -4,7 +4,8 @@ Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*, void*))
 {
 	this->texture = texture;
 	this->drawFunction = drawFunction;
-	style = Shader::VAOStyle::TEXTURED;
+
+	vao = new VAO;
 }
 
 Mesh::Mesh(
@@ -20,7 +21,8 @@ Mesh::Mesh(
 		this->verts.push_back(vert);
 	getUVMap(uv_filepath);
 
-	style = Shader::VAOStyle::TEXTURED;
+	vao = new VAO;
+	vao->makeTextured(verts, uv_coords);
 }
 
 Mesh::Mesh(
@@ -37,7 +39,8 @@ Mesh::Mesh(
 	for (const glm::vec2& uv_coord : uv_coords)
 		this->uv_coords.push_back(uv_coord);
 
-	style = Shader::VAOStyle::TEXTURED;
+	vao = new VAO;
+	vao->makeTextured(verts, uv_coords);
 }
 
 Mesh::Mesh(
@@ -51,12 +54,13 @@ Mesh::Mesh(
 	for (const glm::vec3& vert : verts)
 		this->verts.push_back(vert);
 
-	style = Shader::VAOStyle::SOLID_COLORED;
+	vao = new VAO;
+	vao->makeSolidColored(verts, color);
 }
 
 Mesh::~Mesh()
 {
-	deleteVAO();
+	delete vao;
 }
 
 void Mesh::draw(Camera* camera)
@@ -67,74 +71,6 @@ void Mesh::draw(Camera* camera)
 void Mesh::attachShader(Shader* shader)
 {
 	this->shader = shader;
-
-	shader->makeVAOFromTris(
-		verts,
-		style,
-		VAO,
-		VBO,
-		uv_coords,
-		color
-	);
-}
-
-void Mesh::generateInstancedVAO()
-{
-	std::vector<float> vert_data;
-	if (verts.size() != uv_coords.size())
-	{
-		std::cout << "Vertex and UV_coords size mismatch (";
-		std::cout << verts.size() << ", " << uv_coords.size() << "), aborting VAO creation" << std::endl;
-		return;
-	}
-
-	for (int vert = 0; vert < verts.size(); vert++)
-	{
-		for (int i = 0; i < 3; i++)
-			vert_data.push_back(verts[vert][i]);
-	}
-
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vert_data.size() * sizeof(float), vert_data.data(), GL_STATIC_DRAW);
-
-	int stride = 3 * sizeof(float);
-
-	//position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// instance information
-	glGenBuffers(1, &VBO_instanced);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_instanced);
-	glBufferData(GL_ARRAY_BUFFER, instance_data.size() * sizeof(int), instance_data.data(), GL_STATIC_DRAW);
-
-	glVertexAttribIPointer(1, 1, GL_INT, sizeof(int), (void*)0);
-	glVertexAttribDivisor(1, 1);
-	glEnableVertexAttribArray(1);
-}
-
-void Mesh::deleteVAO()
-{
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &VBO_instanced);
-}
-
-void Mesh::remakeVAO()
-{
-	deleteVAO();
-	shader->makeVAOFromTris(
-		verts,
-		style,
-		VAO,
-		VBO,
-		uv_coords,
-		color
-	);
 }
 
 void Mesh::getUVMap(const std::string& filepath)
@@ -179,7 +115,7 @@ void Mesh::drawTriangles(Mesh* mesh, Camera* camera, void* obj)
 		break;
 	}
 
-	glBindVertexArray(mesh->VAO);
+	glBindVertexArray(mesh->vao->ID);
 	glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
 }
 
@@ -200,7 +136,7 @@ void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera, void* obj)
 		break;
 	}
 
-	glBindVertexArray(mesh->VAO);
+	glBindVertexArray(mesh->vao->ID);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, mesh->verts.size(), mesh->instance_data.size());
 }
 

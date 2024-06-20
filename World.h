@@ -25,7 +25,7 @@ struct ChunkDrawParams
 class World
 {
 private:
-
+	unsigned int chunk_pos_SSBO;
 public:
 	float chunk_unit_length = 0.1;
 	int chunk_radius = 6;
