@@ -1,14 +1,16 @@
 #include "VisibleFacesBVH.h"
 
-VisibleFacesBVH::Box::Box() : faces(nullptr), childA(nullptr), childB(nullptr)
+template <class T>
+VisibleFacesBVH<T>::Box::Box() : faces(nullptr), childA(nullptr), childB(nullptr)
 {
 	min = glm::vec3(std::numeric_limits<float>::infinity());
 	max = glm::vec3(-std::numeric_limits<float>::infinity());
 }
 
-void VisibleFacesBVH::Box::addFace(const glm::vec3& pos, BlockType* block, Chunk* chunk)
+template <class T>
+void VisibleFacesBVH<T>::Box::addDataNode(const glm::vec3& pos, T* obj)
 {
-	FaceData* face = new FaceData;
+	DataNode* face = new DataNode;
 	face->pos = pos;
 	face->block = block;
 	face->chunk = chunk;
@@ -16,14 +18,16 @@ void VisibleFacesBVH::Box::addFace(const glm::vec3& pos, BlockType* block, Chunk
 	addFace(face);
 }
 
-void VisibleFacesBVH::Box::addFace(FaceData* face)
+template <class T>
+void VisibleFacesBVH<T>::Box::addDataNode(DataNode* face)
 {
 	face->next = faces;
 	faces = face;
 	expandToFit(face->pos);
 }
 
-void VisibleFacesBVH::Box::expandToFit(const glm::vec3& pos)
+template <class T>
+void VisibleFacesBVH<T>::Box::expandToFit(const glm::vec3& pos)
 {
 	min = glm::min(min, pos);
 	max = glm::max(max, pos + glm::vec3(1));
@@ -34,7 +38,8 @@ float max2(float a, float b)
 	return a > b ? a : b;
 }
 
-void VisibleFacesBVH::Box::split()
+template <class T>
+void VisibleFacesBVH<T>::Box::split()
 {
 	glm::vec3 size = max - min;
 	if ((int)size.x == 1 && (int)size.y == 1 && (int)size.z == 1)
@@ -47,10 +52,10 @@ void VisibleFacesBVH::Box::split()
 	childB = new Box();
 
 	float splittingPoint = center[longest_axis];
-	FaceData* face = faces;
+	DataNode* face = faces;
 	while (face)
 	{
-		FaceData* current_face = face;
+		DataNode* current_face = face;
 		face = face->next;
 
 		if (current_face->pos[longest_axis] < splittingPoint)
@@ -76,23 +81,8 @@ void VisibleFacesBVH::Box::split()
 		childB->split();
 }
 
-
-// returns true if ray intersects polygon from front (CCW vertex ordering), false otherwise
-bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3* verts, int num_sides)
-{
-	glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
-	if (glm::dot(norm, ray) >= 0)
-		return false;
-	for (int i = 0; i < num_sides; i++)
-	{
-		glm::vec3 leg = verts[(i + 1) % num_sides] - verts[i];
-		if (glm::dot(glm::cross(ray, verts[i] - pos), leg) > 0)
-			return false;
-	}
-	return true;
-}
-
-bool VisibleFacesBVH::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
+template <class T>
+bool VisibleFacesBVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
 {
 	glm::vec3 quad_verts[4];
 	glm::vec3 box_verts[8];
@@ -160,7 +150,8 @@ bool VisibleFacesBVH::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
 	return false;
 }
 
-bool VisibleFacesBVH::raycast(const glm::vec3& pos, const glm::vec3& ray, BlockType** block, Chunk** chunk)
+template <class T>
+bool VisibleFacesBVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj)
 {
 	if (!root)
 		return false;

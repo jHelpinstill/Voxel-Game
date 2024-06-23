@@ -7,20 +7,20 @@
 #include "BlockType.h"
 #include "Chunk.h"
 
+template <class T>
 class VisibleFacesBVH
 {
 private:
-	struct FaceData
+	struct DataNode
 	{
 		glm::vec3 pos;
-		BlockType* block;
-		Chunk* chunk;
-		FaceData* next;
+		T* obj;
+		DataNode* next;
 	};
 	class Box
 	{
 	public:
-		FaceData* faces;
+		DataNode* data;
 		Box* childA;
 		Box* childB;
 
@@ -31,8 +31,8 @@ private:
 
 		bool hitByRay(const glm::vec3& pos, const glm::vec3& ray);
 
-		void addFace(const glm::vec3& pos, BlockType* block, Chunk* chunk);
-		void addFace(FaceData* face);
+		void addDataNode(const glm::vec3& pos, T* obj);
+		void addDataNode(DataNode* face);
 		void expandToFit(const glm::vec3& pos);
 
 		void split();
@@ -43,7 +43,7 @@ public:
 
 	VisibleFacesBVH() : root(nullptr) {}
 
-	bool raycast(const glm::vec3& pos, const glm::vec3& ray, BlockType** block, Chunk** chunk);
+	bool raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj);
 };
 
 #endif
