@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <vector>
 #include <unordered_map>
+#include <limits>
 
 
 //#define LOCK_FRAMERATE

@@ -117,11 +117,6 @@ bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_at, Chunk
 	int x_b = (int)(block_pos.x -= chunk_pos[0] * CHUNK_SIZE);
 	int y_b = (int)(block_pos.y -= chunk_pos[1] * CHUNK_SIZE);
 	int z_b = (int)(block_pos.z -= chunk_pos[2] * CHUNK_SIZE);
-
-	int dominant_direction = 0;
-	for (int i = 0; i < 3; i++)
-		if (glm::abs(dir[i]) > glm::abs(dir[dominant_direction]))
-			dominant_direction = i;
 	
 	glm::vec3 accumulator(0);
 	accumulator.x = block_pos.x - floor(block_pos.x);
@@ -133,10 +128,9 @@ bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_at, Chunk
 		
 		//bool dom_step = true;
 		bool take_step = true;
+		int rank = 0;
 		for (int i = 0; i < 3; i++)
 		{
-			//if (i == dominant_direction)
-			//	continue;
 			if (accumulator[i] > 1 || accumulator[i] < 0)
 			{
 				accumulator[i] += (dir[i] < 0) ? 1 : -1;
@@ -149,12 +143,6 @@ bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_at, Chunk
 		}
 		if (take_step)
 			accumulator += dir;
-		//if (dom_step)
-		//{
-		//	block_pos[dominant_direction] += (dir[dominant_direction] < 0) ? -1 : 1;
-		//	accumulator += dir;
-		//	std::cout << "stepping toward " << dominant_direction << std::endl;
-		//}
 
 		bool next_chunk = false;
 		for (int i = 0; i < 3; i++)

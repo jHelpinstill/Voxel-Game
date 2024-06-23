@@ -52,3 +52,16 @@ std::string vec2string(const glm::vec3 vec)
 	s += std::to_string(vec.z);
 	return s;
 }
+
+namespace util
+{
+	glm::vec3 X = glm::vec3(1, 0, 0);
+	glm::vec3 Y = glm::vec3(0, 1, 0);
+	glm::vec3 Z = glm::vec3(0, 0, 1);
+
+	glm::vec3 XY = glm::vec3(1, 1, 0);
+	glm::vec3 YZ = glm::vec3(0, 1, 1);
+	glm::vec3 ZX = glm::vec3(1, 0, 1);
+
+	glm::vec3 XYZ = glm::vec3(1, 1, 1);
+}
