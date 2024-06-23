@@ -53,6 +53,26 @@ std::string vec2string(const glm::vec3 vec)
 	return s;
 }
 
+// returns true if ray intersects polygon, false otherwise
+bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3* verts, int num_sides)
+{
+	//glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
+	//if (glm::dot(norm, ray) >= 0)
+	//	return false;
+
+	glm::vec3 leg = verts[1 % num_sides] - verts[0];
+	bool sign = (glm::dot(glm::cross(ray, verts[0] - pos), leg) > 0);
+	for (int i = 1; i < num_sides; i++)
+	{
+		leg = verts[(i + 1) % num_sides] - verts[i];
+		bool next_sign = (glm::dot(glm::cross(ray, verts[i] - pos), leg) > 0);
+
+		if (next_sign != sign)
+			return false;
+	}
+	return true;
+}
+
 namespace util
 {
 	glm::vec3 X = glm::vec3(1, 0, 0);

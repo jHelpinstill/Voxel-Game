@@ -66,6 +66,12 @@
     <ClCompile Include="HUDElement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VAO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BVH.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -113,6 +119,12 @@
     <ClInclude Include="HUDElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VAO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BVH.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\meshColorFragment.txt">
@@ -128,5 +140,6 @@
     <Text Include="shaders\worldFragment.txt" />
     <Text Include="shaders\UIColorVertex.txt" />
     <Text Include="shaders\UIColorFragment.txt" />
+    <Text Include="shaders\worldColorFragment.txt" />
   </ItemGroup>
 </Project>

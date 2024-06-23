@@ -1,33 +1,32 @@
-#include "VisibleFacesBVH.h"
+#include "BVH.h"
 
 template <class T>
-VisibleFacesBVH<T>::Box::Box() : faces(nullptr), childA(nullptr), childB(nullptr)
+BVH<T>::Box::Box() : data(nullptr), childA(nullptr), childB(nullptr)
 {
 	min = glm::vec3(std::numeric_limits<float>::infinity());
 	max = glm::vec3(-std::numeric_limits<float>::infinity());
 }
 
 template <class T>
-void VisibleFacesBVH<T>::Box::addDataNode(const glm::vec3& pos, T* obj)
+void BVH<T>::Box::addDataNode(const glm::vec3& pos, const T& obj)
 {
-	DataNode* face = new DataNode;
-	face->pos = pos;
-	face->block = block;
-	face->chunk = chunk;
+	DataNode* node = new DataNode;
+	node->pos = pos;
+	node->obj = obj;
 
-	addFace(face);
+	addDataNode(node);
 }
 
 template <class T>
-void VisibleFacesBVH<T>::Box::addDataNode(DataNode* face)
+void BVH<T>::Box::addDataNode(DataNode* node)
 {
-	face->next = faces;
-	faces = face;
-	expandToFit(face->pos);
+	node->next = data;
+	data = node;
+	expandToFit(node->pos);
 }
 
 template <class T>
-void VisibleFacesBVH<T>::Box::expandToFit(const glm::vec3& pos)
+void BVH<T>::Box::expandToFit(const glm::vec3& pos)
 {
 	min = glm::min(min, pos);
 	max = glm::max(max, pos + glm::vec3(1));
@@ -39,7 +38,7 @@ float max2(float a, float b)
 }
 
 template <class T>
-void VisibleFacesBVH<T>::Box::split()
+void BVH<T>::Box::split()
 {
 	glm::vec3 size = max - min;
 	if ((int)size.x == 1 && (int)size.y == 1 && (int)size.z == 1)
@@ -52,24 +51,24 @@ void VisibleFacesBVH<T>::Box::split()
 	childB = new Box();
 
 	float splittingPoint = center[longest_axis];
-	DataNode* face = faces;
-	while (face)
+	DataNode* node = data;
+	while (node)
 	{
-		DataNode* current_face = face;
-		face = face->next;
+		DataNode* current_node = node;
+		node = node->next;
 
-		if (current_face->pos[longest_axis] < splittingPoint)
-			childA->addFace(current_face);
+		if (current_node->pos[longest_axis] < splittingPoint)
+			childA->addFace(current_node);
 		else
-			childB->addFace(current_face);
+			childB->addFace(current_node);
 	}
 
-	if (!childA->faces)
+	if (!childA->data)
 	{
 		delete childA;
 		childA = nullptr;
 	}
-	if (!childB->faces)
+	if (!childB->data)
 	{
 		delete childB;
 		childB = nullptr;
@@ -82,7 +81,7 @@ void VisibleFacesBVH<T>::Box::split()
 }
 
 template <class T>
-bool VisibleFacesBVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
+bool BVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
 {
 	glm::vec3 quad_verts[4];
 	glm::vec3 box_verts[8];
@@ -151,7 +150,7 @@ bool VisibleFacesBVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ra
 }
 
 template <class T>
-bool VisibleFacesBVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj)
+bool BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray, T* obj)
 {
 	if (!root)
 		return false;

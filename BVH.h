@@ -4,17 +4,15 @@
 
 #include "Config.h"
 #include "util.h"
-#include "BlockType.h"
-#include "Chunk.h"
 
 template <class T>
-class VisibleFacesBVH
+class BVH
 {
 private:
 	struct DataNode
 	{
 		glm::vec3 pos;
-		T* obj;
+		T obj;
 		DataNode* next;
 	};
 	class Box
@@ -31,7 +29,7 @@ private:
 
 		bool hitByRay(const glm::vec3& pos, const glm::vec3& ray);
 
-		void addDataNode(const glm::vec3& pos, T* obj);
+		void addDataNode(const glm::vec3& pos, const T& obj);
 		void addDataNode(DataNode* face);
 		void expandToFit(const glm::vec3& pos);
 
@@ -41,9 +39,9 @@ private:
 public:
 	Box* root;
 
-	VisibleFacesBVH() : root(nullptr) {}
+	BVH() : root(nullptr) {}
 
-	bool raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj);
+	bool raycast(const glm::vec3& pos, const glm::vec3& ray, T* obj);
 };
 
 #endif

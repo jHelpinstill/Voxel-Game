@@ -6,14 +6,22 @@
 #include "ObjectManager.h"
 #include "BlockType.h"
 #include "Mesh.h"
+#include "BVH.h"
 
-#define CHUNK_SIZE 64
+constexpr auto CHUNK_SIZE = 64;
 
 class Chunk
 {
 public:
 	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};
 	int x, y, z, ID, faces;
+
+	struct Face
+	{
+		BlockType* block;
+		int normal;
+	};
+	BVH<Face*> FacesBVH;
 
 	Mesh* mesh;
 	std::string mesh_name;
