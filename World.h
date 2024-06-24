@@ -49,17 +49,19 @@ public:
 
 	void addChunk(int x, int y, int z);
 	Chunk* getChunk(int x, int y, int z);
-	bool peekChunk(int x, int y, int z, Chunk** chunk_at = nullptr);
+	bool peekChunk(int x, int y, int z, Chunk** chunk_out = nullptr);
 
-	void inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at = nullptr);
+	void inspectPos(glm::vec3 pos, BlockType** block_out, Chunk** chunk_out = nullptr);
 	BlockType* inspectPos(glm::vec3 pos);
-	bool inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_at, Chunk** chunk_at = nullptr);
+	bool inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_out, Chunk** chunk_out = nullptr);
 	BlockType* inspectRay(glm::vec3 pos, glm::vec3 dir);
 
 	void updateBlock(glm::vec3 pos, BlockType new_type);
 	void updateLookedAtBlock(Camera* camera, BlockType new_type);
 
 	int encodeChunkPos(Chunk* chunk);
+	Chunk::Group getChunkNeighbors(Chunk* chunk);
+
 	static void drawWorld(Mesh* mesh, Camera* camera, void* obj);
 };
 

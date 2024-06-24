@@ -13,6 +13,21 @@ constexpr auto CHUNK_SIZE = 32;
 class Chunk
 {
 public:
+	class Group
+	{
+	public:
+		Chunk** chunks;
+		int size;
+
+		Group() : chunks(nullptr), size(0) {}
+		Group(int size);
+		Group(const Group& other);
+		Group(Group&& other) noexcept;
+
+		Chunk*& operator[](int i);
+
+		~Group();
+	};
 	struct Key
 	{
 		int x, y, z;
@@ -39,7 +54,7 @@ public:
 	
 	glm::vec3 getPosf();
 	//Mesh* generateMesh();
-	int generateFaceData(std::vector<int>& data);
+	int generateFaceData(std::vector<int>& data, Group neighboring_chunks);
 	int encodeFaceData(int x, int y, int z, int face, glm::vec3 color);// int texture_id);
 
 	static void drawInstanced(Mesh* mesh, Camera* camera, void* obj);

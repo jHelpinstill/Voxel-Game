@@ -217,7 +217,7 @@ void World::remeshChunk(Chunk* chunk)
 
 	std::vector<int> instance_data;
 
-	int num_instances = chunk->generateFaceData(instance_data);
+	int num_instances = chunk->generateFaceData(instance_data, getChunkNeighbors(chunk));
 	int padding = face_per_chunk - num_instances;
 	for (int i = 0; i < padding; i++)
 		instance_data.push_back(0);
@@ -234,6 +234,21 @@ void World::remeshChunk(Chunk* chunk)
 	//}
 
 	std::cout << "Remeshed chunk " << chunk->ID << ", now has " << num_instances << " faces" << std::endl;
+}
+
+Chunk::Group World::getChunkNeighbors(Chunk* chunk)
+{
+	Chunk::Group neighbors(6);
+	int x = chunk->x; int y = chunk->y; int z = chunk->z;
+
+	if (!peekChunk(x, y - 1, z, &neighbors[0])) neighbors[0] = nullptr;
+	if (!peekChunk(x, y + 1, z, &neighbors[1])) neighbors[1] = nullptr;
+	if (!peekChunk(x - 1, y, z, &neighbors[2])) neighbors[2] = nullptr;
+	if (!peekChunk(x + 1, y, z, &neighbors[3])) neighbors[3] = nullptr;
+	if (!peekChunk(x, y, z - 1, &neighbors[4])) neighbors[4] = nullptr;
+	if (!peekChunk(x, y, z + 1, &neighbors[5])) neighbors[5] = nullptr;
+
+	return neighbors;
 }
 
 void World::generateMesh()
@@ -262,7 +277,7 @@ void World::generateMesh()
 	{
 		Chunk* chunk = bucket.second;
 
-		int num_instances = chunk->generateFaceData(mesh->instance_data);
+		int num_instances = chunk->generateFaceData(mesh->instance_data, getChunkNeighbors(chunk));
 		int padding = face_per_chunk - num_instances;
 		for (int i = 0; i < padding; i++)
 			mesh->instance_data.push_back(0);
