@@ -4,9 +4,6 @@
 Chunk::Chunk(int x, int y, int z, long seed, float unit_length) : x(x), y(y), z(z), seed(seed), unit_length(unit_length)
 {
 	this->ID = -1;
-	std::stringstream buffer;
-	buffer << "chunkmesh" << x << y << z;
-	buffer >> mesh_name;
 
 	for (int xb = 0; xb < CHUNK_SIZE; xb++) for (int zb = 0; zb < CHUNK_SIZE; zb++) for (int yb = 0; yb < CHUNK_SIZE; yb++)
 	{

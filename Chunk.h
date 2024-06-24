@@ -10,9 +10,15 @@
 
 constexpr auto CHUNK_SIZE = 32;
 
+/*
+* The chunk class serves to distinguish groups of blocks from one another in order to reduce the time needed for
+* certain operations.
+*/
 class Chunk
 {
 public:
+
+	// Groups allow the easiy manipulation of groups of chunks via pointers. 
 	class Group
 	{
 	public:
@@ -28,6 +34,8 @@ public:
 
 		~Group();
 	};
+
+	// Keys are used to distinguish different chunks within unordered maps by using their coordinates 
 	struct Key
 	{
 		int x, y, z;
@@ -40,11 +48,9 @@ public:
 		}
 	};
 
-	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};
+	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};	// the main array of blocks
 	int x, y, z, ID, faces;
 
-	Mesh* mesh;
-	std::string mesh_name;
 	float unit_length;
 	long seed;
 
