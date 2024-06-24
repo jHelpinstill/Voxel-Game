@@ -8,7 +8,7 @@
 #include "Mesh.h"
 #include "BVH.h"
 
-constexpr auto CHUNK_SIZE = 64;
+constexpr auto CHUNK_SIZE = 32;
 
 class Chunk
 {

@@ -11,22 +11,26 @@ World::World(long seed) : seed(seed)
 void World::setup()
 {
 	std::srand(seed);
-	addChunk(0, 0, 0);// chunks[Key(0, 0, 0)] = new Chunk(glm::ivec3(0, 0, 0));
-	for (int r = 1; r <= chunk_radius; r++)
+	int layers = 2;
+	for(int y = 0; y < layers; y++)
 	{
-		int x, z;
-		x = z = r;
-		for (z = r; z > -r; z--)
-			addChunk(x, 0, z);// chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
-		z = -r;
-		for (x = r; x > -r; x--)
-			addChunk(x, 0, z);//chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
-		x = -r;
-		for (z = -r; z < r; z++)
-			addChunk(x, 0, z);//chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
-		z = r;
-		for (x = -r; x < r; x++)
-			addChunk(x, 0, z);//chunks[Key(x, 0, z)] = new Chunk(glm::ivec3(x, 0, z));
+		addChunk(0, y, 0);// chunks[Key(0, 0, 0)] = new Chunk(glm::ivec3(0, 0, 0));
+		for (int r = 1; r <= chunk_radius; r++)
+		{
+			int x, z;
+			x = z = r;
+			for (z = r; z > -r; z--)
+				addChunk(x, y, z);
+			z = -r;
+			for (x = r; x > -r; x--)
+				addChunk(x, y, z);
+			x = -r;
+			for (z = -r; z < r; z++)
+				addChunk(x, y, z);
+			z = r;
+			for (x = -r; x < r; x++)
+				addChunk(x, y, z);
+		}
 	}
 
 	std::cout << "created " << chunks.size() << " chunks" << std::endl;
@@ -54,18 +58,18 @@ Chunk* World::getChunk(int x, int y, int z)
 	return chunks[key];
 }
 
-bool World::peekChunk(int x, int y, int z, Chunk** chunk_at)
+bool World::peekChunk(int x, int y, int z, Chunk** chunk_out)
 {
 	Chunk::Key key(x, y, z);
 	bool exists = false;
 	if (chunks.find(key) != chunks.end())
 		exists = true;
-	if (exists && chunk_at)
-		*chunk_at = chunks[key];
+	if (exists && chunk_out)
+		*chunk_out = chunks[key];
 	return exists;
 }
 
-void World::inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at)
+void World::inspectPos(glm::vec3 pos, BlockType** block_out, Chunk** chunk_out)
 {
 	Mesh* world_mesh = getMeshByName("world_mesh");
 	//pos -= world_mesh->transform.pos;
@@ -82,10 +86,10 @@ void World::inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at)
 	int z_b = (int)(block_pos.z -= z_ch * CHUNK_SIZE);
 
 	std::cout << "inspecting block at " << pos.x << ", " << pos.y << ", " << pos.z << ", block index " << x_b << ", " << y_b << ", " << z_b << std::endl;
-	if(block_at)
-		*block_at = &chunk->blocks[x_b][y_b][z_b];
-	if (chunk_at)
-		*chunk_at = chunk;
+	if(block_out)
+		*block_out = &chunk->blocks[x_b][y_b][z_b];
+	if (chunk_out)
+		*chunk_out = chunk;
 }
 
 BlockType* World::inspectPos(glm::vec3 pos)
@@ -95,13 +99,12 @@ BlockType* World::inspectPos(glm::vec3 pos)
 	return block;
 }
 
-bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_at, Chunk** chunk_at)
+bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_out, Chunk** chunk_out)
 {
 	//std::cout << "Camera Pos: " << vec2string(pos) << std::endl;
 	//std::cout << "look direction: " << vec2string(dir) << std::endl;
 
 	Mesh* world_mesh = getMeshByName("world_mesh");
-	//pos -= world_mesh->transform.pos;
 
 	dir = glm::normalize(dir);
 
@@ -174,10 +177,10 @@ bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_at, Chunk
 
 	}
 
-	if (block_at)
-		*block_at = &chunk->blocks[x_b][y_b][z_b];
-	if (chunk_at)
-		*chunk_at = chunk;
+	if (block_out)
+		*block_out = &chunk->blocks[x_b][y_b][z_b];
+	if (chunk_out)
+		*chunk_out = chunk;
 }
 
 BlockType* World::inspectRay(glm::vec3 pos, glm::vec3 dir)
