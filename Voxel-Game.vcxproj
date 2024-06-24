@@ -153,7 +153,6 @@
     <ClCompile Include="TriangleMesh.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="VAO.cpp" />
-    <ClCompile Include="BVH.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>

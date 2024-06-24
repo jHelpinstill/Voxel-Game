@@ -1,4 +1,5 @@
 #include "Chunk.h"
+#include "util.h"
 
 Chunk::Chunk(int x, int y, int z, long seed, float unit_length) : x(x), y(y), z(z), seed(seed), unit_length(unit_length)
 {
@@ -40,8 +41,11 @@ glm::vec3 Chunk::getPosf()
 
 int Chunk::generateFaceData(std::vector<int>& data)
 {
+	faces_BVH.reset();
+
 	int instances = 0;
 	std::srand(seed);
+	glm::vec3 chunk_pos = getPosf() * (1.0f / unit_length);
 	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
 		for (int z = 0; z < CHUNK_SIZE; z++)
@@ -51,11 +55,14 @@ int Chunk::generateFaceData(std::vector<int>& data)
 				int rand_num = std::rand();
 				if (blocks[x][y][z] != BlockType::AIR)
 					continue;
+
+				glm::vec3 pos = chunk_pos + glm::vec3(x, y, z);
 				//top
 				if (y != 0) if (blocks[x][y - 1][z] != BlockType::AIR)
 				{
 					data.push_back(encodeFaceData(x, y, z, 0, getBlockColor(blocks[x][y - 1][z], 0, rand_num)));
 					instances++;
+					faces_BVH.root->addDataNode(pos - util::Y, 0);
 				}
 
 				//bottom
@@ -63,6 +70,7 @@ int Chunk::generateFaceData(std::vector<int>& data)
 				{
 					data.push_back(encodeFaceData(x, y, z, 1, getBlockColor(blocks[x][y + 1][z], 1, rand_num)));
 					instances++;
+					faces_BVH.root->addDataNode(pos + util::Y, 1);
 				}
 
 				//left
@@ -70,6 +78,7 @@ int Chunk::generateFaceData(std::vector<int>& data)
 				{
 					data.push_back(encodeFaceData(x, y, z, 2, getBlockColor(blocks[x - 1][y][z], 2, rand_num)));
 					instances++;
+					faces_BVH.root->addDataNode(pos - util::X, 2);
 				}
 
 				//right
@@ -77,6 +86,7 @@ int Chunk::generateFaceData(std::vector<int>& data)
 				{
 					data.push_back(encodeFaceData(x, y, z, 3, getBlockColor(blocks[x + 1][y][z], 3, rand_num)));
 					instances++;
+					faces_BVH.root->addDataNode(pos + util::X, 3);
 				}
 
 				//forward
@@ -84,6 +94,7 @@ int Chunk::generateFaceData(std::vector<int>& data)
 				{
 					data.push_back(encodeFaceData(x, y, z, 4, getBlockColor(blocks[x][y][z - 1], 4, rand_num)));
 					instances++;
+					faces_BVH.root->addDataNode(pos - util::Z, 4);
 				}
 
 				//back
@@ -91,10 +102,13 @@ int Chunk::generateFaceData(std::vector<int>& data)
 				{
 					data.push_back(encodeFaceData(x, y, z, 5, getBlockColor(blocks[x][y][z + 1], 5, rand_num)));
 					instances++;
+					faces_BVH.root->addDataNode(pos + util::Z, 5);
 				}
 			}
 		}
 	}
+
+	faces_BVH.root->split();
 	faces = instances;
 	return instances;
 }

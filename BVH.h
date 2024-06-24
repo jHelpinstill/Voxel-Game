@@ -45,6 +45,7 @@ public:
 	~BVH();
 
 	bool raycast(const glm::vec3& pos, const glm::vec3& ray, T* obj);
+	void reset();
 };
 
 template <class T>
@@ -109,12 +110,18 @@ void BVH<T>::Box::expandToFit(const glm::vec3& pos)
 template <class T>
 void BVH<T>::Box::split()
 {
+	//static int rec_depth = 0;
 	glm::vec3 size = max - min;
 	if ((int)size.x == 1 && (int)size.y == 1 && (int)size.z == 1)
 		return;	// dont split if size is 1x1x1
 
+	//rec_depth++;
+	//std::cout << rec_depth << std::endl;
+
 	glm::vec3 center = (max + min) * 0.5f;
-	int longest_axis = (size.x > max2(size.y, size.z)) ? 0 : (size.y > size.z ? 2 : 1);
+	int longest_axis = (size.x > max2(size.y, size.z)) ? 0 : (size.y > size.z ? 1 : 2);
+
+	//std::cout << longest_axis << std::endl;
 
 	childA = new Box();
 	childB = new Box();
@@ -127,10 +134,12 @@ void BVH<T>::Box::split()
 		node = node->next;
 
 		if (current_node->pos[longest_axis] < splittingPoint)
-			childA->addFace(current_node);
+			childA->addDataNode(current_node);
 		else
-			childB->addFace(current_node);
+			childB->addDataNode(current_node);
 	}
+
+	data = nullptr;
 
 	if (!childA->data)
 	{
@@ -144,9 +153,19 @@ void BVH<T>::Box::split()
 	}
 
 	if (childA)
+	{
+		//std::cout << "entering childA split: size = " << vec2string(size) << std::endl;
 		childA->split();
+		//std::cout << "returning from childA split" << std::endl;
+	}
 	if (childB)
+	{
+		//std::cout << "entering childB split" << std::endl;
 		childB->split();
+		//std::cout << "returning from childB split" << std::endl;
+	}
+	
+	//rec_depth--;
 }
 
 template <class T>
@@ -258,6 +277,13 @@ bool BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray, T* obj)
 		// only remaining option is ray intersects both A and B
 
 	}
+}
+
+template <class T>
+void BVH<T>::reset()
+{
+	delete root;
+	root = new Box;
 }
 
 #endif
