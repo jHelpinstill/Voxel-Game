@@ -13,20 +13,27 @@ constexpr auto CHUNK_SIZE = 64;
 class Chunk
 {
 public:
+	struct Key
+	{
+		int x, y, z;
+		Key(int x, int y, int z) : x(x), y(y), z(z) {}
+		bool operator==(const Key& other) const
+		{
+			return (x == other.x
+				&& y == other.y
+				&& z == other.z);
+		}
+	};
+
 	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};
 	int x, y, z, ID, faces;
-
-	struct Face
-	{
-		BlockType* block;
-		int normal;
-	};
-	BVH<Face*> FacesBVH;
 
 	Mesh* mesh;
 	std::string mesh_name;
 	float unit_length;
 	long seed;
+
+	BVH<int> faces_BVH;
 
 	Chunk(int x, int y, int z, long seed, float unit_length = 1);
 	
@@ -38,22 +45,10 @@ public:
 	static void drawInstanced(Mesh* mesh, Camera* camera, void* obj);
 };
 
-struct ChunkKey
-{
-	int x, y, z;
-	ChunkKey(int x, int y, int z) : x(x), y(y), z(z) {}
-	bool operator==(const ChunkKey& other) const
-	{
-		return (x == other.x
-			&& y == other.y
-			&& z == other.z);
-	}
-};
-
 template <>
-struct std::hash<ChunkKey>
+struct std::hash<Chunk::Key>
 {
-	std::size_t operator()(const ChunkKey& k) const
+	std::size_t operator()(const Chunk::Key& k) const
 	{
 		using std::size_t;
 		using std::hash;

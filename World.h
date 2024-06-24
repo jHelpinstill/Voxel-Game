@@ -6,27 +6,28 @@
 #include "ObjectManager.h"
 #include "Mesh.h"
 #include "Chunk.h"
-
-struct ChunkDrawParams
-{
-	unsigned int count;
-	unsigned int instanceCount;
-	unsigned int first;
-	unsigned int baseInstance;
-
-	ChunkDrawParams(
-		unsigned int count,
-		unsigned int instanceCount,
-		unsigned int first,
-		unsigned int baseInstance
-	) : count(count), instanceCount(instanceCount), first(first), baseInstance(baseInstance) {}
-};
+#include "BVH.h"
 
 class World
 {
 private:
 	unsigned int chunk_pos_SSBO;
 public:
+	struct ChunkDrawParams
+	{
+		unsigned int count;
+		unsigned int instanceCount;
+		unsigned int first;
+		unsigned int baseInstance;
+
+		ChunkDrawParams(
+			unsigned int count,
+			unsigned int instanceCount,
+			unsigned int first,
+			unsigned int baseInstance
+		) : count(count), instanceCount(instanceCount), first(first), baseInstance(baseInstance) {}
+	};
+
 	float chunk_unit_length = 0.1;
 	int chunk_radius = 6;
 	long seed;
@@ -34,9 +35,11 @@ public:
 	float ambient_lighting = 0.1;
 	glm::vec3 sun_dir = glm::vec3(-1);
 
-	std::unordered_map<ChunkKey, Chunk*> chunks;
+	std::unordered_map<Chunk::Key, Chunk*> chunks;
 	std::vector<int> chunk_pos_data;
 	std::vector<ChunkDrawParams> chunk_draw_params;
+
+	BVH<Chunk*> chunks_BVH;
 
 	World(long seed = 0);
 

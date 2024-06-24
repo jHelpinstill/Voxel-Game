@@ -7,6 +7,8 @@ double getDeltaTime(double fps_limit = 0.0);
 
 std::string vec2string(const glm::vec3 vec);
 
+float max2(float a, float b);
+
 // returns true if ray intersects polygon, false otherwise
 bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3* verts, int num_sides);
 

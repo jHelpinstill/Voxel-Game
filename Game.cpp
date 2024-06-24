@@ -18,7 +18,7 @@ void Game::setup()
 	input = new Input(window);
 
 	camera = new Camera(window);
-	camera->transform.pos = glm::vec3(0, 5, 5);
+	camera->transform.pos = glm::vec3(0, 6, 5);
 	camera->clip_far = 1000;
 
 	player = new CameraController(*camera, *input);
@@ -34,9 +34,9 @@ void Game::setup()
 	createTexture("crate", "textures/crate.jpg");
 	createTexture("chunk_texture", "textures/dirt_block.png", true);
 
-	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), "smiley");
-	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
-	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 0, 2), "crate", "meshes/box_two_face_UV.txt");
+	createTexturedBox("box_origin", glm::vec3(1, 4, 1), glm::vec3(0, 0, 0), "smiley");
+	createTexturedBox("crate", glm::vec3(1, 4, 1), glm::vec3(-2, 0, -2), "crate", "meshes/box_two_face_UV.txt");
+	createTexturedBox("ruler", glm::vec3(1, 4, 98), glm::vec3(0, 0, 2), "crate", "meshes/box_two_face_UV.txt");
 
 	HUDElement* crosshair = new HUDElement();
 	hud_elements["crosshair"] = crosshair;

@@ -37,7 +37,7 @@ void World::setup()
 
 void World::addChunk(int x, int y, int z)
 {
-	ChunkKey key(x, y, z);
+	Chunk::Key key(x, y, z);
 	if (chunks.find(key) != chunks.end())
 	{
 		delete chunks[key];
@@ -48,7 +48,7 @@ void World::addChunk(int x, int y, int z)
 
 Chunk* World::getChunk(int x, int y, int z)
 {
-	ChunkKey key(x, y, z);
+	Chunk::Key key(x, y, z);
 	if (chunks.find(key) == chunks.end())
 		chunks[key] = new Chunk(x, y, z, std::rand());
 	return chunks[key];
@@ -56,7 +56,7 @@ Chunk* World::getChunk(int x, int y, int z)
 
 bool World::peekChunk(int x, int y, int z, Chunk** chunk_at)
 {
-	ChunkKey key(x, y, z);
+	Chunk::Key key(x, y, z);
 	bool exists = false;
 	if (chunks.find(key) != chunks.end())
 		exists = true;
@@ -68,7 +68,7 @@ bool World::peekChunk(int x, int y, int z, Chunk** chunk_at)
 void World::inspectPos(glm::vec3 pos, BlockType** block_at, Chunk** chunk_at)
 {
 	Mesh* world_mesh = getMeshByName("world_mesh");
-	pos -= world_mesh->transform.pos;
+	//pos -= world_mesh->transform.pos;
 
 	glm::vec3 block_pos = pos / chunk_unit_length;
 	int x_ch, y_ch, z_ch;
@@ -101,7 +101,7 @@ bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_at, Chunk
 	//std::cout << "look direction: " << vec2string(dir) << std::endl;
 
 	Mesh* world_mesh = getMeshByName("world_mesh");
-	pos -= world_mesh->transform.pos;
+	//pos -= world_mesh->transform.pos;
 
 	dir = glm::normalize(dir);
 
@@ -255,21 +255,23 @@ void World::generateMesh()
 	chunk_pos_data.clear();
 
 	int chunk_counter = 0;
-	for (auto& chunk : chunks)
+	for (auto& bucket : chunks)
 	{
-		int num_instances = chunk.second->generateFaceData(mesh->instance_data);
+		Chunk* chunk = bucket.second;
+
+		int num_instances = chunk->generateFaceData(mesh->instance_data);
 		int padding = face_per_chunk - num_instances;
 		for (int i = 0; i < padding; i++)
 			mesh->instance_data.push_back(0);
 		chunk_draw_params.push_back(ChunkDrawParams(4, num_instances, 0, mesh->instance_data.size() - face_per_chunk));
-		chunk_pos_data.push_back(encodeChunkPos(chunk.second));
-		chunk.second->ID = chunk_counter++;
+		chunk_pos_data.push_back(encodeChunkPos(chunk));
+		chunk->ID = chunk_counter++;
 	}
 	
 	mesh->shader = getShaderByName("world_shader");
 	mesh->vao->makeInstanced(mesh->verts, mesh->instance_data);
 	mesh->drawFunction = drawWorld;
-	mesh->transform.translate(glm::vec3(0, -3, 0));
+	//mesh->transform.translate(glm::vec3(0, -3, 0));
 	mesh->parent_obj = this;
 
 
