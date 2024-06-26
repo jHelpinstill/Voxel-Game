@@ -19,6 +19,7 @@ public:
 	{
 	private:
 		void addDataNode(DataNode* node);
+		bool hitByRay(const glm::vec3& pos, const glm::vec3& ray);
 
 	public:
 		DataNode* data;
@@ -31,8 +32,8 @@ public:
 		Box();
 		~Box();
 
-		bool hitByRay(const glm::vec3& pos, const glm::vec3& ray);
-
+		
+		bool raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj_out, glm::vec3* obj_pos, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*));
 		void addDataNode(const glm::vec3& pos, const T& obj);
 		void expandToFit(const glm::vec3& pos);
 
@@ -40,13 +41,16 @@ public:
 	};
 
 	Box* root;
+	bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*);
 
 	BVH();
 	~BVH();
 
-	bool raycast(const glm::vec3& pos, const glm::vec3& ray, T* obj);
+	bool raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj_out, glm::vec3* obj_pos);
 	void reset();
 };
+
+/////////////////////////// TEMPLATE FUNCTION DEFINITIONS //////////////////////////////
 
 template <class T>
 BVH<T>::BVH()
@@ -110,18 +114,12 @@ void BVH<T>::Box::expandToFit(const glm::vec3& pos)
 template <class T>
 void BVH<T>::Box::split()
 {
-	//static int rec_depth = 0;
 	glm::vec3 size = max - min;
 	if ((int)size.x == 1 && (int)size.y == 1 && (int)size.z == 1)
 		return;	// dont split if size is 1x1x1
 
-	//rec_depth++;
-	//std::cout << rec_depth << std::endl;
-
 	glm::vec3 center = (max + min) * 0.5f;
 	int longest_axis = (size.x > max2(size.y, size.z)) ? 0 : (size.y > size.z ? 1 : 2);
-
-	//std::cout << longest_axis << std::endl;
 
 	childA = new Box();
 	childB = new Box();
@@ -153,130 +151,57 @@ void BVH<T>::Box::split()
 	}
 
 	if (childA)
-	{
-		//std::cout << "entering childA split: size = " << vec2string(size) << std::endl;
 		childA->split();
-		//std::cout << "returning from childA split" << std::endl;
-	}
 	if (childB)
-	{
-		//std::cout << "entering childB split" << std::endl;
 		childB->split();
-		//std::cout << "returning from childB split" << std::endl;
-	}
-	
-	//rec_depth--;
 }
 
 template <class T>
 bool BVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
 {
-	glm::vec3 quad_verts[4];
-	glm::vec3 box_verts[8];
-	glm::vec3 size = max - min;
-
-	using namespace util;
-
-	box_verts[0] = min;
-	box_verts[1] = min + glm::vec3(size.x, 0, 0);
-	box_verts[2] = min + glm::vec3(0, size.y, 0);
-	box_verts[3] = min + glm::vec3(0, 0, size.z);
-	box_verts[4] = min + glm::vec3(size.x, size.y, 0);
-	box_verts[5] = min + glm::vec3(0, size.y, size.z);
-	box_verts[6] = min + glm::vec3(size.x, 0, size.z);
-	box_verts[7] = max;
-
-	// top
-	quad_verts[0] = box_verts[2];
-	quad_verts[1] = box_verts[5];
-	quad_verts[2] = box_verts[7];
-	quad_verts[3] = box_verts[4];
-	if (rayIntersectsPoly(pos, ray, quad_verts, 4))
-		return true;
-
-	// bottom
-	quad_verts[0] = box_verts[0];
-	quad_verts[1] = box_verts[1];
-	quad_verts[2] = box_verts[6];
-	quad_verts[3] = box_verts[3];
-	if (rayIntersectsPoly(pos, ray, quad_verts, 4))
-		return true;
-
-	// left
-	quad_verts[0] = box_verts[1];
-	quad_verts[1] = box_verts[4];
-	quad_verts[2] = box_verts[7];
-	quad_verts[3] = box_verts[6];
-	if (rayIntersectsPoly(pos, ray, quad_verts, 4))
-		return true;
-
-	// right
-	quad_verts[0] = box_verts[0];
-	quad_verts[1] = box_verts[3];
-	quad_verts[2] = box_verts[5];
-	quad_verts[3] = box_verts[2];
-	if (rayIntersectsPoly(pos, ray, quad_verts, 4))
-		return true;
-
-	// forward
-	quad_verts[0] = box_verts[3];
-	quad_verts[1] = box_verts[6];
-	quad_verts[2] = box_verts[7];
-	quad_verts[3] = box_verts[5];
-	if (rayIntersectsPoly(pos, ray, quad_verts, 4))
-		return true;
-
-	// back
-	quad_verts[0] = box_verts[0];
-	quad_verts[1] = box_verts[1];
-	quad_verts[2] = box_verts[4];
-	quad_verts[3] = box_verts[2];
-	if (rayIntersectsPoly(pos, ray, quad_verts, 4))
-		return true;
+	Quad quad;
+	for (int face = 0; face < 6; face++)
+	{
+		quad = Quad(min, max, face);
+		if (rayIntersectsPoly(pos, ray, quad.verts, 4))
+			return true;
+	}
 
 	return false;
 }
 
 template <class T>
-bool BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray, T* obj)
+bool BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj_out, glm::vec3* obj_pos, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*))
 {
-	if (!root)
+	if (!this->hitByRay(pos, ray))
 		return false;
 
-	Box* current_box = &root;
-
-	while (current_box->childA || current_box->childB)
+	DataNode* node = data;
+	while (node)
 	{
-		if (!current_box->childB)
+		if (raycastObj(pos, ray, node->pos, &node->obj))
 		{
-			current_box = current_box->childA;
-			continue;
+			*obj_out = &node->obj;
+			obj_pos = &node->pos;
+			return true;
 		}
-		if (!current_box->childA)
-		{
-			current_box = current_box->childB;
-			continue;
-		}
-
-		bool hitA = current_box->childA->hitByRay(pos, ray);
-		bool hitB = current_box->childA->hitByRay(pos, ray);
-
-		if (hitA && !hitB)
-		{
-			current_box = current_box->childA;
-			continue;
-		}
-		if (hitB && !hitA)
-		{
-			current_box = current_box->childB;
-			continue;
-		}
-		if (!hitA && !hitB)
-			return false;
-
-		// only remaining option is ray intersects both A and B
-
 	}
+
+	bool hit = false;
+	if (childA->raycast(pos, ray, obj_out, obj_pos, raycastObj))
+		hit = true;
+	if (childB->raycast(pos, ray, obj_out, obj_pos, raycastObj))
+		hit = true;
+	return hit;
+}
+
+template <class T>
+bool BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj_out, glm::vec3* obj_pos)
+{
+	if (!root || !raycastObj)
+		return false;
+
+	return root->raycast(pos, ray, obj_out, obj_pos, raycastObj);
 }
 
 template <class T>

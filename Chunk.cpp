@@ -29,6 +29,8 @@ Chunk::Chunk(int x, int y, int z, long seed, float unit_length) : x(x), y(y), z(
 				blocks[xb][yb][zb] = BlockType::AIR;
 		}
 	}
+
+	faces_BVH.raycastObj = raycastFace;
 }
 
 glm::vec3 Chunk::getPosf()
@@ -36,6 +38,12 @@ glm::vec3 Chunk::getPosf()
 	return glm::vec3(x, y, z) * (float)CHUNK_SIZE * unit_length;
 }
 
+/*
+* Scrubs through every block in the chunk in order and finds the visible faces.
+* Visible faces occur only at the adjoining faces of a transparent block and an
+* opaque block: as a face between two opaque blocks is obscured by the blocks,
+* and obviously two transparent blocks have no visible faces.
+*/
 int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 {
 	faces_BVH.reset();
@@ -99,84 +107,6 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 						instances++;
 					}
 				}
-
-				/*
-				//top
-				if (y != 0) if (blocks[x][y - 1][z] != BlockType::AIR)
-				{
-					data.push_back(encodeFaceData(x, y, z, 0, getBlockColor(blocks[x][y - 1][z], 0, rand_num)));
-					instances++;
-					faces_BVH.root->addDataNode(pos - util::Y, 0);
-				}
-				else if (neighboring_chunks[0])
-				{
-					if (neighboring_chunks[0]->blocks[x][CHUNK_SIZE - 1][z] != BlockType::AIR)
-					{
-						data.push_back(encodeFaceData(x, y, z, 0, getBlockColor(neighboring_chunks[0]->blocks[x][y - 1][z], 0, rand_num)));
-						instances++;
-						faces_BVH.root->addDataNode(pos - util::Y, 0);
-					}
-				}
-
-				//bottom
-				if (y != CHUNK_SIZE - 1) if (blocks[x][y + 1][z] != BlockType::AIR)
-				{
-					data.push_back(encodeFaceData(x, y, z, 1, getBlockColor(blocks[x][y + 1][z], 1, rand_num)));
-					instances++;
-					faces_BVH.root->addDataNode(pos + util::Y, 1);
-				}
-				else if (neighboring_chunks[1])
-				{
-					if (neighboring_chunks[1]->blocks[x][0][z] != BlockType::AIR)
-					{
-						data.push_back(encodeFaceData(x, y, z, 0, getBlockColor(neighboring_chunks[1]->blocks[x][0][z], 1, rand_num)));
-						instances++;
-						faces_BVH.root->addDataNode(pos + util::Y, 1);
-					}
-				}
-
-
-				//left
-				if (x != 0) if (blocks[x - 1][y][z] != BlockType::AIR)
-				{
-					data.push_back(encodeFaceData(x, y, z, 2, getBlockColor(blocks[x - 1][y][z], 2, rand_num)));
-					instances++;
-					faces_BVH.root->addDataNode(pos - util::X, 2);
-				}
-				else if (neighboring_chunks[2])
-				{
-					if (neighboring_chunks[2]->blocks[CHUNK_SIZE - 1][y][z] != BlockType::AIR)
-					{
-						data.push_back(encodeFaceData(x, y, z, 0, getBlockColor(neighboring_chunks[2]->blocks[CHUNK_SIZE - 1][y][z], 2, rand_num)));
-						instances++;
-						faces_BVH.root->addDataNode(pos - util::X, 2);
-					}
-				}
-
-				//right
-				if (x != CHUNK_SIZE - 1) if (blocks[x + 1][y][z] != BlockType::AIR)
-				{
-					data.push_back(encodeFaceData(x, y, z, 3, getBlockColor(blocks[x + 1][y][z], 3, rand_num)));
-					instances++;
-					faces_BVH.root->addDataNode(pos + util::X, 3);
-				}
-
-				//forward
-				if (z != 0) if (blocks[x][y][z - 1] != BlockType::AIR)
-				{
-					data.push_back(encodeFaceData(x, y, z, 4, getBlockColor(blocks[x][y][z - 1], 4, rand_num)));
-					instances++;
-					faces_BVH.root->addDataNode(pos - util::Z, 4);
-				}
-
-				//back
-				if (z != CHUNK_SIZE - 1) if (blocks[x][y][z + 1] != BlockType::AIR)
-				{
-					data.push_back(encodeFaceData(x, y, z, 5, getBlockColor(blocks[x][y][z + 1], 5, rand_num)));
-					instances++;
-					faces_BVH.root->addDataNode(pos + util::Z, 5);
-				}
-				*/
 			}
 		}
 	}
@@ -186,37 +116,19 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 	return instances;
 }
 
-//Mesh* Chunk::generateMesh()
-//{
-//	removeMesh(mesh_name);
-//	mesh = new Mesh(getTextureByName("chunk_texture"));
-//	meshes[mesh_name] = mesh;
-//
-//	mesh->verts.push_back(glm::vec3(0, 0, 0));
-//	mesh->verts.push_back(glm::vec3(0, 0, 1));
-//	mesh->verts.push_back(glm::vec3(1, 0, 0));
-//	mesh->verts.push_back(glm::vec3(1, 0, 1));
-//
-//	mesh->uv_coords.push_back(glm::vec2(0, 0));
-//	mesh->uv_coords.push_back(glm::vec2(0.5, 0));
-//	mesh->uv_coords.push_back(glm::vec2(0, 1));
-//	mesh->uv_coords.push_back(glm::vec2(0.5, 1));
-//
-//	generateFaceData(mesh->instance_data);
-//
-//	mesh->shader = getShaderByName("chunk_shader");
-//	mesh->generateInstancedVAO();
-//	mesh->drawFunction = drawInstanced;
-//	mesh->transform.translate(getPosf());
-//	//std::cout << mesh_name << " has " << mesh->verts.size() << " verts and " << mesh->instance_data.size() << " faces" << std::endl;
-//
-//	return mesh;
-//}
-
 #include <bitset>
-
+/*
+* x, y, z: 5 bits each
+* face direction: 3 bits (6 directions)
+* color: 3 bits per channel (rgb)
+* Encoded data bits: 00000bbbgggrrrfffzzzzzyyyyyxxxxx
+* 
+* This encoder must be partnered with a corresponding decoder in the shader.
+*/
 int Chunk::encodeFaceData(int x, int y, int z, int face, glm::vec3 color)// int texture_id)
 {
+	
+
 	color *= 7.0f;
 	int data = (x & 63);
 	data |= (y & 63) << 6;
@@ -227,35 +139,18 @@ int Chunk::encodeFaceData(int x, int y, int z, int face, glm::vec3 color)// int 
 	data |= ((int)color.y & 7) << 24;
 	data |= ((int)color.z & 7) << 27;
 
-
 	//std::bitset<32> bits(data);
 	//std::cout << "instance data: " << bits <<  ", " << data << " (" << x << ", " << y << ", " << z << ", " << face << ", " << texture_id << ")" << std::endl;
 	return data;
 }
 
-void Chunk::drawInstanced(Mesh* mesh, Camera* camera, void* obj)
+bool Chunk::raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, int* face)
 {
-	Chunk* chunk = (Chunk*)obj;
-
-	mesh->shader->use();
-	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
-	mesh->shader->setFloat("unit_length", chunk->unit_length);
-
-	switch (mesh->style)
-	{
-	case Shader::VAOStyle::TEXTURED:
-		glBindTexture(GL_TEXTURE_2D, mesh->texture);
-		break;
-
-	case Shader::VAOStyle::SOLID_COLORED:
-		mesh->shader->setVec3("color", mesh->color);
-		break;
-	}
-
-	glBindVertexArray(mesh->vao->ID);
-	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, mesh->verts.size(), mesh->instance_data.size());
+	Quad quad(pos, *face);
+	return rayIntersectsPoly(pos, ray, quad.verts, 4, util::PolyCulling::CCW);
 }
 
+//////////////////// FUNCTION DEFINIIONS (GROUP) /////////////////////////	
 
 Chunk::Group::Group(int size) : size(size)
 {

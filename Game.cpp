@@ -114,7 +114,7 @@ void Game::stateMachine(double dt)
 
 		if (input->mouse.left.held)
 		{
-			world.updateLookedAtBlock(camera, BlockType::AIR);
+			//world.updateLookedAtBlock(camera, BlockType::AIR);
 			//world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
 			//world.generateMesh();
 		}
@@ -124,16 +124,19 @@ void Game::stateMachine(double dt)
 			//world.generateMesh();
 		}
 
-		//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
+		Chunk* current_chunk = world.getChunk(camera->transform.pos);
+		int* face = nullptr;
+		glm::vec3* block_pos = nullptr;
+		if (current_chunk->faces_BVH.raycast(camera->transform.pos, camera->getLookDirection(), &face, block_pos))
+		{
+			if(input->mouse.left.held)
+			{
+				Mesh* crate = getMeshByName("crate");
+				crate->transform.pos = *block_pos;
+			}
+		}
 
-		//if (input->mouse.left.pressed)
-		//{
-		//	BlockType* block;
-		//	glm::vec3 pos = camera->transform.pos;
-		//	world.inspectPos(pos, &block);
-		//	std::cout << pos.x << ", " << pos.y << ", " << pos.z << ": " << getBlockName(*block) << std::endl;
-		//}
-		//std::cout << 1.0 / dt << " avg: " << avg_fps.avg() << std::endl;
+		//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
 		
 		drawUI();
 		drawMeshes();

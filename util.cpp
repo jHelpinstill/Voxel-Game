@@ -59,11 +59,19 @@ float max2(float a, float b)
 }
 
 // returns true if ray intersects polygon, false otherwise
-bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3* verts, int num_sides)
+bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3* verts, int num_sides, util::PolyCulling culling)
 {
-	//glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
-	//if (glm::dot(norm, ray) >= 0)
-	//	return false;
+	switch (culling)
+	{
+		using namespace util;
+	case PolyCulling::NONE:
+		break;
+	case PolyCulling::CCW:
+	case PolyCulling::CW:
+		glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
+		if ((culling == PolyCulling::CCW) ? (glm::dot(norm, ray) >= 0) : (glm::dot(norm, ray) < 0))
+			return false;
+	}
 
 	glm::vec3 leg = verts[1 % num_sides] - verts[0];
 	bool sign = (glm::dot(glm::cross(ray, verts[0] - pos), leg) > 0);
@@ -76,6 +84,111 @@ bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::ve
 			return false;
 	}
 	return true;
+}
+
+Quad::Quad(const Quad& other)
+{
+	if (!verts)
+		verts = new glm::vec3[4];
+	for (int i = 0; i < 4; i++)
+		this->verts[i] = other.verts[i];
+}
+
+Quad::Quad(const glm::vec3& pos, int face)
+{
+	verts = new glm::vec3[4];
+
+	switch (face)
+	{
+	case 0:
+		verts[0] = pos + util::Y;
+		verts[1] = pos + util::YZ;
+		verts[2] = pos + util::XYZ;
+		verts[3] = pos + util::XY;
+		break;
+	case 1:
+		verts[0] = pos;
+		verts[1] = pos + util::X;
+		verts[2] = pos + util::ZX;
+		verts[3] = pos + util::Z;
+		break;
+	case 2:
+		verts[0] = pos + util::X;
+		verts[1] = pos + util::XY;
+		verts[2] = pos + util::XYZ;
+		verts[3] = pos + util::ZX;
+		break;
+	case 3:
+		verts[0] = pos;
+		verts[1] = pos + util::Z;
+		verts[2] = pos + util::YZ;
+		verts[3] = pos + util::Y;
+		break;
+	case 4:
+		verts[0] = pos + util::Z;
+		verts[1] = pos + util::YZ;
+		verts[2] = pos + util::XYZ;
+		verts[3] = pos + util::XY;
+		break;
+	case 5:
+		verts[0] = pos;
+		verts[1] = pos + util::Y;
+		verts[2] = pos + util::XY;
+		verts[3] = pos + util::X;
+		break;
+	}
+}
+
+Quad::Quad(const glm::vec3& box_min, const glm::vec3& box_max, int face)
+{
+	verts = new glm::vec3[4];
+
+	glm::vec3 size = box_max - box_min;
+	switch (face)
+	{
+	case 0:
+		verts[0] = box_min + glm::vec3(0, size.y, 0);
+		verts[1] = box_min + glm::vec3(0, size.y, size.z);
+		verts[2] = box_max;
+		verts[3] = box_min + glm::vec3(size.x, size.y, 0);
+		break;
+	case 1:
+		verts[0] = box_min;
+		verts[1] = box_min + glm::vec3(size.x, 0, 0);
+		verts[2] = box_min + glm::vec3(size.x, 0, size.z);
+		verts[3] = box_min + glm::vec3(0, 0, size.z);
+		break;
+	case 2:
+		verts[0] = box_min + glm::vec3(size.x, 0, 0);
+		verts[1] = box_min + glm::vec3(size.x, size.y, 0);
+		verts[2] = box_max;
+		verts[3] = box_min + glm::vec3(size.x, 0, size.z);
+		break;
+	case 3:
+		verts[0] = box_min;
+		verts[1] = box_min + glm::vec3(0, 0, size.z);
+		verts[2] = box_min + glm::vec3(0, size.y, size.z);
+		verts[3] = box_min + glm::vec3(0, size.y, 0);
+		break;
+	case 4:
+		verts[0] = box_min + glm::vec3(0, 0, size.z);
+		verts[1] = box_min + glm::vec3(size.x, 0, size.z);
+		verts[2] = box_max;
+		verts[3] = box_min + glm::vec3(0, size.y, size.z);
+		break;
+	case 5:
+		verts[0] = box_min;
+		verts[1] = box_min + glm::vec3(0, size.y, 0);
+		verts[2] = box_min + glm::vec3(size.x, size.y, 0);
+		verts[3] = box_min + glm::vec3(size.x, 0, 0);
+		break;
+	}
+}
+
+Quad::~Quad()
+{
+	std::cout << verts << std::endl;
+	delete[] verts;
 }
 
 namespace util

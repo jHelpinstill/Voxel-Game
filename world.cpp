@@ -69,7 +69,7 @@ bool World::peekChunk(int x, int y, int z, Chunk** chunk_out)
 	return exists;
 }
 
-void World::inspectPos(glm::vec3 pos, BlockType** block_out, Chunk** chunk_out)
+void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chunk_out)
 {
 	Mesh* world_mesh = getMeshByName("world_mesh");
 	//pos -= world_mesh->transform.pos;
@@ -92,6 +92,13 @@ void World::inspectPos(glm::vec3 pos, BlockType** block_out, Chunk** chunk_out)
 		*chunk_out = chunk;
 }
 
+Chunk* World::getChunk(const glm::vec3& pos)
+{
+	Chunk* chunk;
+	inspectPos(pos, nullptr, &chunk);
+	return chunk;
+}
+
 BlockType* World::inspectPos(glm::vec3 pos)
 {
 	BlockType* block;
@@ -99,14 +106,14 @@ BlockType* World::inspectPos(glm::vec3 pos)
 	return block;
 }
 
-bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_out, Chunk** chunk_out)
+bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** block_out, Chunk** chunk_out)
 {
 	//std::cout << "Camera Pos: " << vec2string(pos) << std::endl;
 	//std::cout << "look direction: " << vec2string(dir) << std::endl;
 
 	Mesh* world_mesh = getMeshByName("world_mesh");
 
-	dir = glm::normalize(dir);
+	glm::vec3 unit_ray = glm::normalize(ray);
 
 	glm::vec3 block_pos = pos / chunk_unit_length;
 	int chunk_pos[3];
@@ -136,8 +143,8 @@ bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_out, Chun
 		{
 			if (accumulator[i] > 1 || accumulator[i] < 0)
 			{
-				accumulator[i] += (dir[i] < 0) ? 1 : -1;
-				block_pos[i] += (dir[i] < 0) ? -1 : 1;
+				accumulator[i] += (unit_ray[i] < 0) ? 1 : -1;
+				block_pos[i] += (unit_ray[i] < 0) ? -1 : 1;
 				//dom_step = false;
 				take_step = false;
 				//std::cout << "stepping toward " << i << std::endl;
@@ -145,7 +152,7 @@ bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_out, Chun
 			}
 		}
 		if (take_step)
-			accumulator += dir;
+			accumulator += unit_ray;
 
 		bool next_chunk = false;
 		for (int i = 0; i < 3; i++)
@@ -183,15 +190,15 @@ bool World::inspectRay(glm::vec3 pos, glm::vec3 dir, BlockType** block_out, Chun
 		*chunk_out = chunk;
 }
 
-BlockType* World::inspectRay(glm::vec3 pos, glm::vec3 dir)
+BlockType* World::inspectRay(const glm::vec3& pos, const glm::vec3& ray)
 {
 	BlockType* block;
-	if (!inspectRay(pos, dir, &block))
+	if (!inspectRay(pos, ray, &block))
 		return nullptr;
 	return block;
 }
 
-void World::updateBlock(glm::vec3 pos, BlockType new_type)
+void World::updateBlock(const glm::vec3& pos, BlockType new_type)
 {
 	BlockType* block;
 	Chunk* chunk;
