@@ -25,7 +25,7 @@ public:
 	{
 	private:
 		void addDataNode(DataNode* node);
-		bool hitByRay(const glm::vec3& pos, const glm::vec3& ray);
+		
 
 	public:
 		DataNode* data;
@@ -44,6 +44,7 @@ public:
 		int countDataNodes();
 		//void expandToFit(const glm::vec3& pos);
 		void (*expandToFit)(const glm::vec3& pos, const T& obj, glm::vec3& min, glm::vec3& max);
+		bool hitByRay(const glm::vec3& pos, const glm::vec3& ray);
 
 		void split(int min_data_nodes);
 	};
@@ -223,23 +224,60 @@ auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*ray
 	if (!resized)
 		return nearest_hit;
 
-	if (!this->hitByRay(pos, ray))
+	// figure out which children to search and, if both, in which order
+	Box* ranked_children[2]{};
+	bool childA_hit = (childA && childA->hitByRay(pos, ray));
+	bool childB_hit = (childB && childB->hitByRay(pos, ray));
+
+	std::cout << "box " << this << " ";
+	if (childA_hit && !childB_hit)
 	{
-		//std::cout << "box missed" << std::endl;
-		return nearest_hit;
+		std::cout << "searching childA" << std::endl;
+		ranked_children[0] = childA;
 	}
-	std::cout << "box " << this << " hit, size: " << vec2string(max - min) << std::endl;
-	
+	else if (!childA_hit && childB_hit)
+	{
+		std::cout << "searching childB" << std::endl;
+		ranked_children[0] = childB;
+	}
+	else if (childA_hit && childB_hit)
+	{
+		std::cout << "searching both children: ";
+
+		float distA, distB;
+		distA = glm::length((childA->max - childA->min) - pos);
+		distB = glm::length((childB->max - childB->min) - pos);
+		if (distA < distB)
+		{
+			std::cout << "A closer" << std::endl;
+			ranked_children[0] = childA;
+			ranked_children[1] = childB;
+		}
+		else
+		{
+			std::cout << "B closer" << std::endl;
+			ranked_children[0] = childB;
+			ranked_children[1] = childA;
+		}
+	}
+	else
+		std::cout << "has no children" << std::endl;
+
 	// find hits from child nodes
 	std::vector<DataNode*> hit_nodes;
-	DataNode* child_hit = nullptr;
-	if (childA && (child_hit = childA->raycast(pos, ray, raycastObj)))
-		hit_nodes.push_back(child_hit);
-	if (childB && (child_hit = childB->raycast(pos, ray, raycastObj)))
-		hit_nodes.push_back(child_hit);	
-	
+	DataNode* hit = nullptr;
+	for (int i = 0; i < 2; i++)
+	{
+		if (ranked_children[i] && (hit = ranked_children[i]->raycast(pos, ray, raycastObj)))
+		{
+			hit_nodes.push_back(hit);
+			break;
+		}
+	}
+
 	std::cout << "box " << this << " back from children: " << std::endl;
-	std::cout << "objs hit from children: " << hit_nodes.size() << std::endl;
+	std::cout << "hits received from children: " << hit_nodes.size() << std::endl;
+	int hits_before_self = hit_nodes.size();
 	// find hits from own nodes
 	DataNode* node = data;
 	while (node)
@@ -247,10 +285,11 @@ auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*ray
 		if (raycastObj(pos, ray, node->pos, &node->obj))
 		{
 			hit_nodes.push_back(node);
+			std::cout << "hit face with direction: " << node->obj << std::endl;
 		}
 		node = node->next;
 	}
-	std::cout << "objs hit after searching own: " << hit_nodes.size() << std::endl;
+	std::cout << "hits from own data: " << hit_nodes.size() - hits_before_self << std::endl;
 
 	// find nearest hit
 	if (hit_nodes.size())
@@ -280,7 +319,11 @@ auto BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray)->RaycastResult
 		return result;
 	std::cout << "Raycast begin" << std::endl;
 
-	DataNode* hit_node = root->raycast(pos, ray, raycastObjFunc);
+	DataNode* hit_node = nullptr;
+	if (root->hitByRay(pos, ray))
+		hit_node = root->raycast(pos, ray, raycastObjFunc);
+	else
+		std::cout << "root box missed" << std::endl;
 	if (!hit_node)
 		return result;
 

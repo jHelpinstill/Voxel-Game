@@ -41,7 +41,16 @@ void raycastTest2(Camera* camera, World& world, Input* input)
 			if (input->mouse.left.held)
 			{
 				Mesh* test_block = getMeshByName("test_block");
-				test_block->transform.pos = cast_result.pos;
+				static glm::vec3 offset[6] =
+				{
+					glm::vec3(0, 0.1, 0),
+					glm::vec3(0, -0.1, 0),
+					glm::vec3(0.1, 0, 0),
+					glm::vec3(-0.1, 0, 0),
+					glm::vec3(0, 0, 0.1),
+					glm::vec3(0, 0, -0.1)
+				};
+				test_block->transform.pos = cast_result.pos + offset[*cast_result.obj];
 			}
 		}
 		else
