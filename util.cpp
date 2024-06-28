@@ -61,6 +61,9 @@ float max2(float a, float b)
 // returns true if ray intersects polygon, false otherwise
 bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3* verts, int num_sides, util::PolyCulling culling)
 {
+	if (glm::dot(verts[0] - pos, ray) < 0)
+		return false;
+
 	switch (culling)
 	{
 		using namespace util;

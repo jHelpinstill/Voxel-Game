@@ -13,6 +13,44 @@ Game::~Game()
 	delete camera;
 }
 
+//void raycastTest(const glm::vec3& pos, const glm::vec3& ray)
+//{
+//	for (int i = 0; i < 6; i++)
+//	{
+//		Quad quad(glm::vec3(0, 3, 0), glm::vec3(1, 4, 1), i);
+//		if (rayIntersectsPoly(pos, ray, quad.verts, 4, util::PolyCulling::CCW))
+//			std::cout << "looking at box face " << i << std::endl;
+//	}
+//	std::cout << "" << std::endl;
+//}
+
+void raycastTest2(Camera* camera, World& world, Input* input)
+{
+	Chunk* current_chunk = nullptr;
+	if (world.peekChunk(camera->transform.pos, &current_chunk))
+	{
+		//std::cout << "camera pos: " << vec2string(camera->transform.pos) << std::endl;
+		//std::cout << "chunk pos: " << current_chunk->x << ", " << current_chunk->y << ", " << current_chunk->z << std::endl;
+		Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
+		if (cast_result.hit)
+		{
+			std::cout << "raycast returned true from position " << vec2string(camera->transform.pos);
+			std::cout << "\tlooking at pos: " << vec2string(cast_result.pos);
+			std::cout << "\tface looked at: " << *cast_result.obj << std::endl;
+
+			if (input->mouse.left.held)
+			{
+				Mesh* test_block = getMeshByName("test_block");
+				test_block->transform.pos = cast_result.pos;
+			}
+		}
+		else
+			std::cout << "raycast failed" << std::endl;
+	}
+}
+
+
+int data_node_called = 0;
 void Game::setup()
 {
 	input = new Input(window);
@@ -37,6 +75,7 @@ void Game::setup()
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 3, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 3, -2), "crate", "meshes/box_two_face_UV.txt");
 	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 3, 2), "crate", "meshes/box_two_face_UV.txt");
+	createTexturedBox("test_block", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), "crate", "meshes/box_two_face_UV.txt");
 
 	HUDElement* crosshair = new HUDElement();
 	hud_elements["crosshair"] = crosshair;
@@ -49,6 +88,8 @@ void Game::setup()
 
 	Chunk* chunk = world.getChunk(0, 1, 0);
 	traceBVHi(chunk->faces_BVH);
+
+	std::cout << "data node called: " << data_node_called << " times" << std::endl;
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -127,31 +168,13 @@ void Game::stateMachine(double dt)
 			//world.generateMesh();
 		}
 
-		Chunk* current_chunk = nullptr;
-		if (world.peekChunk(camera->transform.pos, &current_chunk))
-		{
-			//std::cout << "camera pos: " << vec2string(camera->transform.pos) << std::endl;
-			//std::cout << "chunk pos: " << current_chunk->x << ", " << current_chunk->y << ", " << current_chunk->z << std::endl;
-			int* face = nullptr;
-			glm::vec3 block_pos(0);
-			if (current_chunk->faces_BVH.raycast(camera->transform.pos, camera->getLookDirection(), &face, block_pos))
-			{
-				std::cout << "raycast returned true at " << vec2string(camera->transform.pos) << std::endl;
-				if (input->mouse.left.held)
-				{
-					Mesh* crate = getMeshByName("crate");
-					crate->transform.pos = block_pos;
-				}
-			}
-			else
-				std::cout << "raycast failed" << std::endl;
-		}
-		else
-			//std::cout << "peek chunk failed" << std::endl;
-		
+		raycastTest2(camera, world, input);
+
 
 		//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
-		
+
+		//raycastTest(camera->transform.pos, camera->getLookDirection());
+
 		drawUI();
 		drawMeshes();
 		break;

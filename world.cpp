@@ -295,6 +295,7 @@ void World::generateMesh()
 	chunk_pos_data.clear();
 
 	int chunk_counter = 0;
+	int face_counter = 0;
 	for (auto& bucket : chunks)
 	{
 		Chunk* chunk = bucket.second;
@@ -306,12 +307,14 @@ void World::generateMesh()
 		chunk_draw_params.push_back(ChunkDrawParams(4, num_instances, 0, mesh->instance_data.size() - face_per_chunk));
 		chunk_pos_data.push_back(encodeChunkPos(chunk));
 		chunk->ID = chunk_counter++;
+
+		std::cout << "num_instances: " << num_instances << std::endl;
+		face_counter += num_instances;
 	}
 	
 	mesh->shader = getShaderByName("world_shader");
 	mesh->vao->makeInstanced(mesh->verts, mesh->instance_data);
 	mesh->drawFunction = drawWorld;
-	//mesh->transform.translate(glm::vec3(0, -3, 0));
 	mesh->parent_obj = this;
 
 
@@ -320,7 +323,7 @@ void World::generateMesh()
 	glBufferData(GL_SHADER_STORAGE_BUFFER, chunk_pos_data.size() * sizeof(int), chunk_pos_data.data(), GL_STATIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, chunk_pos_SSBO);
 
-	std::cout << "Finished world generation. World contains: " << chunks.size() << " chunks with " << mesh->instance_data.size() * 2 << " triangles" << std::endl;
+	std::cout << "Finished world generation. World contains: " << chunks.size() << " chunks with " << face_counter << " faces" << std::endl;
 }
 
 #include <bitset>

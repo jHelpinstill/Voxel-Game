@@ -56,11 +56,9 @@ public:
 	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};	// the main array of blocks
 	int x, y, z, ID, faces;
 	
-
 	float unit_length;		// length of one block in world coordinates
 	long seed;				// unique random number used for various things
 
-	
 	/*
 	* Bounding Volume Hierarchy used for raycasting. Enables the quick discovery of
 	* which face in the world mesh (belonging to this chunk) is intersected by a ray.
@@ -68,6 +66,10 @@ public:
 	*/
 	BVH<int> faces_BVH;
 	static bool raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, int* face);
+	static void expandToFitFace(const glm::vec3& pos, const int& face, glm::vec3& min, glm::vec3& max);
+
+	typedef BVH<int>::RaycastResult RaycastResult;
+	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);
 	
 	// chunks are initialized with their coordinates, random seed, and unit length
 	Chunk(int x, int y, int z, long seed, float unit_length = 1);

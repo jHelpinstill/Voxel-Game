@@ -16,6 +16,8 @@ struct MonitorBVHi
 	int max_data_nodes;
 	float avg_data_nodes;
 	int sum_data_nodes;
+
+	int num_faces[6];
 };
 
 void traceBVHi(BVH<int>& bvh);

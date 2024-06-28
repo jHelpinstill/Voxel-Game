@@ -3,11 +3,7 @@
 
 void traceBVHi(BVH<int>& bvh)
 {
-	MonitorBVHi monitor =
-	{
-		0, 0, 0, 0, 0,
-		0, 0, 0
-	};
+	MonitorBVHi monitor{};
 
 	traceBVHi(bvh.root, monitor);
 
@@ -22,6 +18,11 @@ void traceBVHi(BVH<int>& bvh)
 	std::cout << "-with both child nodes: " << monitor.num_with_both_children << std::endl;
 	std::cout << "most data nodes: " << monitor.max_data_nodes << std::endl;
 	std::cout << "avg data nodes: " << monitor.avg_data_nodes << std::endl;
+
+	for (int i = 0; i < 6; i++)
+	{
+		std::cout << "num faces in direction " << i << ": " << monitor.num_faces[i] << std::endl;
+	}
 }
 
 void traceBVHi(BVH<int>::Box* box, MonitorBVHi& monitor)
@@ -37,6 +38,7 @@ void traceBVHi(BVH<int>::Box* box, MonitorBVHi& monitor)
 		BVH<int>::DataNode* node = box->data;
 		while (node)
 		{
+			monitor.num_faces[node->obj]++;
 			num_data_nodes++;
 			node = node->next;
 		}

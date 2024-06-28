@@ -1,7 +1,9 @@
 #include "Chunk.h"
 #include "util.h"
 
-Chunk::Chunk(int x, int y, int z, long seed, float unit_length) : x(x), y(y), z(z), seed(seed), unit_length(unit_length)
+Chunk::Chunk(int x, int y, int z, long seed, float unit_length)
+	: faces_BVH(raycastFace, expandToFitFace)
+	, x(x), y(y), z(z), seed(seed), unit_length(unit_length)
 {
 	this->ID = -1;
 
@@ -29,8 +31,6 @@ Chunk::Chunk(int x, int y, int z, long seed, float unit_length) : x(x), y(y), z(
 				blocks[xb][yb][zb] = BlockType::AIR;
 		}
 	}
-
-	faces_BVH.raycastObj = raycastFace;
 }
 
 glm::vec3 Chunk::getPosf()
@@ -50,7 +50,6 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 
 	int instances = 0;
 	std::srand(seed);
-	glm::vec3 chunk_pos = getPosf() * (1.0f / unit_length);
 	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
 		for (int z = 0; z < CHUNK_SIZE; z++)
@@ -61,7 +60,7 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 				if (blocks[x][y][z] != BlockType::AIR)
 					continue;
 
-				glm::vec3 pos = chunk_pos + glm::vec3(x, y, z);
+				glm::vec3 pos = glm::vec3(x, y, z);
 
 				glm::vec3 surrounding_block_positions[6] =
 				{
@@ -111,12 +110,10 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 		}
 	}
 
-	faces_BVH.root->split();
+	faces_BVH.root->split(6);
 	faces = instances;
 	return instances;
 }
-
-#include <bitset>
 /*
 * x, y, z: 5 bits each
 * face direction: 3 bits (6 directions)
@@ -127,8 +124,6 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 */
 int Chunk::encodeFaceData(int x, int y, int z, int face, glm::vec3 color)// int texture_id)
 {
-	
-
 	color *= 7.0f;
 	int data = (x & 63);
 	data |= (y & 63) << 6;
@@ -139,9 +134,16 @@ int Chunk::encodeFaceData(int x, int y, int z, int face, glm::vec3 color)// int 
 	data |= ((int)color.y & 7) << 24;
 	data |= ((int)color.z & 7) << 27;
 
-	//std::bitset<32> bits(data);
-	//std::cout << "instance data: " << bits <<  ", " << data << " (" << x << ", " << y << ", " << z << ", " << face << ", " << texture_id << ")" << std::endl;
 	return data;
+}
+
+Chunk::RaycastResult Chunk::raycast(const glm::vec3& pos, const glm::vec3& ray)
+{
+	glm::vec3 chunk_space_pos = (pos - getPosf()) * (1.0f / unit_length);
+	RaycastResult result = faces_BVH.raycast(chunk_space_pos, ray);
+	if (result.hit)
+		result.pos = getPosf() + result.pos * unit_length;
+	return result;
 }
 
 bool Chunk::raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, int* face)
@@ -150,11 +152,45 @@ bool Chunk::raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::v
 	return rayIntersectsPoly(pos, ray, quad.verts, 4, util::PolyCulling::CCW);
 }
 
+void Chunk::expandToFitFace(const glm::vec3& pos, const int& face, glm::vec3& min, glm::vec3& max)
+{
+	glm::vec3 face_min, face_max;
+	switch (face)
+	{
+	case 0:
+		face_min = pos + util::Y;
+		face_max = pos + util::XYZ;
+		break;
+	case 1:
+		face_min = pos;
+		face_max = util::ZX;
+		break;
+	case 2:
+		face_min = pos + util::X;
+		face_max = pos + util::XYZ;
+		break;
+	case 3:
+		face_min = pos;
+		face_max = pos + util::YZ;
+		break;
+	case 4:
+		face_min = pos + util::Z;
+		face_max = pos + util::XYZ;
+		break;
+	case 5:
+		face_min = pos;
+		face_max = pos + util::XY;
+		break;
+	}
+	min = glm::min(min, face_min);
+	max = glm::max(max, face_max);
+}
+
 //////////////////// FUNCTION DEFINIIONS (GROUP) /////////////////////////	
 
 Chunk::Group::Group(int size) : size(size)
 {
-	chunks = new Chunk * [6];
+	chunks = new Chunk* [size];
 }
 
 Chunk::Group::Group(const Group& other)
