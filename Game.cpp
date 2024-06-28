@@ -47,6 +47,9 @@ void Game::setup()
 
 	world.setup();
 
+	Chunk* chunk = world.getChunk(0, 1, 0);
+	traceBVHi(chunk->faces_BVH);
+
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 }
@@ -124,17 +127,28 @@ void Game::stateMachine(double dt)
 			//world.generateMesh();
 		}
 
-		Chunk* current_chunk = world.getChunk(camera->transform.pos);
-		int* face = nullptr;
-		glm::vec3* block_pos = nullptr;
-		if (current_chunk->faces_BVH.raycast(camera->transform.pos, camera->getLookDirection(), &face, block_pos))
+		Chunk* current_chunk = nullptr;
+		if (world.peekChunk(camera->transform.pos, &current_chunk))
 		{
-			if(input->mouse.left.held)
+			//std::cout << "camera pos: " << vec2string(camera->transform.pos) << std::endl;
+			//std::cout << "chunk pos: " << current_chunk->x << ", " << current_chunk->y << ", " << current_chunk->z << std::endl;
+			int* face = nullptr;
+			glm::vec3* block_pos = nullptr;
+			if (current_chunk->faces_BVH.raycast(camera->transform.pos, camera->getLookDirection(), &face, block_pos))
 			{
-				Mesh* crate = getMeshByName("crate");
-				crate->transform.pos = *block_pos;
+				std::cout << "raycast returned true at " << vec2string(camera->transform.pos) << std::endl;
+				if (input->mouse.left.held && block_pos)
+				{
+					Mesh* crate = getMeshByName("crate");
+					crate->transform.pos = *block_pos;
+				}
 			}
+			else
+				std::cout << "raycast failed" << std::endl;
 		}
+		else
+			//std::cout << "peek chunk failed" << std::endl;
+		
 
 		//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
 		

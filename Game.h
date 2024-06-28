@@ -12,6 +12,7 @@
 #include "ObjectManager.h"
 #include "World.h"
 #include "HUDElement.h"
+#include "Debug.h"
 
 class Game
 {

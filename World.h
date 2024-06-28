@@ -29,7 +29,7 @@ public:
 	};
 
 	float chunk_unit_length = 0.1;
-	int chunk_radius = 6;
+	int chunk_radius = 0;
 	long seed;
 
 	float ambient_lighting = 0.1;
@@ -48,11 +48,13 @@ public:
 	void remeshChunk(Chunk* chunk);
 
 	void addChunk(int x, int y, int z);
+	Chunk* getChunk(const glm::vec3& pos);
 	Chunk* getChunk(int x, int y, int z);
+	bool peekChunk(const glm::vec3& pos, Chunk** chunk_out = nullptr);
 	bool peekChunk(int x, int y, int z, Chunk** chunk_out = nullptr);
 
 	void inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chunk_out = nullptr);
-	Chunk* getChunk(const glm::vec3& pos);
+	
 	BlockType* inspectPos(glm::vec3 pos);
 	bool inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** block_out, Chunk** chunk_out = nullptr);
 	BlockType* inspectRay(const glm::vec3& pos, const glm::vec3& ray);

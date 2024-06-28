@@ -86,18 +86,8 @@ bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::ve
 	return true;
 }
 
-Quad::Quad(const Quad& other)
-{
-	if (!verts)
-		verts = new glm::vec3[4];
-	for (int i = 0; i < 4; i++)
-		this->verts[i] = other.verts[i];
-}
-
 Quad::Quad(const glm::vec3& pos, int face)
 {
-	verts = new glm::vec3[4];
-
 	switch (face)
 	{
 	case 0:
@@ -141,7 +131,7 @@ Quad::Quad(const glm::vec3& pos, int face)
 
 Quad::Quad(const glm::vec3& box_min, const glm::vec3& box_max, int face)
 {
-	verts = new glm::vec3[4];
+	//std::cout << vec2string(box_max) << "--" << vec2string(box_min) << std::endl;
 
 	glm::vec3 size = box_max - box_min;
 	switch (face)
@@ -183,12 +173,6 @@ Quad::Quad(const glm::vec3& box_min, const glm::vec3& box_max, int face)
 		verts[3] = box_min + glm::vec3(size.x, 0, 0);
 		break;
 	}
-}
-
-Quad::~Quad()
-{
-	std::cout << verts << std::endl;
-	delete[] verts;
 }
 
 namespace util

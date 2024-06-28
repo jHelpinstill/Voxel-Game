@@ -50,6 +50,13 @@ void World::addChunk(int x, int y, int z)
 	chunks[key] = new Chunk(x, y, z, std::rand(), chunk_unit_length);
 }
 
+Chunk* World::getChunk(const glm::vec3& pos)
+{
+	Chunk* chunk;
+	inspectPos(pos, nullptr, &chunk);
+	return chunk;
+}
+
 Chunk* World::getChunk(int x, int y, int z)
 {
 	Chunk::Key key(x, y, z);
@@ -58,15 +65,27 @@ Chunk* World::getChunk(int x, int y, int z)
 	return chunks[key];
 }
 
+bool World::peekChunk(const glm::vec3& pos, Chunk** chunk_out)
+{
+	glm::vec3 block_pos = pos / chunk_unit_length;
+	int x, y, z;
+	x = (int)(block_pos.x / CHUNK_SIZE); if (block_pos.x < 0) x--;
+	y = (int)(block_pos.y / CHUNK_SIZE); if (block_pos.y < 0) y--;
+	z = (int)(block_pos.z / CHUNK_SIZE); if (block_pos.z < 0) z--;
+
+	return peekChunk(x, y, z, chunk_out);
+}
+
 bool World::peekChunk(int x, int y, int z, Chunk** chunk_out)
 {
 	Chunk::Key key(x, y, z);
-	bool exists = false;
 	if (chunks.find(key) != chunks.end())
-		exists = true;
-	if (exists && chunk_out)
-		*chunk_out = chunks[key];
-	return exists;
+	{
+		if(chunk_out)
+			*chunk_out = chunks[key];
+		return true;
+	}
+	return false;
 }
 
 void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chunk_out)
@@ -79,25 +98,21 @@ void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chun
 	x_ch = (int)(block_pos.x / CHUNK_SIZE); if (block_pos.x < 0) x_ch--;
 	y_ch = (int)(block_pos.y / CHUNK_SIZE); if (block_pos.y < 0) y_ch--;
 	z_ch = (int)(block_pos.z / CHUNK_SIZE); if (block_pos.z < 0) z_ch--;
-	Chunk* chunk = getChunk(x_ch, y_ch, z_ch);
+	Chunk* chunk = nullptr;
+	if (!peekChunk(x_ch, y_ch, z_ch, &chunk))
+		return;
 
 	int x_b = (int)(block_pos.x -= x_ch * CHUNK_SIZE);
 	int y_b = (int)(block_pos.y -= y_ch * CHUNK_SIZE);
 	int z_b = (int)(block_pos.z -= z_ch * CHUNK_SIZE);
 
-	std::cout << "inspecting block at " << pos.x << ", " << pos.y << ", " << pos.z << ", block index " << x_b << ", " << y_b << ", " << z_b << std::endl;
+	//std::cout << "inspecting block at " << pos.x << ", " << pos.y << ", " << pos.z << ", block index " << x_b << ", " << y_b << ", " << z_b << std::endl;
 	if(block_out)
 		*block_out = &chunk->blocks[x_b][y_b][z_b];
 	if (chunk_out)
 		*chunk_out = chunk;
 }
 
-Chunk* World::getChunk(const glm::vec3& pos)
-{
-	Chunk* chunk;
-	inspectPos(pos, nullptr, &chunk);
-	return chunk;
-}
 
 BlockType* World::inspectPos(glm::vec3 pos)
 {
@@ -360,6 +375,7 @@ void World::drawWorld(Mesh* mesh, Camera* camera, void* obj)
 	for (auto& chunk_obj : world->chunks)
 	{
 		Chunk* chunk = chunk_obj.second;
+
 		glm::vec3 a, b, c, d;
 		float length = CHUNK_SIZE * world->chunk_unit_length;
 		a = chunk->getPosf();

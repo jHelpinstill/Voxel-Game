@@ -35,12 +35,10 @@ bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::ve
 class Quad
 {
 public:
-	glm::vec3* verts;
+	glm::vec3 verts[4];
 	
-	Quad() : verts(nullptr) {}
-	Quad(const Quad& other);
+	Quad() {}
 	Quad(const glm::vec3& pos, int face);
 	Quad(const glm::vec3& box_min, const glm::vec3& box_max, int face);
 
-	~Quad();
 };
