@@ -46,7 +46,7 @@ public:
 	BVH();
 	~BVH();
 
-	bool raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj_out, glm::vec3* obj_pos);
+	bool raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj_out, glm::vec3& obj_pos);
 	void reset();
 };
 
@@ -194,6 +194,8 @@ bool BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, std::vecto
 	if (!resized)
 		return false;
 
+	std::cout << "box size: " << vec2string(max - min) << std::endl;
+
 	if (!this->hitByRay(pos, ray))
 	{
 		std::cout << "box missed" << std::endl;
@@ -215,22 +217,22 @@ bool BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, std::vecto
 	}
 
 	
-	if (childA->raycast(pos, ray, hit_nodes, raycastObj))
+	if (childA && childA->raycast(pos, ray, hit_nodes, raycastObj))
 		object_hit = true;
-	if (childB->raycast(pos, ray, hit_nodes, raycastObj))
+	if (childB && childB->raycast(pos, ray, hit_nodes, raycastObj))
 		object_hit = true;
 	return object_hit;
 }
 
 template <class T>
-bool BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj_out, glm::vec3* obj_pos)
+bool BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj_out, glm::vec3& obj_pos)
 {
 	if (!root || !raycastObj)
 		return false;
 	std::cout << "Raycast begin" << std::endl;
 
 	std::vector<DataNode*> hit_nodes;
-	if (!root->raycast(pos, ray, hit_nodes, raycastObj))
+	if (!root->raycast(pos, ray, hit_nodes, raycastObj) || hit_nodes.size() == 0)
 		return false;
 
 	int closest = 0;
@@ -246,7 +248,7 @@ bool BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray, T** obj_out, gl
 	}
 
 	*obj_out = &hit_nodes[closest]->obj;
-	*obj_pos = hit_nodes[closest]->pos;
+	obj_pos = hit_nodes[closest]->pos;
 	return true;
 }
 

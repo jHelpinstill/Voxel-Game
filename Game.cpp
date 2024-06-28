@@ -133,14 +133,14 @@ void Game::stateMachine(double dt)
 			//std::cout << "camera pos: " << vec2string(camera->transform.pos) << std::endl;
 			//std::cout << "chunk pos: " << current_chunk->x << ", " << current_chunk->y << ", " << current_chunk->z << std::endl;
 			int* face = nullptr;
-			glm::vec3* block_pos = nullptr;
+			glm::vec3 block_pos(0);
 			if (current_chunk->faces_BVH.raycast(camera->transform.pos, camera->getLookDirection(), &face, block_pos))
 			{
 				std::cout << "raycast returned true at " << vec2string(camera->transform.pos) << std::endl;
-				if (input->mouse.left.held && block_pos)
+				if (input->mouse.left.held)
 				{
 					Mesh* crate = getMeshByName("crate");
-					crate->transform.pos = *block_pos;
+					crate->transform.pos = block_pos;
 				}
 			}
 			else
