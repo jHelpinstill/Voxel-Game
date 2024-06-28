@@ -40,5 +40,4 @@ public:
 	Quad() {}
 	Quad(const glm::vec3& pos, int face);
 	Quad(const glm::vec3& box_min, const glm::vec3& box_max, int face);
-
 };

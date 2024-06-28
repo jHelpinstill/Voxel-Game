@@ -208,6 +208,7 @@ void BVH<T>::Box::split(int min_data_nodes)
 template <class T>
 bool BVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
 {
+	std::cout << "box size: " << vec2string(max - min) << std::endl;
 	for (int face = 0; face < 6; face++)
 	{
 		Quad quad(min, max, face);

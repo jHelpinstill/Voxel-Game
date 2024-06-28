@@ -61,7 +61,8 @@ float max2(float a, float b)
 // returns true if ray intersects polygon, false otherwise
 bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3* verts, int num_sides, util::PolyCulling culling)
 {
-	if (glm::dot(verts[0] - pos, ray) < 0)
+	glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
+	if (glm::dot(verts[0] - pos, norm) * glm::dot(ray, norm) < 0)
 		return false;
 
 	switch (culling)
@@ -70,10 +71,13 @@ bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::ve
 	case PolyCulling::NONE:
 		break;
 	case PolyCulling::CCW:
-	case PolyCulling::CW:
-		glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
-		if ((culling == PolyCulling::CCW) ? (glm::dot(norm, ray) >= 0) : (glm::dot(norm, ray) < 0))
+		if (glm::dot(norm, ray) >= 0)
 			return false;
+		break;
+	case PolyCulling::CW:
+		if(glm::dot(norm, ray) < 0)
+			return false;
+		break;
 	}
 
 	glm::vec3 leg = verts[1 % num_sides] - verts[0];
@@ -134,8 +138,6 @@ Quad::Quad(const glm::vec3& pos, int face)
 
 Quad::Quad(const glm::vec3& box_min, const glm::vec3& box_max, int face)
 {
-	//std::cout << vec2string(box_max) << "--" << vec2string(box_min) << std::endl;
-
 	glm::vec3 size = box_max - box_min;
 	switch (face)
 	{
