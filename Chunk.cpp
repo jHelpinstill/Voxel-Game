@@ -148,7 +148,7 @@ Chunk::RaycastResult Chunk::raycast(const glm::vec3& pos, const glm::vec3& ray)
 
 bool Chunk::raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, int* face)
 {
-	std::cout << "raycastFace called with face direction: " << *face << std::endl;
+	//td::cout << "raycastFace called with face direction: " << *face << std::endl;
 	Quad quad(face_pos, *face);
 	return rayIntersectsPoly(pos, ray, quad.verts, 4, util::PolyCulling::CCW);
 }

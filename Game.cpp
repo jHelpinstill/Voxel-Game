@@ -34,27 +34,24 @@ void raycastTest2(Camera* camera, World& world, Input* input)
 		Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
 		if (cast_result.hit)
 		{
-			std::cout << "raycast returned true from position " << vec2string(camera->transform.pos);
-			std::cout << "\tlooking at pos: " << vec2string(cast_result.pos);
-			std::cout << "\tface looked at: " << *cast_result.obj << std::endl;
+			//std::cout << "raycast returned true from position " << vec2string(camera->transform.pos);
+			//std::cout << "\tlooking at pos: " << vec2string(cast_result.pos);
+			//std::cout << "\tface looked at: " << *cast_result.obj << std::endl;
 
-			if (input->mouse.left.held)
+			Mesh* test_block = getMeshByName("test_block");
+			static glm::vec3 offset[6] =
 			{
-				Mesh* test_block = getMeshByName("test_block");
-				static glm::vec3 offset[6] =
-				{
-					glm::vec3(0, 0.1, 0),
-					glm::vec3(0, -0.1, 0),
-					glm::vec3(0.1, 0, 0),
-					glm::vec3(-0.1, 0, 0),
-					glm::vec3(0, 0, 0.1),
-					glm::vec3(0, 0, -0.1)
-				};
-				test_block->transform.pos = cast_result.pos + offset[*cast_result.obj];
-			}
+				glm::vec3(0, 0.1, 0),
+				glm::vec3(0, -0.1, 0),
+				glm::vec3(0.1, 0, 0),
+				glm::vec3(-0.1, 0, 0),
+				glm::vec3(0, 0, 0.1),
+				glm::vec3(0, 0, -0.1)
+			};
+			test_block->transform.pos = cast_result.pos + offset[*cast_result.obj];
 		}
-		else
-			std::cout << "raycast failed" << std::endl;
+		//else
+			//std::cout << "raycast failed" << std::endl;
 	}
 }
 
@@ -167,6 +164,7 @@ void Game::stateMachine(double dt)
 
 		if (input->mouse.left.held)
 		{
+			raycastTest2(camera, world, input);
 			//world.updateLookedAtBlock(camera, BlockType::AIR);
 			//world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
 			//world.generateMesh();
@@ -176,8 +174,6 @@ void Game::stateMachine(double dt)
 			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
 			//world.generateMesh();
 		}
-
-		raycastTest2(camera, world, input);
 
 
 		//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);

@@ -123,9 +123,9 @@ Quad::Quad(const glm::vec3& pos, int face)
 		break;
 	case 4:
 		verts[0] = pos + util::Z;
-		verts[1] = pos + util::YZ;
+		verts[1] = pos + util::ZX;
 		verts[2] = pos + util::XYZ;
-		verts[3] = pos + util::XY;
+		verts[3] = pos + util::YZ;
 		break;
 	case 5:
 		verts[0] = pos;

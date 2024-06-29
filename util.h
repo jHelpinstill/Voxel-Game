@@ -1,6 +1,9 @@
 #pragma once
 #include "config.h"
 
+#define UTIL_INFINITY std::numeric_limits<float>::infinity()
+#define UTIL_NEGATIVE_INFINITY -std::numeric_limits<float>::infinity()
+
 namespace util
 {
 	extern glm::vec3 X;
