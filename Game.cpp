@@ -161,56 +161,9 @@ void Game::stateMachine(double dt)
 			player->move_speed = 5;
 
 		player->update(dt);
-
-		if (input->mouse.left.held)
-		{
-			//raycastTest2(camera, world, input);
-			// 
-			//world.updateLookedAtBlock(camera, BlockType::AIR);
-			//world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
-			//world.generateMesh();
-		}
-		if (input->mouse.left.held)
-		{
-			Chunk* current_chunk = nullptr;
-			if (world.peekChunk(camera->transform.pos, &current_chunk))
-			{
-				Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
-				if (cast_result.hit)
-					world.updateBlock(cast_result.pos, BlockType::AIR);
-			}
-		}
-		if (input->mouse.right.pressed)
-		{
-			raycastTest2(camera, world, input);
-			Chunk* current_chunk = nullptr;
-			if (world.peekChunk(camera->transform.pos, &current_chunk))
-			{
-				Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
-				//static const glm::vec3 offset[6] =
-				//{
-				//	glm::vec3(0, 0.1, 0),
-				//	glm::vec3(0, -0.1, 0),
-				//	glm::vec3(0.1, 0, 0),
-				//	glm::vec3(-0.1, 0, 0),
-				//	glm::vec3(0, 0, 0.1),
-				//	glm::vec3(0, 0, -0.1)
-				//};
-
-				if (cast_result.hit)
-					world.updateBlock(current_chunk, cast_result.obj->block, BlockType::DIRT);
-			}
-		}
-		//else if (input->keyHeld('E') || input->mouse.right.held)
-		//{
-		//	world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
-		//	//world.generateMesh();
-		//}
-
+		world.update(dt, camera, input);
 
 		//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
-
-		//raycastTest(camera->transform.pos, camera->getLookDirection());
 
 		drawUI();
 		drawMeshes();

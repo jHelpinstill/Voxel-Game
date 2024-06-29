@@ -187,6 +187,7 @@
     <Text Include="shaders\worldColorFragment.txt" />
     <Text Include="shaders\worldFragment.txt" />
     <Text Include="shaders\worldVertex.txt" />
+    <Text Include="test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

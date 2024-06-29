@@ -39,6 +39,29 @@ void World::setup()
 	generateMesh();
 }
 
+void World::update(float dt, Camera* camera, Input* input)
+{
+	Chunk* current_chunk = nullptr;
+	if (input->mouse.left.pressed)
+	{
+		if (peekChunk(camera->transform.pos, &current_chunk))
+		{
+			Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
+			if (cast_result.hit)
+				updateBlock(cast_result.pos, BlockType::AIR);
+		}
+	}
+	if (input->mouse.right.pressed)
+	{
+		if (peekChunk(camera->transform.pos, &current_chunk))
+		{
+			Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
+			if (cast_result.hit)
+				updateBlock(current_chunk, current_chunk->blocks.getNeighbor(cast_result.obj->block, cast_result.obj->norm), BlockType::DIRT);
+		}
+	}
+}
+
 void World::addChunk(int x, int y, int z)
 {
 	Chunk::Key key(x, y, z);
@@ -60,9 +83,10 @@ Chunk* World::getChunk(const glm::vec3& pos)
 Chunk* World::getChunk(int x, int y, int z)
 {
 	Chunk::Key key(x, y, z);
-	if (chunks.find(key) == chunks.end())
-		chunks[key] = new Chunk(x, y, z, std::rand());
-	return chunks[key];
+	if (chunks.find(key) != chunks.end())
+		return chunks[key];
+	chunks[key] = new Chunk(x, y, z, std::rand(), chunk_unit_length);
+	
 }
 
 bool World::peekChunk(const glm::vec3& pos, Chunk** chunk_out)
@@ -108,7 +132,7 @@ void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chun
 
 	//std::cout << "inspecting block at " << pos.x << ", " << pos.y << ", " << pos.z << ", block index " << x_b << ", " << y_b << ", " << z_b << std::endl;
 	if(block_out)
-		*block_out = &chunk->blocks[x_b][y_b][z_b];
+		*block_out = &chunk->blocks(x_b, y_b, z_b);
 	if (chunk_out)
 		*chunk_out = chunk;
 }
@@ -147,7 +171,7 @@ bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** b
 	accumulator.x = block_pos.x - floor(block_pos.x);
 	accumulator.y = block_pos.y - floor(block_pos.y);
 	accumulator.z = block_pos.z - floor(block_pos.z);
-	while (chunk->blocks[x_b][y_b][z_b] == BlockType::AIR)// || chunk->blocks[x_b][y_b][z_b] == BlockType::STONE)
+	while (chunk->blocks(x_b, y_b, z_b) == BlockType::AIR)// || chunk->blocks[x_b][y_b][z_b] == BlockType::STONE)
 	{
 		//chunk->blocks[x_b][y_b][z_b] = BlockType::STONE;
 		
@@ -200,7 +224,7 @@ bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** b
 	}
 
 	if (block_out)
-		*block_out = &chunk->blocks[x_b][y_b][z_b];
+		*block_out = &chunk->blocks(x_b, y_b, z_b);
 	if (chunk_out)
 		*chunk_out = chunk;
 }
@@ -231,6 +255,8 @@ void World::updateBlock(const glm::vec3& pos, BlockType new_type)
 
 void World::updateBlock(Chunk* chunk, BlockType* block, BlockType new_type)
 {
+	if (!block)
+		return;
 	*block = new_type;
 	remeshChunk(chunk);
 }
@@ -261,11 +287,6 @@ void World::remeshChunk(Chunk* chunk)
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vao->data_VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, chunk_params->baseInstance * sizeof(int), num_instances * sizeof(int), instance_data.data());
-	//int i = chunk_params->baseInstance;
-	//for (int instance : instance_data)
-	//{
-	//	mesh->instance_data[i++] = instance;
-	//}
 
 	std::cout << "Remeshed chunk " << chunk->ID << ", now has " << num_instances << " faces" << std::endl;
 }
@@ -329,7 +350,6 @@ void World::generateMesh()
 	mesh->drawFunction = drawWorld;
 	mesh->parent_obj = this;
 
-
 	glGenBuffers(1, &chunk_pos_SSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, chunk_pos_SSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, chunk_pos_data.size() * sizeof(int), chunk_pos_data.data(), GL_STATIC_DRAW);
@@ -337,8 +357,6 @@ void World::generateMesh()
 
 	std::cout << "Finished world generation. World contains: " << chunks.size() << " chunks with " << face_counter << " faces" << std::endl;
 }
-
-#include <bitset>
 
 int World::encodeChunkPos(Chunk* chunk)
 {
@@ -350,8 +368,6 @@ int World::encodeChunkPos(Chunk* chunk)
 	data |= ((y + 512) & 1023) << 10;
 	data |= ((z + 512) & 1023) << 20;
 
-	//std::bitset<32> bits(data);
-	//std::cout << "chunk data: " << bits <<  ", " << data << " (" << x << ", " << y << ", " << z << ")" << std::endl;
 	return data;
 }
 
@@ -361,7 +377,6 @@ void World::drawWorld(Mesh* mesh, Camera* camera, void* obj)
 
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat() * glm::scale(glm::mat4(1.0), glm::vec3(world->chunk_unit_length)));
-	//mesh->shader->setFloat("unit_length", world->chunk_unit_length);
 	mesh->shader->setInt("chunk_size", CHUNK_SIZE);
 	mesh->shader->setFloat("ambient", world->ambient_lighting);
 

@@ -7,6 +7,8 @@
 #include "Mesh.h"
 #include "Chunk.h"
 #include "BVH.h"
+#include "Camera.h"
+#include "Input.h"
 
 class World
 {
@@ -46,6 +48,8 @@ public:
 	void setup();
 	void generateMesh();
 	void remeshChunk(Chunk* chunk);
+
+	void update(float dt, Camera* camera, Input* input);
 
 	void addChunk(int x, int y, int z);
 	Chunk* getChunk(const glm::vec3& pos);

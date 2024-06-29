@@ -9,6 +9,8 @@
 #include "BVH.h"
 
 constexpr auto CHUNK_SIZE = 32;	// number of blocks per side
+constexpr auto CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
+constexpr auto CHUNK_VOLUME = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 
 /*
 * The chunk class serves to distinguish groups of blocks from one another in order to reduce the time needed for
@@ -53,7 +55,41 @@ public:
 	* ID: chunk's position in the worlds chunk_draw_params array (used for drawing world fron instanced quad)
 	* faces: number of quad instances belonging to this chunk in world mesh
 	*/
-	BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};	// the main array of blocks
+	struct Blocks
+	{
+		BlockType data[CHUNK_VOLUME];
+		BlockType& operator[](int index)
+		{
+			return data[index];
+		}
+		BlockType& operator()(int x, int y, int z)
+		{
+			return data[x + CHUNK_SIZE * y + CHUNK_AREA * z];
+		}
+		int getIndex(BlockType* block)
+		{
+			return ((int)block - (int)data) / sizeof(BlockType);
+		}
+		BlockType* getNeighbor(BlockType* block, int face, int dist = 1)
+		{
+			int i = getIndex(block);
+			std::cout << "index of block is: " << i << ", coords: " << i % CHUNK_SIZE << ", " << (i % CHUNK_AREA) / CHUNK_SIZE << ", " << i / CHUNK_AREA << std::endl;
+			switch (face)
+			{
+			case 0: i += CHUNK_SIZE * dist; break;
+			case 1: i -= CHUNK_SIZE * dist; break;
+			case 2: i += dist; break;
+			case 3: i -= dist; break;
+			case 4: i += CHUNK_AREA * dist; break;
+			case 5: i -= CHUNK_AREA * dist; break;
+			}
+			if (i < 0 || i >= CHUNK_VOLUME)
+				return nullptr;
+			return &data[i];
+		}
+	} blocks;
+
+	//BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};	// the main array of blocks
 	int x, y, z, ID, faces;
 	
 	float unit_length;		// length of one block in world coordinates

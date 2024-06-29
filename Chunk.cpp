@@ -16,7 +16,7 @@ Chunk::Chunk(int x, int y, int z, long seed, float unit_length)
 
 		if (pos.y < 2.0)
 		{
-			blocks[xb][yb][zb] = BlockType::STONE;
+			blocks(xb, yb, zb) = BlockType::STONE;
 			continue;
 		}
 		if (pos.y < 
@@ -24,11 +24,11 @@ Chunk::Chunk(int x, int y, int z, long seed, float unit_length)
 			2.1 * (sin(pos.x * 3.0 / 64) * cos(pos.z * 7.0 / 64)) +
 			0.5 * (sin(pos.x * 25.0 / 64) * cos(pos.z * 29.0 / 64))
 			)
-			blocks[xb][yb][zb] = BlockType::DIRT;
+			blocks(xb, yb, zb) = BlockType::DIRT;
 		else
 		{
 			for(yb; yb < CHUNK_SIZE; yb++)
-				blocks[xb][yb][zb] = BlockType::AIR;
+				blocks(xb, yb, zb) = BlockType::AIR;
 		}
 	}
 }
@@ -57,7 +57,7 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 			for (int y = CHUNK_SIZE - 1; y >= 0; y--)
 			{
 				int rand_num = std::rand();
-				if (blocks[x][y][z] != BlockType::AIR)
+				if (blocks(x, y, z) != BlockType::AIR)
 					continue;
 
 				glm::vec3 pos = glm::vec3(x, y, z);
@@ -95,9 +95,9 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 					BlockType* block = nullptr;
 
 					if (inside_boundaries[dir])
-						block = &blocks[surrounding_block_coords[dir][0]][surrounding_block_coords[dir][1]][surrounding_block_coords[dir][2]];
+						block = &blocks(surrounding_block_coords[dir][0], surrounding_block_coords[dir][1], surrounding_block_coords[dir][2]);
 					else if (neighboring_chunks[dir])
-						block = &neighboring_chunks[dir]->blocks[neighboring_chunks_block_coords[dir][0]][neighboring_chunks_block_coords[dir][1]][neighboring_chunks_block_coords[dir][2]];
+						block = &neighboring_chunks[dir]->blocks(neighboring_chunks_block_coords[dir][0], neighboring_chunks_block_coords[dir][1], neighboring_chunks_block_coords[dir][2]);
 
 					if (block && *block != BlockType::AIR)
 					{
