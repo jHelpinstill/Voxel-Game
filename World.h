@@ -55,11 +55,12 @@ public:
 
 	void inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chunk_out = nullptr);
 	
-	BlockType* inspectPos(glm::vec3 pos);
+	BlockType* inspectPos(const glm::vec3& pos);
 	bool inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** block_out, Chunk** chunk_out = nullptr);
 	BlockType* inspectRay(const glm::vec3& pos, const glm::vec3& ray);
 
 	void updateBlock(const glm::vec3& pos, BlockType new_type);
+	void updateBlock(Chunk* chunk, BlockType* block, BlockType new_type);
 	void updateLookedAtBlock(Camera* camera, BlockType new_type);
 
 	int encodeChunkPos(Chunk* chunk);

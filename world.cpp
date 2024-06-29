@@ -114,7 +114,7 @@ void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chun
 }
 
 
-BlockType* World::inspectPos(glm::vec3 pos)
+BlockType* World::inspectPos(const glm::vec3& pos)
 {
 	BlockType* block;
 	inspectPos(pos, &block);
@@ -215,10 +215,22 @@ BlockType* World::inspectRay(const glm::vec3& pos, const glm::vec3& ray)
 
 void World::updateBlock(const glm::vec3& pos, BlockType new_type)
 {
-	BlockType* block;
-	Chunk* chunk;
+	BlockType* block = nullptr;
+	Chunk* chunk = nullptr;
 	inspectPos(pos, &block, &chunk);
 
+	if (!block)
+	{
+		std::cout << "updateBlock no block at pos" << std::endl;
+		return;
+	}
+
+	*block = new_type;
+	remeshChunk(chunk);
+}
+
+void World::updateBlock(Chunk* chunk, BlockType* block, BlockType new_type)
+{
 	*block = new_type;
 	remeshChunk(chunk);
 }

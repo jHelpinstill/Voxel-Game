@@ -92,7 +92,7 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 
 				for (int dir = 0; dir < 6; dir++)
 				{
-					const BlockType* block = nullptr;
+					BlockType* block = nullptr;
 
 					if (inside_boundaries[dir])
 						block = &blocks[surrounding_block_coords[dir][0]][surrounding_block_coords[dir][1]][surrounding_block_coords[dir][2]];
@@ -102,7 +102,8 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 					if (block && *block != BlockType::AIR)
 					{
 						data.push_back(encodeFaceData(x, y, z, dir, getBlockColor(*block, dir, rand_num)));
-						faces_BVH.root->addDataNode(surrounding_block_positions[dir], dir);
+						Face face = { block, dir };
+						faces_BVH.root->addDataNode(surrounding_block_positions[dir], face);
 						instances++;
 					}
 				}
@@ -146,17 +147,17 @@ Chunk::RaycastResult Chunk::raycast(const glm::vec3& pos, const glm::vec3& ray)
 	return result;
 }
 
-bool Chunk::raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, int* face)
+bool Chunk::raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, Face* face)
 {
 	//td::cout << "raycastFace called with face direction: " << *face << std::endl;
-	Quad quad(face_pos, *face);
+	Quad quad(face_pos, face->norm);
 	return rayIntersectsPoly(pos, ray, quad.verts, 4, util::PolyCulling::CCW);
 }
 
-void Chunk::expandToFitFace(const glm::vec3& pos, const int& face, glm::vec3& min, glm::vec3& max)
+void Chunk::expandToFitFace(const glm::vec3& pos, const Face& face, glm::vec3& min, glm::vec3& max)
 {
 	glm::vec3 face_min, face_max;
-	switch (face)
+	switch (face.norm)
 	{
 	case 0:
 		face_min = pos + util::Y;

@@ -130,16 +130,6 @@ void BVH<T>::Box::addDataNode(DataNode* node)
 	expandToFit(node->pos, node->obj, min, max);
 }
 
-//template <class T>
-//void BVH<T>::Box::expandToFit(const glm::vec3& pos)
-//{
-//	resized = true;
-//	//std::cout << "expandToFit called with position: " << vec2string(pos);
-//	min = glm::min(min, pos);
-//	max = glm::max(max, pos + glm::vec3(1));
-//	//std::cout << " results min: " << vec2string(min) << ", max: " << vec2string(max) << std::endl;
-//}
-
 template <class T>
 int BVH<T>::Box::countDataNodes()
 {
@@ -156,8 +146,6 @@ int BVH<T>::Box::countDataNodes()
 template <class T>
 void BVH<T>::Box::split(int min_data_nodes)
 {
-	//std::cout << "split called" << std::endl;
-
 	glm::vec3 size = max - min;
 
 	glm::vec3 center = (max + min) * 0.5f;
@@ -203,14 +191,11 @@ void BVH<T>::Box::split(int min_data_nodes)
 		else if (num_nodes > min_data_nodes)
 			childB->split(min_data_nodes);
 	}
-
-	//std::cout << "return from falloff" << std::endl;
 }
 
 template <class T>
 bool BVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
 {
-	//std::cout << "box size: " << vec2string(max - min) << std::endl;
 	for (int face = 0; face < 6; face++)
 	{
 		Quad quad(min, max, face);
@@ -256,7 +241,7 @@ auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*ray
 {
 	DataNode* nearest_hit = nullptr;
 	if (!resized)
-		return nearest_hit;
+		return nearest_hit;	// don't bother if box hasn't been resized yet (not initialized with data)
 
 	// figure out which children to search and, if both, in which order
 	Box* ranked_children[2]{};
@@ -264,40 +249,29 @@ auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*ray
 	bool childA_hit = (childA && childA->hitByRay(pos, ray));
 	bool childB_hit = (childB && childB->hitByRay(pos, ray));
 
-	//std::cout << "box " << this << " ";
-	if (childA_hit && !childB_hit)
-	{
-		//std::cout << "searching childA" << std::endl;
+	if (childA_hit && !childB_hit) // will only search childA
 		ranked_children[0] = childA;
-	}
-	else if (!childA_hit && childB_hit)
-	{
-		//std::cout << "searching childB" << std::endl;
-		ranked_children[0] = childB;
-	}
-	else if (childA_hit && childB_hit)
-	{
-		//std::cout << "searching both children: ";
 
+	else if (!childA_hit && childB_hit) // will only search childB
+		ranked_children[0] = childB;
+
+	else if (childA_hit && childB_hit) // will be searching both children
+	{
 		float distA, distB;
 		distA = glm::length((childA->max - childA->min) - pos);
 		distB = glm::length((childB->max - childB->min) - pos);
-		if (distA < distB)
+		if (distA < distB) // childA is closer
 		{
-			//std::cout << "A closer" << std::endl;
 			ranked_children[0] = childA;
 			ranked_children[1] = childB;
 		}
-		else
+		else // childB is closer
 		{
-			//std::cout << "B closer" << std::endl;
 			ranked_children[0] = childB;
 			ranked_children[1] = childA;
 		}
 		monotonically_closer = isMonotonicallyCloser(pos, ranked_children);
 	}
-	//else
-		//std::cout << "has no children" << std::endl;
 
 	// find hits from child nodes
 	std::vector<DataNode*> hit_nodes;
@@ -312,21 +286,15 @@ auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*ray
 		}
 	}
 
-	//std::cout << "box " << this << " back from children: " << std::endl;
-	//std::cout << "hits received from children: " << hit_nodes.size() << std::endl;
-	int hits_before_self = hit_nodes.size();
 	// find hits from own nodes
 	DataNode* node = data;
 	while (node)
 	{
 		if (raycastObj(pos, ray, node->pos, &node->obj))
-		{
 			hit_nodes.push_back(node);
-			//std::cout << "hit face with direction: " << node->obj << std::endl;
-		}
+
 		node = node->next;
 	}
-	//std::cout << "hits from own data: " << hit_nodes.size() - hits_before_self << std::endl;
 
 	// find nearest hit
 	if (hit_nodes.size())

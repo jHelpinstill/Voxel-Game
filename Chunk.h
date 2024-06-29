@@ -64,11 +64,17 @@ public:
 	* which face in the world mesh (belonging to this chunk) is intersected by a ray.
 	* Works similarly to a binary search, only in 3D space.
 	*/
-	BVH<int> faces_BVH;
-	static bool raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, int* face);
-	static void expandToFitFace(const glm::vec3& pos, const int& face, glm::vec3& min, glm::vec3& max);
+	
+	struct Face
+	{
+		BlockType* block;
+		int norm;
+	};
+	BVH<Face> faces_BVH;
+	static bool raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, Face* face);
+	static void expandToFitFace(const glm::vec3& pos, const Face& face, glm::vec3& min, glm::vec3& max);
 
-	typedef BVH<int>::RaycastResult RaycastResult;
+	typedef BVH<Face>::RaycastResult RaycastResult;
 	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);
 	
 	// chunks are initialized with their coordinates, random seed, and unit length

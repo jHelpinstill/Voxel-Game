@@ -48,7 +48,7 @@ void raycastTest2(Camera* camera, World& world, Input* input)
 				glm::vec3(0, 0, 0.1),
 				glm::vec3(0, 0, -0.1)
 			};
-			test_block->transform.pos = cast_result.pos + offset[*cast_result.obj];
+			test_block->transform.pos = cast_result.pos + offset[cast_result.obj->norm];
 		}
 		//else
 			//std::cout << "raycast failed" << std::endl;
@@ -93,7 +93,7 @@ void Game::setup()
 	world.setup();
 
 	Chunk* chunk = world.getChunk(0, 1, 0);
-	traceBVHi(chunk->faces_BVH);
+	//traceBVHi(chunk->faces_BVH);
 
 	std::cout << "data node called: " << data_node_called << " times" << std::endl;
 
@@ -164,16 +164,48 @@ void Game::stateMachine(double dt)
 
 		if (input->mouse.left.held)
 		{
-			raycastTest2(camera, world, input);
+			//raycastTest2(camera, world, input);
+			// 
 			//world.updateLookedAtBlock(camera, BlockType::AIR);
 			//world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::AIR);
 			//world.generateMesh();
 		}
-		else if (input->keyHeld('E') || input->mouse.right.held)
+		if (input->mouse.left.held)
 		{
-			world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
-			//world.generateMesh();
+			Chunk* current_chunk = nullptr;
+			if (world.peekChunk(camera->transform.pos, &current_chunk))
+			{
+				Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
+				if (cast_result.hit)
+					world.updateBlock(cast_result.pos, BlockType::AIR);
+			}
 		}
+		if (input->mouse.right.pressed)
+		{
+			raycastTest2(camera, world, input);
+			Chunk* current_chunk = nullptr;
+			if (world.peekChunk(camera->transform.pos, &current_chunk))
+			{
+				Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
+				//static const glm::vec3 offset[6] =
+				//{
+				//	glm::vec3(0, 0.1, 0),
+				//	glm::vec3(0, -0.1, 0),
+				//	glm::vec3(0.1, 0, 0),
+				//	glm::vec3(-0.1, 0, 0),
+				//	glm::vec3(0, 0, 0.1),
+				//	glm::vec3(0, 0, -0.1)
+				//};
+
+				if (cast_result.hit)
+					world.updateBlock(current_chunk, cast_result.obj->block, BlockType::DIRT);
+			}
+		}
+		//else if (input->keyHeld('E') || input->mouse.right.held)
+		//{
+		//	world.updateBlock(camera->transform.pos + camera->getLookDirection() * 2.0f, BlockType::DIRT);
+		//	//world.generateMesh();
+		//}
 
 
 		//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
