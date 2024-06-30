@@ -38,7 +38,7 @@ public:
 	typedef BVH<Chunk*>::RaycastResult RaycastResult;
 	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);
 
-	ChunkManager() : bvh(raycastChunk, expandToFitChunk) {}
+	ChunkManager() : bvh(raycastChunk, expandToFitChunk, 1) {}
 
 	Chunk* get(const glm::vec3& pos);
 	Chunk* get(int x, int y, int z);

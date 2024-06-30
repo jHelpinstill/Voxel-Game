@@ -52,6 +52,7 @@ public:
 
 		static bool isMonotonicallyCloser(const glm::vec3& pos, Box** boxes);
 	};
+	int min_nodes_per_box;
 
 	Box* root;
 	bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*);
@@ -60,13 +61,15 @@ public:
 	BVH() : root(nullptr), raycastObjFunc(nullptr), boxExpandToFitFunc(nullptr) {}
 	BVH(
 		bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*),
-		void (*boxExpandToFitFunc)(const glm::vec3&, T*, glm::vec3&, glm::vec3&)
+		void (*boxExpandToFitFunc)(const glm::vec3&, T*, glm::vec3&, glm::vec3&),
+		int min_nodes = 1
 	);
 	~BVH();
 
 	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);
 	void reset();
 	void rebuild();
+	void build();
 };
 
 /////////////////////////// BVH FUNCTION DEFINITIONS //////////////////////////////
@@ -74,9 +77,11 @@ public:
 template <class T>
 BVH<T>::BVH(
 	bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*),
-	void (*boxExpandToFitFunc)(const glm::vec3&, T*, glm::vec3&, glm::vec3&)
+	void (*boxExpandToFitFunc)(const glm::vec3&, T*, glm::vec3&, glm::vec3&),
+	int min_nodes
 )	: raycastObjFunc(raycastObjFunc)
 	, boxExpandToFitFunc(boxExpandToFitFunc)
+	, min_nodes_per_box(min_nodes)
 {
 	root = new Box(boxExpandToFitFunc);
 }
@@ -121,7 +126,13 @@ void BVH<T>::rebuild()
 {
 	root->data = root->getData();
 	reset();
-	root->split();
+	root->split(min_nodes_per_box);
+}
+
+template <class T>
+void BVH<T>::build()
+{
+	root->split(min_nodes_per_box);
 }
 
 /////////////////////////// BOX FUNCTION DEFINITIONS //////////////////////////////

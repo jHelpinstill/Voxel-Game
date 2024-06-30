@@ -7,7 +7,10 @@ bool ChunkManager::add(int x, int y, int z)
 	{
 		return false;
 	}
-	chunks[key] = new Chunk(x, y, z, std::rand(), unit_length);
+	Chunk* chunk = new Chunk(x, y, z, std::rand(), unit_length);
+	chunks[key] = chunk;
+	bvh.root->addDataNode(glm::vec3(x, y, z), chunk);
+	bvh.rebuild();
 	return true;
 }
 

@@ -3,7 +3,7 @@
 #include "util.h"
 
 Chunk::Chunk(int x, int y, int z, long seed, float unit_length)
-	: faces_BVH(raycastFace, expandToFitFace)
+	: faces_BVH(raycastFace, expandToFitFace, 6)
 	, x(x), y(y), z(z), seed(seed), unit_length(unit_length)
 {
 	this->ID = -1;
@@ -112,7 +112,7 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 		}
 	}
 
-	faces_BVH.root->split(6);
+	faces_BVH.build();
 	faces = instances;
 	return instances;
 }
