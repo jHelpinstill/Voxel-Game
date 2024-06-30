@@ -5,7 +5,7 @@ int face_per_chunk;
 
 World::World(long seed) : seed(seed)
 {
-	face_per_chunk = 4 * CHUNK_SIZE * CHUNK_SIZE;
+	face_per_chunk = 5 * CHUNK_AREA;
 }
 
 void World::setup()
@@ -73,20 +73,16 @@ void World::addChunk(int x, int y, int z)
 	chunks[key] = new Chunk(x, y, z, std::rand(), chunk_unit_length);
 }
 
-Chunk* World::getChunk(const glm::vec3& pos)
-{
-	Chunk* chunk;
-	inspectPos(pos, nullptr, &chunk);
-	return chunk;
-}
-
 Chunk* World::getChunk(int x, int y, int z)
 {
 	Chunk::Key key(x, y, z);
 	if (chunks.find(key) != chunks.end())
 		return chunks[key];
-	chunks[key] = new Chunk(x, y, z, std::rand(), chunk_unit_length);
 	
+	Chunk* chunk = new Chunk(x, y, z, std::rand(), chunk_unit_length);
+	chunks[key] = chunk;
+	addChunkToMesh(chunk);
+	return chunk;
 }
 
 bool World::peekChunk(const glm::vec3& pos, Chunk** chunk_out)
@@ -271,26 +267,6 @@ void World::updateLookedAtBlock(Camera* camera, BlockType new_type)
 	remeshChunk(chunk);
 }
 
-void World::remeshChunk(Chunk* chunk)
-{
-	ChunkDrawParams* chunk_params = &chunk_draw_params[chunk->ID];
-
-	std::vector<int> instance_data;
-
-	int num_instances = chunk->generateFaceData(instance_data, getChunkNeighbors(chunk));
-	int padding = face_per_chunk - num_instances;
-	for (int i = 0; i < padding; i++)
-		instance_data.push_back(0);
-	chunk_params->instanceCount = num_instances;
-
-	Mesh* mesh = getMeshByName("world_mesh");
-
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vao->data_VBO);
-	glBufferSubData(GL_ARRAY_BUFFER, chunk_params->baseInstance * sizeof(int), num_instances * sizeof(int), instance_data.data());
-
-	std::cout << "Remeshed chunk " << chunk->ID << ", now has " << num_instances << " faces" << std::endl;
-}
-
 Chunk::Group World::getChunkNeighbors(Chunk* chunk)
 {
 	Chunk::Group neighbors(6);
@@ -311,18 +287,18 @@ void World::generateMesh()
 	std::cout << "Generating World mesh..." << std::endl;
 
 	removeMesh("world_mesh");
-	Mesh* mesh = new Mesh(getTextureByName("chunk_texture"));
-	meshes["world_mesh"] = mesh;
+	Mesh* world_mesh = new Mesh(getTextureByName("chunk_texture"));
+	meshes["world_mesh"] = world_mesh;
 
-	mesh->verts.push_back(glm::vec3(0, 0, 0));
-	mesh->verts.push_back(glm::vec3(0, 0, 1));
-	mesh->verts.push_back(glm::vec3(1, 0, 0));
-	mesh->verts.push_back(glm::vec3(1, 0, 1));
+	world_mesh->verts.push_back(glm::vec3(0, 0, 0));
+	world_mesh->verts.push_back(glm::vec3(0, 0, 1));
+	world_mesh->verts.push_back(glm::vec3(1, 0, 0));
+	world_mesh->verts.push_back(glm::vec3(1, 0, 1));
 
-	mesh->uv_coords.push_back(glm::vec2(0, 0));
-	mesh->uv_coords.push_back(glm::vec2(0.5, 0));
-	mesh->uv_coords.push_back(glm::vec2(0, 1));
-	mesh->uv_coords.push_back(glm::vec2(0.5, 1));
+	world_mesh->uv_coords.push_back(glm::vec2(0, 0));
+	world_mesh->uv_coords.push_back(glm::vec2(0.5, 0));
+	world_mesh->uv_coords.push_back(glm::vec2(0, 1));
+	world_mesh->uv_coords.push_back(glm::vec2(0.5, 1));
 
 	chunk_draw_params.clear();
 	chunk_pos_data.clear();
@@ -333,11 +309,11 @@ void World::generateMesh()
 	{
 		Chunk* chunk = bucket.second;
 
-		int num_instances = chunk->generateFaceData(mesh->instance_data, getChunkNeighbors(chunk));
+		int num_instances = chunk->generateFaceData(world_mesh->instance_data, getChunkNeighbors(chunk));
 		int padding = face_per_chunk - num_instances;
 		for (int i = 0; i < padding; i++)
-			mesh->instance_data.push_back(0);
-		chunk_draw_params.push_back(ChunkDrawParams(4, num_instances, 0, mesh->instance_data.size() - face_per_chunk));
+			world_mesh->instance_data.push_back(0);
+		chunk_draw_params.push_back(ChunkDrawParams(4, num_instances, 0, world_mesh->instance_data.size() - face_per_chunk));
 		chunk_pos_data.push_back(encodeChunkPos(chunk));
 		chunk->ID = chunk_counter++;
 
@@ -345,10 +321,10 @@ void World::generateMesh()
 		face_counter += num_instances;
 	}
 	
-	mesh->shader = getShaderByName("world_shader");
-	mesh->vao->makeInstanced(mesh->verts, mesh->instance_data);
-	mesh->drawFunction = drawWorld;
-	mesh->parent_obj = this;
+	world_mesh->shader = getShaderByName("world_shader");
+	world_mesh->vao->makeInstanced(world_mesh->verts, world_mesh->instance_data);
+	world_mesh->drawFunction = drawWorld;
+	world_mesh->parent_obj = this;
 
 	glGenBuffers(1, &chunk_pos_SSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, chunk_pos_SSBO);
@@ -356,6 +332,49 @@ void World::generateMesh()
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, chunk_pos_SSBO);
 
 	std::cout << "Finished world generation. World contains: " << chunks.size() << " chunks with " << face_counter << " faces" << std::endl;
+}
+
+void World::remeshChunk(Chunk* chunk)
+{
+	ChunkDrawParams* chunk_params = &chunk_draw_params[chunk->ID];
+
+	std::vector<int> chunk_instance_data;
+
+	int chunk_num_instances = chunk->generateFaceData(chunk_instance_data, getChunkNeighbors(chunk));
+	int padding = face_per_chunk - chunk_num_instances;
+	for (int i = 0; i < padding; i++)
+		chunk_instance_data.push_back(0);
+	chunk_params->instanceCount = chunk_num_instances;
+
+	Mesh* mesh = getMeshByName("world_mesh");
+
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vao->data_VBO);
+	glBufferSubData(GL_ARRAY_BUFFER, chunk_params->baseInstance * sizeof(int), chunk_num_instances * sizeof(int), chunk_instance_data.data());
+
+	std::cout << "Remeshed chunk " << chunk->ID << ", now has " << chunk_num_instances << " faces" << std::endl;
+}
+
+void World::addChunkToMesh(Chunk* chunk)
+{
+	Mesh* world_mesh = getMeshByName("world_mesh");
+
+	int num_instances = chunk->generateFaceData(world_mesh->instance_data, getChunkNeighbors(chunk));
+	int padding = face_per_chunk - num_instances;
+	for (int i = 0; i < padding; i++)
+		world_mesh->instance_data.push_back(0);
+	chunk_draw_params.push_back(ChunkDrawParams(4, num_instances, 0, world_mesh->instance_data.size() - face_per_chunk));
+	chunk_pos_data.push_back(encodeChunkPos(chunk));
+
+	chunk->ID = chunks.size();
+
+	world_mesh->vao->reset();
+	world_mesh->vao->makeInstanced(world_mesh->verts, world_mesh->instance_data);
+
+	glDeleteBuffers(1, &chunk_pos_SSBO);
+	glGenBuffers(1, &chunk_pos_SSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, chunk_pos_SSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, chunk_pos_data.size() * sizeof(int), chunk_pos_data.data(), GL_STATIC_DRAW);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, chunk_pos_SSBO);
 }
 
 int World::encodeChunkPos(Chunk* chunk)

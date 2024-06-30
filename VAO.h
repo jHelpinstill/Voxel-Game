@@ -19,6 +19,8 @@ public:
 	VAO() : style(Style::NONE) {}
 	~VAO();
 
+	void bind();
+
 	void makeTextured(const std::vector<glm::vec3>& verts, const std::vector<glm::vec2>& uv_coords);
 	void makeSolidColored(const std::vector<glm::vec3>& verts, const glm::vec3& color);
 	void makeInstanced(const std::vector<glm::vec3>& verts, const std::vector<int>& instance_data);

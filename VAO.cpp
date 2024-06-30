@@ -1,5 +1,11 @@
 #include "VAO.h"
 
+void VAO::bind()
+{
+	glGenVertexArrays(1, &ID);
+	glBindVertexArray(ID);
+}
+
 void VAO::makeTextured(const std::vector<glm::vec3>& verts, const std::vector<glm::vec2>& uv_coords)
 {
 	reset();
@@ -22,8 +28,7 @@ void VAO::makeTextured(const std::vector<glm::vec3>& verts, const std::vector<gl
 		data.push_back(uv_coords[vert].y);
 	}
 
-	glGenVertexArrays(1, &ID);
-	glBindVertexArray(ID);
+	bind();
 
 	glGenBuffers(1, &verts_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, verts_VBO);
@@ -52,8 +57,7 @@ void VAO::makeSolidColored(const std::vector<glm::vec3>& verts, const glm::vec3&
 			data.push_back(vert[i]);
 	}
 
-	glGenVertexArrays(1, &ID);
-	glBindVertexArray(ID);
+	bind();
 
 	glGenBuffers(1, &verts_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, verts_VBO);
@@ -78,8 +82,7 @@ void VAO::makeInstanced(const std::vector<glm::vec3>& verts, const std::vector<i
 			vert_data.push_back(verts[vert][i]);
 	}
 
-	glGenVertexArrays(1, &ID);
-	glBindVertexArray(ID);
+	bind();
 
 	glGenBuffers(1, &verts_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, verts_VBO);

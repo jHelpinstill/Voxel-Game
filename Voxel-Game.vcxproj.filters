@@ -144,6 +144,5 @@
     <Text Include="shaders\UIColorVertex.txt" />
     <Text Include="shaders\UIColorFragment.txt" />
     <Text Include="shaders\worldColorFragment.txt" />
-    <Text Include="test.txt" />
   </ItemGroup>
 </Project>

@@ -29,7 +29,7 @@ Mesh* getMeshByName(const std::string& name)
 	}
 	catch (std::out_of_range)
 	{
-		std::cout << "WARNING: Tried to access nonexistent Shader \"" << name << "\"" << std::endl;
+		std::cout << "WARNING: Tried to access nonexistent Mesh \"" << name << "\"" << std::endl;
 		while (1)
 			;
 	}
@@ -43,7 +43,7 @@ unsigned int getTextureByName(const std::string& name)
 	}
 	catch (std::out_of_range)
 	{
-		std::cout << "WARNING: Tried to access nonexistent Shader \"" << name << "\"" << std::endl;
+		std::cout << "WARNING: Tried to access nonexistent Texture \"" << name << "\"" << std::endl;
 		while (1)
 			;
 	}

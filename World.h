@@ -14,6 +14,8 @@ class World
 {
 private:
 	unsigned int chunk_pos_SSBO;
+	void addChunk(int x, int y, int z);
+
 public:
 	struct ChunkDrawParams
 	{
@@ -47,12 +49,11 @@ public:
 
 	void setup();
 	void generateMesh();
+	void addChunkToMesh(Chunk* chunk);
 	void remeshChunk(Chunk* chunk);
 
 	void update(float dt, Camera* camera, Input* input);
 
-	void addChunk(int x, int y, int z);
-	Chunk* getChunk(const glm::vec3& pos);
 	Chunk* getChunk(int x, int y, int z);
 	bool peekChunk(const glm::vec3& pos, Chunk** chunk_out = nullptr);
 	bool peekChunk(int x, int y, int z, Chunk** chunk_out = nullptr);
