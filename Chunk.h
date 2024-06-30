@@ -107,6 +107,7 @@ public:
 
 	typedef BVH<Face>::RaycastResult RaycastResult;
 	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);
+	RaycastResult last_successful_raycast;
 	
 	// chunks are initialized with their coordinates, random seed, and unit length
 	Chunk(int x, int y, int z, long seed, float unit_length = 1);

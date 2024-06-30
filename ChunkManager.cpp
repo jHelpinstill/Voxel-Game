@@ -9,7 +9,7 @@ bool ChunkManager::add(int x, int y, int z)
 	}
 	Chunk* chunk = new Chunk(x, y, z, std::rand(), unit_length);
 	chunks[key] = chunk;
-	bvh.root->addDataNode(glm::vec3(x, y, z), chunk);
+	bvh.root->addDataNode(glm::vec3(x, y, z) * (float)CHUNK_SIZE * unit_length, chunk);
 	bvh.rebuild();
 	return true;
 }
@@ -56,15 +56,28 @@ int ChunkManager::size()
 
 ChunkManager::RaycastResult ChunkManager::raycast(const glm::vec3& pos, const glm::vec3& ray)
 {
-	return RaycastResult();
+	BVH<Chunk*>::RaycastResult cast = bvh.raycast(pos, ray);
+	RaycastResult result{};
+	if (cast.hit)
+	{
+		result.hit = cast.hit;
+		result.chunk = *cast.obj;
+
+		Chunk::RaycastResult hit_block = result.chunk->last_successful_raycast;
+		result.block = hit_block.obj->block;
+		result.face = hit_block.obj->norm;
+		result.pos = hit_block.pos;
+	}
+	return result;
 }
 
 bool ChunkManager::raycastChunk(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& chunk_pos, Chunk** chunk)
 {
-	return true; // each leaf box in the bvh will contain a single chunk exactly its own size, so if the box was hit then the chunk must also be hit
+	//Chunk::RaycastResult chunk_result = (*chunk)->raycast(pos, ray);
+	return (*chunk)->raycast(pos, ray).hit;
 }
 void ChunkManager::expandToFitChunk(const glm::vec3& pos, Chunk** chunk, glm::vec3& min, glm::vec3& max)
 {
 	min = glm::min(min, pos);
-	max = glm::max(max, pos + util::XYZ);
+	max = glm::max(max, pos + util::XYZ * (float)CHUNK_SIZE * (*chunk)->unit_length);
 }

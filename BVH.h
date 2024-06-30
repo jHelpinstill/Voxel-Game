@@ -24,7 +24,7 @@ public:
 	class Box
 	{
 	private:
-		void addDataNode(DataNode* node);
+		
 		
 	public:
 		DataNode* data;
@@ -39,13 +39,14 @@ public:
 		~Box();
 		
 		DataNode* raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*));
+		void split(int min_data_nodes);
+
 		void addDataNode(const glm::vec3& pos, const T& obj);
+		void addDataNode(DataNode* node);
 		int countDataNodes();
-		//void expandToFit(const glm::vec3& pos);
+
 		void (*expandToFit)(const glm::vec3& pos, T* obj, glm::vec3& min, glm::vec3& max);
 		bool hitByRay(const glm::vec3& pos, const glm::vec3& ray);
-
-		void split(int min_data_nodes);
 
 		// WARNING: renders tree unusable until BVH::rebuild() is called
 		DataNode* getData(DataNode* existing_data = nullptr);
@@ -124,9 +125,37 @@ void BVH<T>::reset()
 template <class T>
 void BVH<T>::rebuild()
 {
-	root->data = root->getData();
-	reset();
+	std::cout << "(in rebuild()) " << root->countDataNodes() << " nodes in root" << std::endl;
+	DataNode* nodes = root->getData();
+
+	int counter = 0;
+	DataNode* node = nodes;
+	while (node)
+	{
+		counter++;
+		node = node->next;
+	}
+	std::cout << counter << " nodes retrieved from all boxes" << std::endl;
+
+	delete root->childA;
+	root->childA = nullptr;
+	delete root->childB;
+	root->childB = nullptr;
+
+	root->data = nodes;
 	root->split(min_nodes_per_box);
+
+	
+	std::cout << "root size: " << vec2string(root->max - root->min) << std::endl;
+	if (root->childA)
+		std::cout << "root has childA" << std::endl;
+	else
+		std::cout << "root does not have childA" << std::endl;
+
+	if (root->childB)
+		std::cout << "root has childB" << std::endl;
+	else
+		std::cout << "root does not have childB" << std::endl;
 }
 
 template <class T>
@@ -199,6 +228,11 @@ int BVH<T>::Box::countDataNodes()
 template <class T>
 auto BVH<T>::Box::getData(DataNode* existing_data)->DataNode*
 {
+	if (childA)
+		existing_data = childA->getData(existing_data);
+	if (childB)
+		existing_data = childB->getData(existing_data);
+
 	if (!data)
 		return existing_data;
 
@@ -207,17 +241,18 @@ auto BVH<T>::Box::getData(DataNode* existing_data)->DataNode*
 		tail = tail->next;
 	tail->next = existing_data;
 
-	if (childA)
-		childA->getData(data);
-	if (childB)
-		childB->getData(data);
-
-	return data;
+	existing_data = data;
+	data = nullptr;
+	return existing_data;
 }
+
+class Chunk;
 
 template <class T>
 void BVH<T>::Box::split(int min_data_nodes)
 {
+	bool debug_chunk = typeid(T) == typeid(Chunk*);
+
 	glm::vec3 size = max - min;
 
 	glm::vec3 center = (max + min) * 0.5f;
@@ -234,9 +269,15 @@ void BVH<T>::Box::split(int min_data_nodes)
 		node = node->next;
 
 		if (current_node->pos[longest_axis] < splittingPoint)
+		{
+			if (debug_chunk) std::cout << "childA added node" << std::endl;
 			childA->addDataNode(current_node);
+		}
 		else
+		{
+			if (debug_chunk) std::cout << "childB added node" << std::endl;
 			childB->addDataNode(current_node);
+		}
 	}
 
 	data = nullptr;

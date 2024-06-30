@@ -144,7 +144,10 @@ Chunk::RaycastResult Chunk::raycast(const glm::vec3& pos, const glm::vec3& ray)
 	glm::vec3 chunk_space_pos = (pos - getPosf()) * (1.0f / unit_length);
 	RaycastResult result = faces_BVH.raycast(chunk_space_pos, ray);
 	if (result.hit)
+	{
 		result.pos = getPosf() + result.pos * unit_length;
+		last_successful_raycast = result;
+	}
 	return result;
 }
 

@@ -1,5 +1,6 @@
 #include "World.h"
 #include "util.h"
+#include "Debug.h"
 
 int face_per_chunk;
 
@@ -33,6 +34,8 @@ void World::setup()
 		}
 	}
 
+	traceBVHchunk(chunks.bvh);
+
 	std::cout << "created " << chunks.size() << " chunks" << std::endl;
 
 	createShader("world_shader", "shaders/worldVertex.txt", "shaders/worldColorFragment.txt");
@@ -41,24 +44,31 @@ void World::setup()
 
 void World::update(float dt, Camera* camera, Input* input)
 {
-	Chunk* current_chunk = nullptr;
+	//Chunk* current_chunk = nullptr;
 	if (input->mouse.left.pressed)
 	{
-		if (current_chunk = chunks.get(camera->transform.pos))
-		{
-			Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
-			if (cast_result.hit)
-				updateBlock(cast_result.pos, BlockType::AIR);
-		}
+		ChunkManager::RaycastResult cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());
+		if (cast.hit)
+			updateBlock(cast.pos, BlockType::AIR);
+
+		//if (current_chunk = chunks.get(camera->transform.pos))
+		//{
+		//	Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
+		//	if (cast_result.hit)
+		//		updateBlock(cast_result.pos, BlockType::AIR);
+		//}
 	}
 	if (input->mouse.right.pressed)
 	{
-		if (current_chunk = chunks.get(camera->transform.pos))
-		{
-			Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
-			if (cast_result.hit)
-				updateBlock(current_chunk, current_chunk->blocks.getNeighbor(cast_result.obj->block, cast_result.obj->norm), BlockType::DIRT);
-		}
+		ChunkManager::RaycastResult cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());
+		if (cast.hit)
+			updateBlock(cast.chunk, cast.chunk->blocks.getNeighbor(cast.block, cast.face), BlockType::DIRT);
+		//if (current_chunk = chunks.get(camera->transform.pos))
+		//{
+		//	Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
+		//	if (cast_result.hit)
+		//		updateBlock(current_chunk, current_chunk->blocks.getNeighbor(cast_result.obj->block, cast_result.obj->norm), BlockType::DIRT);
+		//}
 	}
 }
 
