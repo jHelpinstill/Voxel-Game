@@ -46,42 +46,34 @@ void World::update(float dt, Camera* camera, Input* input)
 {
 	//Chunk* current_chunk = nullptr;
 	static bool single_mine = true;
+	if (input->keyPressed('Q'))
+		single_mine = !single_mine;
 
 	ChunkManager::RaycastResult cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());
-	if ((input->mouse.left.held && !single_mine) || (input->mouse.left.pressed && single_mine))
+	if(cast.hit)
 	{
-		//putMeshWhereLooking(cast, "test_block");
-		if (cast.hit)
+		if ((input->mouse.left.held && !single_mine) || (input->mouse.left.pressed && single_mine))
 		{
 			//std::cout << "MINING ";
 			//printBlockData(cast.block, cast.chunk);
 			updateBlock(cast.block, cast.chunk, BlockType::AIR);
 		}
-	}
-	if ((input->mouse.right.held && !single_mine) || (input->mouse.right.pressed && single_mine))
-	{
-		//putMeshWhereLooking(cast, "test_block");
-		if (cast.hit)
+		if ((input->mouse.right.held && !single_mine) || (input->mouse.right.pressed && single_mine))
 		{
 			//std::cout << "PLACING ";
 			//printBlockData(cast.block, cast.chunk);
 			placeBlock(cast, BlockType::DIRT);
 		}
-	}
-	if (input->keyPressed('Q'))
-		single_mine = !single_mine;
-	if (input->keyPressed('E'))
-	{
-		putMeshWhereLooking(cast, "test_block");
-		std::cout << "Inspect ";
-		printBlockInfo(cast.block, cast.chunk);
-	}
-	if (input->keyPressed('I'))
-	{
-		if (!cast.hit)
-			std::cout << "not looking at chunk" << std::endl;
-		else
+		if (input->keyPressed('E'))
+		{
+			putMeshWhereLooking(cast, "test_block");
+			std::cout << "Inspect ";
+			printBlockInfo(cast.block, cast.chunk);
+		}
+		if (input->keyPressed('I'))
+		{
 			traceBVHface(cast.chunk->faces_BVH);
+		}
 	}
 }
 
@@ -361,6 +353,11 @@ void World::drawWorld(Mesh* mesh, Camera* camera, void* obj)
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat() * glm::scale(glm::mat4(1.0), glm::vec3(world->chunks.unit_length)));
 	mesh->shader->setInt("chunk_size", CHUNK_SIZE);
 	mesh->shader->setFloat("ambient", world->ambient_lighting);
+
+	mesh->shader->setInt("coord_bits", world->chunks.shader_info.coord_bits);
+	mesh->shader->setInt("face_bits", world->chunks.shader_info.face_bits);
+	mesh->shader->setInt("color_bits", world->chunks.shader_info.color_bits);
+	mesh->shader->setInt("chunk_bits", world->chunks.chunk_pos_bits);
 
 	glm::vec3 lighting_dir = world->sun_dir;
 	float t = glm::dot(glm::normalize(lighting_dir), glm::vec3(0, 1, 0));
