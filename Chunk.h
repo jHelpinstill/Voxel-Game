@@ -2,7 +2,7 @@
 #ifndef CHUNK_
 #define CHUNK_
 
-#include "config.h"
+#include "Config.h"
 #include "ObjectManager.h"
 #include "BlockType.h"
 #include "Mesh.h"
@@ -13,13 +13,22 @@ constexpr auto CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
 constexpr auto CHUNK_VOLUME = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 
 /*
-* The chunk class serves to distinguish groups of blocks from one another in order to reduce the time needed for
-* certain operations.
+* The chunk class manages a group of blocks
 */
 class Chunk
 {
 public:
-
+	struct Key
+	{
+		int x, y, z;
+		Key(int x, int y, int z) : x(x), y(y), z(z) {}
+		bool operator==(const Key& other) const
+		{
+			return (x == other.x
+				&& y == other.y
+				&& z == other.z);
+		}
+	};
 	// Group allows the easiy manipulation of collections of chunks. 
 	class Group
 	{
@@ -37,24 +46,6 @@ public:
 		~Group();
 	};
 
-	// Keys are used to distinguish different chunks within unordered maps by using their coordinates 
-	struct Key
-	{
-		int x, y, z;
-		Key(int x, int y, int z) : x(x), y(y), z(z) {}
-		bool operator==(const Key& other) const
-		{
-			return (x == other.x
-				&& y == other.y
-				&& z == other.z);
-		}
-	};
-
-	/* 
-	* x, y, z: the chunk's coordinates in the world in units of CHUNK_SIZE
-	* ID: chunk's position in the worlds chunk_draw_params array (used for drawing world fron instanced quad)
-	* faces: number of quad instances belonging to this chunk in world mesh
-	*/
 	struct Blocks
 	{
 		BlockType data[CHUNK_VOLUME];
@@ -89,8 +80,12 @@ public:
 		}
 	} blocks;
 
-	//BlockType blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};	// the main array of blocks
 	int x, y, z, ID, faces;
+	/* 
+	* x, y, z: the chunk's coordinates in the world in units of CHUNK_SIZE
+	* ID: chunk's position in the worlds chunk_draw_params array (used for drawing world fron instanced quad)
+	* faces: number of quad instances belonging to this chunk in world mesh
+	*/
 	
 	float unit_length;		// length of one block in world coordinates
 	long seed;				// unique random number used for various things
@@ -132,7 +127,7 @@ public:
 	
 };
 
-// The following code is used for the hashing of chunks using the custom Chunk::Key, for use in unordered maps of chunks
+// used for the hashing of chunks using the custom ChunkManager::Key
 template <>
 struct std::hash<Chunk::Key>
 {

@@ -1,4 +1,5 @@
 #include "Chunk.h"
+#include "ChunkManager.h"
 #include "util.h"
 
 Chunk::Chunk(int x, int y, int z, long seed, float unit_length)
@@ -39,7 +40,7 @@ glm::vec3 Chunk::getPosf()
 }
 
 /*
-* Scrubs through every block in the chunk in order and finds the visible faces.
+* Checks through every block in the chunk and finds visible faces.
 * Visible faces occur only at the adjoining faces of a transparent block and an
 * opaque block: as a face between two opaque blocks is obscured by the blocks,
 * and obviously two transparent blocks have no visible faces.
@@ -192,7 +193,7 @@ void Chunk::expandToFitFace(const glm::vec3& pos, const Face& face, glm::vec3& m
 
 Chunk::Group::Group(int size) : size(size)
 {
-	chunks = new Chunk* [size];
+	chunks = new Chunk * [size];
 }
 
 Chunk::Group::Group(const Group& other)
