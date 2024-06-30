@@ -24,7 +24,7 @@ public:
 		) : count(count), instanceCount(instanceCount), first(first), baseInstance(baseInstance) {}
 	};
 
-	unsigned int pos_SSBO;
+	unsigned int pos_SSBO = 0;
 	float unit_length = 0.1;
 
 	std::unordered_map<Chunk::Key, Chunk*> chunks;
@@ -32,12 +32,17 @@ public:
 	std::vector<DrawParams> draw_params;
 
 	BVH<Chunk*> bvh;
+	static bool raycastChunk(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& chunk_pos, Chunk** chunk);
+	static void expandToFitChunk(const glm::vec3& pos, Chunk** chunk, glm::vec3& min, glm::vec3& max);
 
-	ChunkManager() {}
+	typedef BVH<Chunk*>::RaycastResult RaycastResult;
+	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);
+
+	ChunkManager() : bvh(raycastChunk, expandToFitChunk) {}
 
 	Chunk* get(const glm::vec3& pos);
 	Chunk* get(int x, int y, int z);
-	void add(int x, int y, int z);
+	bool add(int x, int y, int z);
 
 	int size();
 

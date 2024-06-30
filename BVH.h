@@ -26,7 +26,6 @@ public:
 	private:
 		void addDataNode(DataNode* node);
 		
-
 	public:
 		DataNode* data;
 		Box* childA;
@@ -36,14 +35,14 @@ public:
 		glm::vec3 min {};
 		glm::vec3 max {};
 
-		Box(void (*expandToFit)(const glm::vec3&, const T&, glm::vec3&, glm::vec3&));
+		Box(void (*expandToFit)(const glm::vec3&, T*, glm::vec3&, glm::vec3&));
 		~Box();
 		
 		DataNode* raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*));
 		void addDataNode(const glm::vec3& pos, const T& obj);
 		int countDataNodes();
 		//void expandToFit(const glm::vec3& pos);
-		void (*expandToFit)(const glm::vec3& pos, const T& obj, glm::vec3& min, glm::vec3& max);
+		void (*expandToFit)(const glm::vec3& pos, T* obj, glm::vec3& min, glm::vec3& max);
 		bool hitByRay(const glm::vec3& pos, const glm::vec3& ray);
 
 		void split(int min_data_nodes);
@@ -56,12 +55,12 @@ public:
 
 	Box* root;
 	bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*);
-	void (*boxExpandToFitFunc)(const glm::vec3& pos, const T& obj, glm::vec3& min, glm::vec3& max);
+	void (*boxExpandToFitFunc)(const glm::vec3& pos, T* obj, glm::vec3& min, glm::vec3& max);
 
-	BVH() : raycastObjFunc(nullptr), boxExpandToFitFunc(nullptr) {}
+	BVH() : root(nullptr), raycastObjFunc(nullptr), boxExpandToFitFunc(nullptr) {}
 	BVH(
 		bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*),
-		void (*boxExpandToFitFunc)(const glm::vec3&, const T&, glm::vec3&, glm::vec3&)
+		void (*boxExpandToFitFunc)(const glm::vec3&, T*, glm::vec3&, glm::vec3&)
 	);
 	~BVH();
 
@@ -75,7 +74,7 @@ public:
 template <class T>
 BVH<T>::BVH(
 	bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*),
-	void (*boxExpandToFitFunc)(const glm::vec3&, const T&, glm::vec3&, glm::vec3&)
+	void (*boxExpandToFitFunc)(const glm::vec3&, T*, glm::vec3&, glm::vec3&)
 )	: raycastObjFunc(raycastObjFunc)
 	, boxExpandToFitFunc(boxExpandToFitFunc)
 {
@@ -128,7 +127,7 @@ void BVH<T>::rebuild()
 /////////////////////////// BOX FUNCTION DEFINITIONS //////////////////////////////
 
 template <class T>
-BVH<T>::Box::Box(void (*expandToFit)(const glm::vec3&, const T&, glm::vec3&, glm::vec3&))
+BVH<T>::Box::Box(void (*expandToFit)(const glm::vec3&, T*, glm::vec3&, glm::vec3&))
 	: expandToFit(expandToFit)
 	, data(nullptr), childA(nullptr), childB(nullptr), resized(false)
 {
@@ -170,7 +169,7 @@ void BVH<T>::Box::addDataNode(DataNode* node)
 	node->next = data;
 	data = node;
 	resized = true;
-	expandToFit(node->pos, node->obj, min, max);
+	expandToFit(node->pos, &node->obj, min, max);
 }
 
 template <class T>

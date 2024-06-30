@@ -1,14 +1,14 @@
 #include "ChunkManager.h"
 
-void ChunkManager::add(int x, int y, int z)
+bool ChunkManager::add(int x, int y, int z)
 {
 	Chunk::Key key(x, y, z);
 	if (chunks.find(key) != chunks.end())
 	{
-		delete chunks[key];
-		chunks.erase(key);
+		return false;
 	}
 	chunks[key] = new Chunk(x, y, z, std::rand(), unit_length);
+	return true;
 }
 
 Chunk* ChunkManager::get(const glm::vec3& pos)
@@ -49,4 +49,19 @@ Chunk::Group ChunkManager::getNeighbors(Chunk* chunk)
 int ChunkManager::size()
 {
 	return chunks.size();
+}
+
+ChunkManager::RaycastResult ChunkManager::raycast(const glm::vec3& pos, const glm::vec3& ray)
+{
+	return RaycastResult();
+}
+
+bool ChunkManager::raycastChunk(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& chunk_pos, Chunk** chunk)
+{
+	return true; // each leaf box in the bvh will contain a single chunk exactly its own size, so if the box was hit then the chunk must also be hit
+}
+void ChunkManager::expandToFitChunk(const glm::vec3& pos, Chunk** chunk, glm::vec3& min, glm::vec3& max)
+{
+	min = glm::min(min, pos);
+	max = glm::max(max, pos + util::XYZ);
 }

@@ -103,7 +103,7 @@ public:
 	};
 	BVH<Face> faces_BVH;
 	static bool raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, Face* face);
-	static void expandToFitFace(const glm::vec3& pos, const Face& face, glm::vec3& min, glm::vec3& max);
+	static void expandToFitFace(const glm::vec3& pos, Face* face, glm::vec3& min, glm::vec3& max);
 
 	typedef BVH<Face>::RaycastResult RaycastResult;
 	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);

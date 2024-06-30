@@ -155,10 +155,10 @@ bool Chunk::raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::v
 	return rayIntersectsPoly(pos, ray, quad.verts, 4, util::PolyCulling::CCW);
 }
 
-void Chunk::expandToFitFace(const glm::vec3& pos, const Face& face, glm::vec3& min, glm::vec3& max)
+void Chunk::expandToFitFace(const glm::vec3& pos, Face* face, glm::vec3& min, glm::vec3& max)
 {
 	glm::vec3 face_min, face_max;
-	switch (face.norm)
+	switch (face->norm)
 	{
 	case 0:
 		face_min = pos + util::Y;
