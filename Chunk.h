@@ -8,7 +8,7 @@
 #include "Mesh.h"
 #include "BVH.h"
 
-constexpr auto CHUNK_SIZE = 32;	// number of blocks per side
+constexpr auto CHUNK_SIZE = 32;	// number of blocks per side (DO NOT CHANGE)
 constexpr auto CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
 constexpr auto CHUNK_VOLUME = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 
@@ -18,6 +18,13 @@ constexpr auto CHUNK_VOLUME = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 class Chunk
 {
 public:
+	struct ShaderInfo
+	{
+		int coord_bits;
+		int face_bits;
+		int color_bits;
+	} shader_info;
+
 	struct Key
 	{
 		int x, y, z;
@@ -183,7 +190,7 @@ public:
 	RaycastResult last_successful_raycast;
 	
 	// chunks are initialized with their coordinates, random seed, and unit length
-	Chunk(int x, int y, int z, long seed, float unit_length = 1);
+	Chunk(int x, int y, int z, long seed, ShaderInfo shader_info, float unit_length = 1);
 	
 	// returns the chunk's position in world space, rather than chunk coordinates.
 	glm::vec3 getPosf();
@@ -194,10 +201,7 @@ public:
 	int generateFaceData(std::vector<int>& data, Group neighboring_chunks);
 	
 	
-	// Encodes info about a face into a single 32-bit int. x, y, z are in block coordinates within the chunk
-	// (i.e. 0 -> CHUNK_SIZE - 1), face is the normal direction in standard format (0, 1, 2, 3, 4, 5 -> up, down, left, right, forward, back).
-	// Color param is a float vector, but is convereted into a reduced-bit version when encoded (3 bits per channel currently).
-	int encodeFaceData(int x, int y, int z, int face, glm::vec3 color);
+	int encodeFaceData(int x, int y, int z, int face, const glm::vec3& color);
 	
 };
 

@@ -25,6 +25,8 @@ public:
 	};
 
 	unsigned int pos_SSBO = 0;
+	Chunk::ShaderInfo shader_info = {5, 3, 3};
+	int chunk_pos_bits = 10;
 	float unit_length = 0.1;
 
 	std::unordered_map<Chunk::Key, Chunk*> chunks;

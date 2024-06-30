@@ -2,9 +2,9 @@
 #include "ChunkManager.h"
 #include "util.h"
 
-Chunk::Chunk(int x, int y, int z, long seed, float unit_length)
+Chunk::Chunk(int x, int y, int z, long seed, ShaderInfo shader_info, float unit_length)
 	: faces_BVH(raycastFace, expandToFitFace, 6)
-	, x(x), y(y), z(z), seed(seed), unit_length(unit_length)
+	, x(x), y(y), z(z), seed(seed), unit_length(unit_length), shader_info(shader_info)
 {
 	this->ID = -1;
 
@@ -123,18 +123,30 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks)
 * Encoded data bits: 00000bbbgggrrrfffzzzzzyyyyyxxxxx
 * 
 * This encoder must be partnered with a corresponding decoder in the shader.
+* 
+* Encodes info about a face into a single 32-bit int. x, y, z are in block coordinates within the chunk
+* (i.e. 0 -> CHUNK_SIZE - 1), face is the normal direction in standard format (0, 1, 2, 3, 4, 5 -> up, down, left, right, forward, back).
+* Color param is a float vector, but is convereted into a reduced-bit version when encoded (3 bits per channel currently). 
 */
-int Chunk::encodeFaceData(int x, int y, int z, int face, glm::vec3 color)// int texture_id)
+int Chunk::encodeFaceData(int x, int y, int z, int face, const glm::vec3& color)// int texture_id)
 {
-	color *= 7.0f;
-	int data = (x & 63);
-	data |= (y & 63) << 6;
-	data |= (z & 63) << 12;
-	data |= (face & 7) << 18;
+	const int coord_mask = (1 << shader_info.coord_bits) - 1;
+	const int face_mask = (1 << shader_info.face_bits) - 1;
+	const int color_mask = (1 << shader_info.color_bits) - 1;
+	
+	glm::vec3 reduced_color = color * 7.0f;
+	int offset = 0;
+	int data = 0;
 
-	data |= ((int)color.x & 7) << 21;
-	data |= ((int)color.y & 7) << 24;
-	data |= ((int)color.z & 7) << 27;
+	data |= (x & coord_mask) << offset; (offset += shader_info.coord_bits);
+	data |= (y & coord_mask) << offset; (offset += shader_info.coord_bits);
+	data |= (z & coord_mask) << offset; (offset += shader_info.coord_bits);
+
+	data |= (face & face_mask) << offset; (offset += shader_info.face_bits);
+
+	data |= ((int)reduced_color.x & color_mask) << offset; (offset += shader_info.color_bits);
+	data |= ((int)reduced_color.y & color_mask) << offset; (offset += shader_info.color_bits);
+	data |= ((int)reduced_color.z & color_mask) << offset; (offset += shader_info.color_bits);
 
 	return data;
 }
