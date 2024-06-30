@@ -24,37 +24,6 @@ Game::~Game()
 //	std::cout << "" << std::endl;
 //}
 
-//void raycastTest2(Camera* camera, World& world, Input* input)
-//{
-//	Chunk* current_chunk = nullptr;
-//	if (world.peekChunk(camera->transform.pos, &current_chunk))
-//	{
-//		//std::cout << "camera pos: " << vec2string(camera->transform.pos) << std::endl;
-//		//std::cout << "chunk pos: " << current_chunk->x << ", " << current_chunk->y << ", " << current_chunk->z << std::endl;
-//		Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
-//		if (cast_result.hit)
-//		{
-//			//std::cout << "raycast returned true from position " << vec2string(camera->transform.pos);
-//			//std::cout << "\tlooking at pos: " << vec2string(cast_result.pos);
-//			//std::cout << "\tface looked at: " << *cast_result.obj << std::endl;
-//
-//			Mesh* test_block = getMeshByName("test_block");
-//			static glm::vec3 offset[6] =
-//			{
-//				glm::vec3(0, 0.1, 0),
-//				glm::vec3(0, -0.1, 0),
-//				glm::vec3(0.1, 0, 0),
-//				glm::vec3(-0.1, 0, 0),
-//				glm::vec3(0, 0, 0.1),
-//				glm::vec3(0, 0, -0.1)
-//			};
-//			test_block->transform.pos = cast_result.pos + offset[cast_result.obj->norm];
-//		}
-//		//else
-//			//std::cout << "raycast failed" << std::endl;
-//	}
-//}
-
 
 int data_node_called = 0;
 void Game::setup()

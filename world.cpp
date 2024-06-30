@@ -45,52 +45,62 @@ void World::setup()
 void World::update(float dt, Camera* camera, Input* input)
 {
 	//Chunk* current_chunk = nullptr;
-	if (input->mouse.left.pressed)
-	{
-		ChunkManager::RaycastResult cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());
-		if (cast.hit)
-			updateBlock(cast.pos, BlockType::AIR);
+	static bool single_mine = true;
 
-		//if (current_chunk = chunks.get(camera->transform.pos))
-		//{
-		//	Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
-		//	if (cast_result.hit)
-		//		updateBlock(cast_result.pos, BlockType::AIR);
-		//}
-	}
-	if (input->mouse.right.pressed)
+	ChunkManager::RaycastResult cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());
+	if ((input->mouse.left.held && !single_mine) || (input->mouse.left.pressed && single_mine))
 	{
-		ChunkManager::RaycastResult cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());
+		//putMeshWhereLooking(cast, "test_block");
 		if (cast.hit)
-			updateBlock(cast.chunk, cast.chunk->blocks.getNeighbor(cast.block, cast.face), BlockType::DIRT);
-		//if (current_chunk = chunks.get(camera->transform.pos))
-		//{
-		//	Chunk::RaycastResult cast_result = current_chunk->raycast(camera->transform.pos, camera->getLookDirection());
-		//	if (cast_result.hit)
-		//		updateBlock(current_chunk, current_chunk->blocks.getNeighbor(cast_result.obj->block, cast_result.obj->norm), BlockType::DIRT);
-		//}
+		{
+			//std::cout << "MINING ";
+			//printBlockData(cast.block, cast.chunk);
+			updateBlock(cast.block, cast.chunk, BlockType::AIR);
+		}
+	}
+	if ((input->mouse.right.held && !single_mine) || (input->mouse.right.pressed && single_mine))
+	{
+		//putMeshWhereLooking(cast, "test_block");
+		if (cast.hit)
+		{
+			//std::cout << "PLACING ";
+			//printBlockData(cast.block, cast.chunk);
+			placeBlock(cast, BlockType::DIRT);
+		}
+	}
+	if (input->keyPressed('Q'))
+		single_mine = !single_mine;
+	if (input->keyPressed('E'))
+	{
+		putMeshWhereLooking(cast, "test_block");
+		std::cout << "Inspect ";
+		printBlockInfo(cast.block, cast.chunk);
+	}
+	if (input->keyPressed('I'))
+	{
+		if (!cast.hit)
+			std::cout << "not looking at chunk" << std::endl;
+		else
+			traceBVHface(cast.chunk->faces_BVH);
 	}
 }
 
 void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chunk_out)
 {
-	Mesh* world_mesh = getMeshByName("world_mesh");
-	//pos -= world_mesh->transform.pos;
-
 	glm::vec3 block_pos = pos / chunks.unit_length;
+
 	int x_ch, y_ch, z_ch;
-	x_ch = (int)(block_pos.x / CHUNK_SIZE); if (block_pos.x < 0) x_ch--;
-	y_ch = (int)(block_pos.y / CHUNK_SIZE); if (block_pos.y < 0) y_ch--;
-	z_ch = (int)(block_pos.z / CHUNK_SIZE); if (block_pos.z < 0) z_ch--;
+	x_ch = floor(block_pos.x / CHUNK_SIZE);
+	y_ch = floor(block_pos.y / CHUNK_SIZE);
+	z_ch = floor(block_pos.z / CHUNK_SIZE);
 	Chunk* chunk = nullptr;
 	if (!(chunk = chunks.get(x_ch, y_ch, z_ch)))
 		return;
 
-	int x_b = (int)(block_pos.x -= x_ch * CHUNK_SIZE);
-	int y_b = (int)(block_pos.y -= y_ch * CHUNK_SIZE);
-	int z_b = (int)(block_pos.z -= z_ch * CHUNK_SIZE);
+	int x_b = floor(block_pos.x -= x_ch * CHUNK_SIZE);
+	int y_b = floor(block_pos.y -= y_ch * CHUNK_SIZE);
+	int z_b = floor(block_pos.z -= z_ch * CHUNK_SIZE);
 
-	//std::cout << "inspecting block at " << pos.x << ", " << pos.y << ", " << pos.z << ", block index " << x_b << ", " << y_b << ", " << z_b << std::endl;
 	if(block_out)
 		*block_out = &chunk->blocks(x_b, y_b, z_b);
 	if (chunk_out)
@@ -197,38 +207,42 @@ BlockType* World::inspectRay(const glm::vec3& pos, const glm::vec3& ray)
 	return block;
 }
 
-void World::updateBlock(const glm::vec3& pos, BlockType new_type)
+void World::updateBlock(BlockType* block, Chunk* chunk, BlockType new_type)
 {
-	BlockType* block = nullptr;
-	Chunk* chunk = nullptr;
-	inspectPos(pos, &block, &chunk);
-
 	if (!block)
-	{
-		std::cout << "updateBlock no block at pos" << std::endl;
 		return;
+	*block = new_type;
+	remeshChunk(chunk);
+
+	int face = 0;
+	std::cout << "updating block " << std::endl;
+	printBlockInfo(block, chunk);
+
+	if (chunk->blocks.onBoundary(block, &face))
+	{
+		std::cout << "remeshing neighboring chunk" << std::endl;
+		remeshChunk(chunks.getNeighbor(chunk, face));
+	}
+}
+
+void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type)
+{
+	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2); // move to center of block to avoid floating point nonsense
+	switch (cast.face)
+	{
+	case 0: pos.y += chunks.unit_length; break;
+	case 1: pos.y -= chunks.unit_length; break;
+	case 2: pos.x += chunks.unit_length; break;
+	case 3: pos.x -= chunks.unit_length; break;
+	case 4: pos.z += chunks.unit_length; break;
+	case 5: pos.z -= chunks.unit_length; break;
 	}
 
-	*block = new_type;
-	remeshChunk(chunk);
-}
-
-void World::updateBlock(Chunk* chunk, BlockType* block, BlockType new_type)
-{
-	if (!block)
-		return;
-	*block = new_type;
-	remeshChunk(chunk);
-}
-
-void World::updateLookedAtBlock(Camera* camera, BlockType new_type)
-{
 	BlockType* block;
 	Chunk* chunk;
-	if (!inspectRay(camera->transform.pos, camera->getLookDirection(), &block, &chunk))
-		return;
-	*block = new_type;
-	remeshChunk(chunk);
+	inspectPos(pos, &block, &chunk);
+	if (block && chunk)
+		updateBlock(block, chunk, new_type);
 }
 
 void World::generateMesh()
@@ -266,7 +280,6 @@ void World::generateMesh()
 		chunks.pos_data.push_back(encodeChunkPos(chunk));
 		chunk->ID = chunk_counter++;
 
-		std::cout << "num_instances: " << num_instances << std::endl;
 		face_counter += num_instances;
 	}
 	
@@ -285,8 +298,11 @@ void World::generateMesh()
 
 void World::remeshChunk(Chunk* chunk)
 {
-	ChunkManager::DrawParams* chunk_params = &chunks.draw_params[chunk->ID];
+	if (!chunk)
+		return;
+	std::cout << "remeshing chunk at: " << chunk->x << ", " << chunk->y << ", " << chunk->z << std::endl;
 
+	ChunkManager::DrawParams* chunk_params = &chunks.draw_params[chunk->ID];
 	std::vector<int> chunk_instance_data;
 
 	int chunk_num_instances = chunk->generateFaceData(chunk_instance_data, chunks.getNeighbors(chunk));
@@ -299,8 +315,6 @@ void World::remeshChunk(Chunk* chunk)
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vao->data_VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, chunk_params->baseInstance * sizeof(int), chunk_num_instances * sizeof(int), chunk_instance_data.data());
-
-	std::cout << "Remeshed chunk " << chunk->ID << ", now has " << chunk_num_instances << " faces" << std::endl;
 }
 
 void World::addChunkToMesh(Chunk* chunk)

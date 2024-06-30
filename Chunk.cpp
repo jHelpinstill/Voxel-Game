@@ -169,7 +169,7 @@ void Chunk::expandToFitFace(const glm::vec3& pos, Face* face, glm::vec3& min, gl
 		break;
 	case 1:
 		face_min = pos;
-		face_max = util::ZX;
+		face_max = pos + util::ZX;
 		break;
 	case 2:
 		face_min = pos + util::X;

@@ -125,37 +125,14 @@ void BVH<T>::reset()
 template <class T>
 void BVH<T>::rebuild()
 {
-	std::cout << "(in rebuild()) " << root->countDataNodes() << " nodes in root" << std::endl;
-	DataNode* nodes = root->getData();
-
-	int counter = 0;
-	DataNode* node = nodes;
-	while (node)
-	{
-		counter++;
-		node = node->next;
-	}
-	std::cout << counter << " nodes retrieved from all boxes" << std::endl;
+	root->data = root->getData();
 
 	delete root->childA;
 	root->childA = nullptr;
 	delete root->childB;
 	root->childB = nullptr;
 
-	root->data = nodes;
 	root->split(min_nodes_per_box);
-
-	
-	std::cout << "root size: " << vec2string(root->max - root->min) << std::endl;
-	if (root->childA)
-		std::cout << "root has childA" << std::endl;
-	else
-		std::cout << "root does not have childA" << std::endl;
-
-	if (root->childB)
-		std::cout << "root has childB" << std::endl;
-	else
-		std::cout << "root does not have childB" << std::endl;
 }
 
 template <class T>
@@ -251,7 +228,17 @@ class Chunk;
 template <class T>
 void BVH<T>::Box::split(int min_data_nodes)
 {
-	bool debug_chunk = typeid(T) == typeid(Chunk*);
+	static int split_depth = 0;
+	split_depth++;
+
+	if (typeid(T) == typeid(Chunk::Face))
+	{
+		
+		if (split_depth > 20)
+		{
+			std::cout << "max depth exceeded: splits: " << split_depth << std::endl;
+		}
+	}
 
 	glm::vec3 size = max - min;
 
@@ -270,12 +257,10 @@ void BVH<T>::Box::split(int min_data_nodes)
 
 		if (current_node->pos[longest_axis] < splittingPoint)
 		{
-			if (debug_chunk) std::cout << "childA added node" << std::endl;
 			childA->addDataNode(current_node);
 		}
 		else
 		{
-			if (debug_chunk) std::cout << "childB added node" << std::endl;
 			childB->addDataNode(current_node);
 		}
 	}
@@ -304,6 +289,8 @@ void BVH<T>::Box::split(int min_data_nodes)
 		else if (num_nodes > min_data_nodes)
 			childB->split(min_data_nodes);
 	}
+
+	split_depth--;
 }
 
 template <class T>

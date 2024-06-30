@@ -14,7 +14,7 @@
 class World
 {
 public:
-	int chunk_radius = 0;
+	int chunk_radius = 5;
 	long seed;
 
 	float ambient_lighting = 0.1;
@@ -37,9 +37,9 @@ public:
 	bool inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** block_out, Chunk** chunk_out = nullptr);
 	BlockType* inspectRay(const glm::vec3& pos, const glm::vec3& ray);
 
-	void updateBlock(const glm::vec3& pos, BlockType new_type);
-	void updateBlock(Chunk* chunk, BlockType* block, BlockType new_type);
-	void updateLookedAtBlock(Camera* camera, BlockType new_type);
+	void updateBlock(BlockType* block, Chunk* chunk, BlockType new_type);
+	void placeBlock(ChunkManager::RaycastResult cast, BlockType new_type);
+	void removeBlock(ChunkManager::RaycastResult cast, BlockType new_type);
 
 	int encodeChunkPos(Chunk* chunk);
 

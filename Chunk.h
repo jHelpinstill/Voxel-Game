@@ -61,22 +61,95 @@ public:
 		{
 			return ((int)block - (int)data) / sizeof(BlockType);
 		}
-		BlockType* getNeighbor(BlockType* block, int face, int dist = 1)
+		bool getCoords(BlockType* block, int& x, int& y, int& z)
 		{
 			int i = getIndex(block);
-			std::cout << "index of block is: " << i << ", coords: " << i % CHUNK_SIZE << ", " << (i % CHUNK_AREA) / CHUNK_SIZE << ", " << i / CHUNK_AREA << std::endl;
+			if (i < 0 || i >= CHUNK_VOLUME)
+				return false;
+
+			x = i % CHUNK_SIZE;
+			y = (i % CHUNK_AREA) / CHUNK_SIZE;
+			z = i / CHUNK_AREA;
+			return true;
+		}
+		bool onBoundary(BlockType* block, int* face = nullptr)
+		{
+			int x, y, z;
+			if (!getCoords(block, x, y, z))
+				return true;
+			
+			if (y == 31)
+			{
+				if (face)
+					*face = 0;
+				return true;
+			}
+			if (y == 0)
+			{
+				if (face)
+					*face = 1;
+				return true;
+			}
+			if (x == 31)
+			{
+				if (face)
+					*face = 2;
+				return true;
+			}
+			if (x == 0)
+			{
+				if (face)
+					*face = 3;
+				return true;
+			}
+			if (z == 31)
+			{
+				if (face)
+					*face = 4;
+				return true;
+			}
+			if (z == 0)
+			{
+				if (face)
+					*face = 5;
+				return true;
+			}
+
+			return false;
+		}
+		BlockType* getNeighbor(BlockType* block, int face, int dist = 1)
+		{
+			int x, y, z;
+			if (!getCoords(block, x, y, z))
+				return nullptr;
 			switch (face)
 			{
-			case 0: i += CHUNK_SIZE * dist; break;
-			case 1: i -= CHUNK_SIZE * dist; break;
-			case 2: i += dist; break;
-			case 3: i -= dist; break;
-			case 4: i += CHUNK_AREA * dist; break;
-			case 5: i -= CHUNK_AREA * dist; break;
+			case 0: y++; if(y > 31) return nullptr; break;
+			case 1: y--; if(y < 0) return nullptr; break;
+			case 2: x++; if(x > 31) return nullptr; break;
+			case 3: x--; if(x < 0) return nullptr; break;
+			case 4: z++; if(z > 31) return nullptr; break;
+			case 5: z--; if(z < 0) return nullptr; break;
 			}
-			if (i < 0 || i >= CHUNK_VOLUME)
-				return nullptr;
-			return &data[i];
+
+			return &(*this)(x, y, z);
+
+
+			//int i = getIndex(block);
+			//
+			//std::cout << "index of block is: " << i << ", coords: " << i % CHUNK_SIZE << ", " << (i % CHUNK_AREA) / CHUNK_SIZE << ", " << i / CHUNK_AREA << std::endl;
+			//switch (face)
+			//{
+			//case 0: i += CHUNK_SIZE * dist; break;
+			//case 1: i -= CHUNK_SIZE * dist; break;
+			//case 2: i += dist; break;
+			//case 3: i -= dist; break;
+			//case 4: i += CHUNK_AREA * dist; break;
+			//case 5: i -= CHUNK_AREA * dist; break;
+			//}
+			//if (i < 0 || i >= CHUNK_VOLUME)
+			//	return nullptr;
+			//return &data[i];
 		}
 	} blocks;
 

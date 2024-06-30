@@ -5,8 +5,13 @@
 #include "Config.h"
 #include "BVH.h"
 #include "Chunk.h"
+#include "ChunkManager.h"
 
-struct MonitorBVHi
+void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string& mesh_name);
+
+void printBlockInfo(BlockType* block, Chunk* chunk);
+
+struct MonitorBVHface
 {
 	int boxes_without_data;
 	int num_boxes;
@@ -21,8 +26,8 @@ struct MonitorBVHi
 	int num_faces[6];
 };
 
-void traceBVHi(BVH<int>& bvh);
-void traceBVHi(BVH<int>::Box* box, MonitorBVHi& monitor);
+void traceBVHface(BVH<Chunk::Face>& bvh);
+void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface& monitor);
 
 struct MonitorBVHchunk
 {

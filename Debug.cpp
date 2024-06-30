@@ -1,11 +1,41 @@
 #include "Debug.h"
 
-
-void traceBVHi(BVH<int>& bvh)
+void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string& mesh_name)
 {
-	MonitorBVHi monitor{};
+	if (cast.hit)
+	{
+		Mesh* test_block = getMeshByName(mesh_name);
+		float length = cast.chunk->unit_length;
+		static glm::vec3 offset[6] =
+		{
+			glm::vec3(0, length, 0),
+			glm::vec3(0, -length, 0),
+			glm::vec3(length, 0, 0),
+			glm::vec3(-length, 0, 0),
+			glm::vec3(0, 0, length),
+			glm::vec3(0, 0, -length)
+		};
+		test_block->transform.pos = cast.pos + offset[cast.face];
+	}
+}
 
-	traceBVHi(bvh.root, monitor);
+void printBlockInfo(BlockType* block, Chunk* chunk)
+{
+	std::cout << "block data:  " << std::endl;
+	std::cout << "\ttype:      " << getBlockName(*block) << std::endl;
+	int x, y, z; chunk->blocks.getCoords(block, x, y, z);
+	std::cout << "\tgrid pos:  " << x << ", " << y << ", " << z << std::endl;
+	std::cout << "\tworld pos: " << vec2string(chunk->getPosf() + glm::vec3(x, y, z) * chunk->unit_length) << std::endl;
+	std::cout << "\tindex:     " << chunk->blocks.getIndex(block) << std::endl;
+	std::cout << "\tpointer:   " << block << std::endl;
+	std::cout << std::endl;
+}
+
+void traceBVHface(BVH<Chunk::Face>& bvh)
+{
+	MonitorBVHface monitor{};
+
+	traceBVHface(bvh.root, monitor);
 
 	if(monitor.sum_data_nodes)
 		monitor.avg_data_nodes = monitor.sum_data_nodes / (float)(monitor.num_boxes - monitor.boxes_without_data);
@@ -23,9 +53,10 @@ void traceBVHi(BVH<int>& bvh)
 	{
 		std::cout << "num faces in direction " << i << ": " << monitor.num_faces[i] << std::endl;
 	}
+	std::cout << std::endl;
 }
 
-void traceBVHi(BVH<int>::Box* box, MonitorBVHi& monitor)
+void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface& monitor)
 {
 	monitor.num_boxes++;
 	if (!box->data)
@@ -35,10 +66,10 @@ void traceBVHi(BVH<int>::Box* box, MonitorBVHi& monitor)
 		monitor.num_leaf_boxes++;
 
 		int num_data_nodes = 0;
-		BVH<int>::DataNode* node = box->data;
+		BVH<Chunk::Face>::DataNode* node = box->data;
 		while (node)
 		{
-			monitor.num_faces[node->obj]++;
+			monitor.num_faces[node->obj.norm]++;
 			num_data_nodes++;
 			node = node->next;
 		}
@@ -50,18 +81,18 @@ void traceBVHi(BVH<int>::Box* box, MonitorBVHi& monitor)
 	else if (box->childA && box->childB)
 	{
 		monitor.num_with_both_children++;
-		traceBVHi(box->childA, monitor);
-		traceBVHi(box->childB, monitor);
+		traceBVHface(box->childA, monitor);
+		traceBVHface(box->childB, monitor);
 	}
 	else if (box->childA)
 	{
 		monitor.num_with_single_child++;
-		traceBVHi(box->childA, monitor);
+		traceBVHface(box->childA, monitor);
 	}
 	else
 	{
 		monitor.num_with_single_child++;
-		traceBVHi(box->childB, monitor);
+		traceBVHface(box->childB, monitor);
 	}
 }
 

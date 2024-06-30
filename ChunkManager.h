@@ -53,6 +53,7 @@ public:
 
 	int size();
 
+	Chunk* getNeighbor(Chunk* chunk, int face);
 	Chunk::Group getNeighbors(Chunk* chunk);
 };
 

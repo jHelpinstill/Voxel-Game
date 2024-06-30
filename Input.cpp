@@ -48,17 +48,17 @@ void Input::update()
 
 bool Input::keyPressed(int key)
 {
-	return keys[key].pressed;
+	return keys[toupper(key)].pressed;
 }
 
 bool Input::keyHeld(int key)
 {
-	return keys[key].held;
+	return keys[toupper(key)].held;
 }
 
 bool Input::keyReleased(int key)
 {
-	return keys[key].released;
+	return keys[toupper(key)].released;
 }
 
 void Input::lockCursor()

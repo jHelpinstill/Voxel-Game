@@ -18,9 +18,9 @@ Chunk* ChunkManager::get(const glm::vec3& pos)
 {
 	glm::vec3 block_pos = pos / unit_length;
 	int x, y, z;
-	x = (int)(block_pos.x / CHUNK_SIZE); if (block_pos.x < 0) x--;
-	y = (int)(block_pos.y / CHUNK_SIZE); if (block_pos.y < 0) y--;
-	z = (int)(block_pos.z / CHUNK_SIZE); if (block_pos.z < 0) z--;
+	x = floor(block_pos.x / CHUNK_SIZE);
+	y = floor(block_pos.y / CHUNK_SIZE);
+	z = floor(block_pos.z / CHUNK_SIZE);
 
 	return get(x, y, z);
 }
@@ -32,6 +32,20 @@ Chunk* ChunkManager::get(int x, int y, int z)
 		return chunks[key];
 
 	return nullptr;
+}
+
+Chunk* ChunkManager::getNeighbor(Chunk* chunk, int face)
+{
+	int x = chunk->x; int y = chunk->y; int z = chunk->z;
+	switch (face)
+	{
+		case 0: return get(x, y + 1, z);
+		case 1: return get(x, y - 1, z);
+		case 2: return get(x + 1, y, z);
+		case 3: return get(x - 1, y, z);
+		case 4: return get(x, y, z + 1);
+		case 5: return get(x, y, z - 1);
+	}
 }
 
 Chunk::Group ChunkManager::getNeighbors(Chunk* chunk)
