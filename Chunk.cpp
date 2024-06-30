@@ -134,7 +134,7 @@ int Chunk::encodeFaceData(int x, int y, int z, int face, const glm::vec3& color)
 	const int face_mask = (1 << shader_info.face_bits) - 1;
 	const int color_mask = (1 << shader_info.color_bits) - 1;
 	
-	glm::vec3 reduced_color = color * 7.0f;
+	glm::vec3 reduced_color = color * (float)(color_mask + 1);
 	int offset = 0;
 	int data = 0;
 

@@ -334,13 +334,17 @@ void World::addChunkToMesh(Chunk* chunk)
 
 int World::encodeChunkPos(Chunk* chunk)
 {
+	const int chunk_pos_mask = (1 << chunks.chunk_pos_bits) - 1;
+	const int half_chunk_mask = (chunk_pos_mask / 2) + 1;
+
 	int x = chunk->x;
 	int y = chunk->y;
 	int z = chunk->z;
 
-	int data = ((x + 512) & 1023);
-	data |= ((y + 512) & 1023) << 10;
-	data |= ((z + 512) & 1023) << 20;
+	int data = 0; int offset = 0;
+	data |= ((x + half_chunk_mask) & chunk_pos_mask) << offset; offset += chunks.chunk_pos_bits;
+	data |= ((y + half_chunk_mask) & chunk_pos_mask) << offset; offset += chunks.chunk_pos_bits;
+	data |= ((z + half_chunk_mask) & chunk_pos_mask) << offset;
 
 	return data;
 }
@@ -353,11 +357,6 @@ void World::drawWorld(Mesh* mesh, Camera* camera, void* obj)
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat() * glm::scale(glm::mat4(1.0), glm::vec3(world->chunks.unit_length)));
 	mesh->shader->setInt("chunk_size", CHUNK_SIZE);
 	mesh->shader->setFloat("ambient", world->ambient_lighting);
-
-	mesh->shader->setInt("coord_bits", world->chunks.shader_info.coord_bits);
-	mesh->shader->setInt("face_bits", world->chunks.shader_info.face_bits);
-	mesh->shader->setInt("color_bits", world->chunks.shader_info.color_bits);
-	mesh->shader->setInt("chunk_bits", world->chunks.chunk_pos_bits);
 
 	glm::vec3 lighting_dir = world->sun_dir;
 	float t = glm::dot(glm::normalize(lighting_dir), glm::vec3(0, 1, 0));
