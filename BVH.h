@@ -231,7 +231,7 @@ void BVH<T>::Box::split(int min_data_nodes)
 	static int split_depth = 0;
 	split_depth++;
 
-	if (typeid(T) == typeid(Chunk::Face))
+	if (typeid(T) == typeid(Chunk*))
 	{
 		
 		if (split_depth > 20)
@@ -244,6 +244,9 @@ void BVH<T>::Box::split(int min_data_nodes)
 
 	glm::vec3 center = (max + min) * 0.5f;
 	int longest_axis = (size.x > max2(size.y, size.z)) ? 0 : (size.y > size.z ? 1 : 2);
+
+	if(split_depth > 20)
+		std::cout << "size: " << vec2string(size) << "--" << "center: " << vec2string(center) << std::endl;
 
 	childA = new Box(expandToFit);
 	childB = new Box(expandToFit);

@@ -9,7 +9,7 @@ bool ChunkManager::add(int x, int y, int z)
 	}
 	Chunk* chunk = new Chunk(x, y, z, std::rand(), shader_info, unit_length);
 	chunks[key] = chunk;
-	bvh.root->addDataNode(glm::vec3(x, y, z) * (float)CHUNK_SIZE * unit_length, chunk);
+	bvh.root->addDataNode((glm::vec3(x, y, z) + glm::vec3(0.5)) * (float)CHUNK_SIZE * unit_length, chunk); // position is center of chunk to prevent floating point errors
 	bvh.rebuild();
 	return true;
 }
@@ -87,11 +87,11 @@ ChunkManager::RaycastResult ChunkManager::raycast(const glm::vec3& pos, const gl
 
 bool ChunkManager::raycastChunk(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& chunk_pos, Chunk** chunk)
 {
-	//Chunk::RaycastResult chunk_result = (*chunk)->raycast(pos, ray);
 	return (*chunk)->raycast(pos, ray).hit;
 }
 void ChunkManager::expandToFitChunk(const glm::vec3& pos, Chunk** chunk, glm::vec3& min, glm::vec3& max)
 {
-	min = glm::min(min, pos);
-	max = glm::max(max, pos + util::XYZ * (float)CHUNK_SIZE * (*chunk)->unit_length);
+	glm::vec3 half_diameter = util::XYZ * (float)CHUNK_SIZE * (*chunk)->unit_length * 0.5f;
+	min = glm::min(min, pos - half_diameter);
+	max = glm::max(max, pos + half_diameter);
 }

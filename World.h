@@ -14,7 +14,7 @@
 class World
 {
 public:
-	int chunk_radius = 5;
+	int chunk_radius = 10;
 	long seed;
 
 	float ambient_lighting = 0.1;
