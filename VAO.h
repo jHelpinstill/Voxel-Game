@@ -16,7 +16,7 @@ public:
 	} style;
 	unsigned int ID, verts_VBO, data_VBO;
 
-	VAO() : style(Style::NONE) {}
+	VAO() : style(Style::NONE), ID(0), verts_VBO(0), data_VBO(0) {}
 	~VAO();
 
 	void bind();

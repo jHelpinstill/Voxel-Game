@@ -3,7 +3,7 @@
 Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*, void*))
 {
 	this->texture = texture;
-	this->drawFunction = drawFunction;
+	this->drawFunc = drawFunction;
 
 	vao = new VAO;
 }
@@ -15,7 +15,7 @@ Mesh::Mesh(
 	void (*drawFunction)(Mesh*, Camera*, void*)
 ) {
 	this->texture = texture;
-	this->drawFunction = drawFunction;
+	this->drawFunc = drawFunction;
 
 	for (const glm::vec3& vert : verts)
 		this->verts.push_back(vert);
@@ -32,7 +32,7 @@ Mesh::Mesh(
 	void (*drawFunction)(Mesh*, Camera*, void*)
 ) {
 	this->texture = texture;
-	this->drawFunction = drawFunction;
+	this->drawFunc = drawFunction;
 
 	for (const glm::vec3& vert : verts)
 		this->verts.push_back(vert);
@@ -49,7 +49,7 @@ Mesh::Mesh(
 	void (*drawFunction)(Mesh*, Camera*, void*)
 ) {
 	this->color = color;
-	this->drawFunction = drawFunction;
+	this->drawFunc = drawFunction;
 
 	for (const glm::vec3& vert : verts)
 		this->verts.push_back(vert);
@@ -65,7 +65,8 @@ Mesh::~Mesh()
 
 void Mesh::draw(Camera* camera)
 {
-	drawFunction(this, camera, parent_obj);
+	if(drawFunc)
+		drawFunc(this, camera, parent_obj);
 }
 
 void Mesh::attachShader(Shader* shader)

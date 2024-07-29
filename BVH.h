@@ -166,13 +166,9 @@ BVH<T>::Box::~Box()
 	}
 }
 
-extern int data_node_called;
-
 template <class T>
 void BVH<T>::Box::addDataNode(const glm::vec3& pos, const T& obj)
 {
-	data_node_called++;
-
 	DataNode* node = new DataNode;
 	node->pos = pos;
 	node->obj = obj;

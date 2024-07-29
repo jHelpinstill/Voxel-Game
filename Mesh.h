@@ -22,7 +22,7 @@ public:
 	unsigned int texture;
 	std::string uv_filepath;
 	glm::vec3 color;
-	void (*drawFunction)(Mesh* mesh, Camera* camera, void* obj);
+	void (*drawFunc)(Mesh* mesh, Camera* camera, void* obj);
 
 	std::vector<glm::vec3> verts;
 	std::vector<int> instance_data;
@@ -39,12 +39,12 @@ public:
 		const std::vector<glm::vec3>& verts,
 		unsigned int texture,
 		const std::vector<glm::vec2>& uv_coords,
-		void (*drawFunction)(Mesh*, Camera*, void*) = drawTriangles
+		void (*drawFunc)(Mesh*, Camera*, void*) = drawTriangles
 	);
 	Mesh(
 		const std::vector<glm::vec3>& verts,
 		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5),
-		void (*drawFunction)(Mesh*, Camera*, void*) = drawTriangles
+		void (*drawFunc)(Mesh*, Camera*, void*) = drawTriangles
 	);
 	
 	~Mesh();

@@ -13,19 +13,6 @@ Game::~Game()
 	delete camera;
 }
 
-//void raycastTest(const glm::vec3& pos, const glm::vec3& ray)
-//{
-//	for (int i = 0; i < 6; i++)
-//	{
-//		Quad quad(glm::vec3(0, 3, 0), glm::vec3(1, 4, 1), i);
-//		if (rayIntersectsPoly(pos, ray, quad.verts, 4, util::PolyCulling::CCW))
-//			std::cout << "looking at box face " << i << std::endl;
-//	}
-//	std::cout << "" << std::endl;
-//}
-
-
-int data_node_called = 0;
 void Game::setup()
 {
 	input = new Input(window);
@@ -52,22 +39,16 @@ void Game::setup()
 	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 3, 2), "crate", "meshes/box_two_face_UV.txt");
 	createTexturedBox("test_block", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), "crate", "meshes/box_two_face_UV.txt");
 
-	HUDElement* crosshair = new HUDElement();
-	hud_elements["crosshair"] = crosshair;
-	crosshair->shader = getShaderByName("solid_UI_shader");
-	crosshair->addRect(-0.007, -0.007, 0.014, 0.014);
-	crosshair->createVAO();
-	crosshair->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
+	//HUDElement* crosshair = new HUDElement();
+	//hud_elements["crosshair"] = crosshair;
+	//crosshair->shader = getShaderByName("solid_UI_shader");
+	//crosshair->addRect(-0.007, -0.007, 0.014, 0.014);
+	//crosshair->createVAO();
+	//crosshair->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 
 	world.setup();
 
-	//Chunk* chunk = world.getChunk(0, 1, 0);
-	//traceBVHi(chunk->faces_BVH);
-
-	std::cout << "data node called: " << data_node_called << " times" << std::endl;
-
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
 }
 
 #define AVG_FPS_HISTORY_SIZE 100
@@ -134,8 +115,8 @@ void Game::stateMachine(double dt)
 
 		//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
 
-		drawUI();
 		drawMeshes();
+		drawUI();
 		break;
 	}
 	}
@@ -143,19 +124,14 @@ void Game::stateMachine(double dt)
 
 void Game::drawMeshes()
 {
-	num_meshes = 0;
+	glEnable(GL_DEPTH_TEST);
 	for (auto& mesh : meshes)
-	{
 		mesh.second->draw(camera);
-		num_meshes++;
-	}
-	//std::cout << c << "meshes" << std::endl;
 }
 
 void Game::drawUI()
 {
+	glDisable(GL_DEPTH_TEST);
 	for (auto& hud_elem : hud_elements)
-	{
 		hud_elem.second->draw();
-	}
 }

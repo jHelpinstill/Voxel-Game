@@ -37,7 +37,6 @@ int main()
 
 	Game game(window);
 
-	//unsigned int texture = createTexture("textures/smiley.png");
 	float frame_rate = 0.0;
 	while (!glfwWindowShouldClose(window))
 	{

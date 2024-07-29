@@ -110,7 +110,7 @@ void VAO::reset()
 	{
 	case Style::INSTANCED:
 		glDeleteBuffers(1, &data_VBO);
-	case Style::TEXTURED:
+	default:
 		glDeleteVertexArrays(1, &ID);
 		glDeleteBuffers(1, &verts_VBO);
 	case Style::NONE:

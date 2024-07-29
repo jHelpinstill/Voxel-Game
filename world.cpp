@@ -277,7 +277,7 @@ void World::generateMesh()
 	
 	world_mesh->shader = getShaderByName("world_shader");
 	world_mesh->vao->makeInstanced(world_mesh->verts, world_mesh->instance_data);
-	world_mesh->drawFunction = drawWorld;
+	world_mesh->drawFunc = drawWorld;
 	world_mesh->parent_obj = this;
 
 	glGenBuffers(1, &chunks.pos_SSBO);

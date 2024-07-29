@@ -34,6 +34,7 @@ Chunk::Chunk(int x, int y, int z, long seed, ShaderInfo shader_info, float unit_
 	}
 }
 
+// returns the chunk's position in world space, rather than chunk coordinates.
 glm::vec3 Chunk::getPosf()
 {
 	return glm::vec3(x, y, z) * (float)CHUNK_SIZE * unit_length;
@@ -234,4 +235,97 @@ Chunk*& Chunk::Group::operator[](int i)
 Chunk::Group::~Group()
 {
 	delete chunks;
+}
+
+//////////////////// FUNCTION DEFINIIONS (Blocks) /////////////////////////
+
+BlockType& Chunk::Blocks::operator[](int index)
+{
+	return data[index];
+}
+
+BlockType& Chunk::Blocks::operator()(int x, int y, int z)
+{
+	return data[x + CHUNK_SIZE * y + CHUNK_AREA * z];
+}
+
+int Chunk::Blocks::getIndex(BlockType* block)
+{
+	return ((int)block - (int)data) / sizeof(BlockType);
+}
+
+bool Chunk::Blocks::getCoords(BlockType* block, int& x, int& y, int& z)
+{
+	int i = getIndex(block);
+	if (i < 0 || i >= CHUNK_VOLUME)
+		return false;
+
+	x = i % CHUNK_SIZE;
+	y = (i % CHUNK_AREA) / CHUNK_SIZE;
+	z = i / CHUNK_AREA;
+	return true;
+}
+
+bool Chunk::Blocks::onBoundary(BlockType* block, int* face)
+{
+	int x, y, z;
+	if (!getCoords(block, x, y, z))
+		return true;
+
+	if (y == 31)
+	{
+		if (face)
+			*face = 0;
+		return true;
+	}
+	if (y == 0)
+	{
+		if (face)
+			*face = 1;
+		return true;
+	}
+	if (x == 31)
+	{
+		if (face)
+			*face = 2;
+		return true;
+	}
+	if (x == 0)
+	{
+		if (face)
+			*face = 3;
+		return true;
+	}
+	if (z == 31)
+	{
+		if (face)
+			*face = 4;
+		return true;
+	}
+	if (z == 0)
+	{
+		if (face)
+			*face = 5;
+		return true;
+	}
+
+	return false;
+}
+
+BlockType* Chunk::Blocks::getNeighbor(BlockType* block, int face, int dist)
+{
+	int x, y, z;
+	if (!getCoords(block, x, y, z))
+		return nullptr;
+	switch (face)
+	{
+	case 0: y++; if (y > 31) return nullptr; break;
+	case 1: y--; if (y < 0) return nullptr; break;
+	case 2: x++; if (x > 31) return nullptr; break;
+	case 3: x--; if (x < 0) return nullptr; break;
+	case 4: z++; if (z > 31) return nullptr; break;
+	case 5: z--; if (z < 0) return nullptr; break;
+	}
+
+	return &(*this)(x, y, z);
 }
