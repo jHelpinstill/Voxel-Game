@@ -1,21 +1,12 @@
 #include "Textbox.h"
 
-void Textbox::drawTextbox(Decal* decal, GLFWwindow* window, void* obj)
+void Textbox::drawTextbox(Decal* decal, GLFWwindow* window)
 {
 	if(decal->texture)
-	{
-		decal->shader->use();
+		Decal::drawDefault(decal, window);
 
-		decal->shader->setMat4("projection", decal->getMat());
-		glBindTexture(GL_TEXTURE_2D, decal->texture);
+	Textbox* textbox = (Textbox*)decal->attached_obj;
 
-		decal->vao->bind();
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-
-	Textbox* textbox = (Textbox*)obj;
-
-	
 	glm::vec2 cursor = decal->getScreenCoords();
 	cursor.y += decal->size.y;
 	long start = 0;

@@ -84,6 +84,9 @@
     <ClCompile Include="Textbox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ClickableRegion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Textbox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClickableRegion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

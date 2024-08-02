@@ -349,9 +349,9 @@ int World::encodeChunkPos(Chunk* chunk)
 	return data;
 }
 
-void World::drawWorld(Mesh* mesh, Camera* camera, void* obj)
+void World::drawWorld(Mesh* mesh, Camera* camera)
 {
-	World* world = (World*)obj;
+	World* world = (World*)mesh->parent_obj;
 
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat() * glm::scale(glm::mat4(1.0), glm::vec3(world->chunks.unit_length)));

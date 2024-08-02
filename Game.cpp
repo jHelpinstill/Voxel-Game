@@ -47,11 +47,11 @@ void Game::setup()
 	crosshair->origin = glm::vec2(0.5f);
 	crosshair->adjustment = glm::vec2(0.5f);
 
-	//Decal* textbox_test = createDecal("textbox", "white_square", "decal_shader", glm::vec2(100, 200), glm::vec2(0, 50), window);
-	//textbox_test->origin = glm::vec2(0.5, 0);
-	//textbox_test->adjustment = glm::vec2(0.5, 0);
-	//textbox_test->drawFunc = Textbox::drawTextbox;
-	//textbox_test->attached_obj = new Textbox("This is a textbox with wrapping and now there's a lot more text to try to get it to wrap", getFontByName("arial"), getShaderByName("font_shader"), 0.5, glm::vec3(0));
+	Decal* textbox_test = createDecal("textbox", "white_square", "decal_shader", glm::vec2(100, 200), glm::vec2(0, 50), window);
+	textbox_test->origin = glm::vec2(0.5, 0);
+	textbox_test->adjustment = glm::vec2(0.5, 0);
+	textbox_test->drawFunc = Textbox::drawTextbox;
+	textbox_test->attached_obj = new Textbox("This is a textbox with wrapping and now there's a lot more text to try to get it to wrap", getFontByName("arial"), getShaderByName("font_shader"), 0.5, glm::vec3(0));
 
 	Decal* pause_text = createDecal("pause_text", "white_square", "decal_shader", glm::vec2(475, 50), glm::vec2(0), window);
 	pause_text->origin = glm::vec2(0.5);

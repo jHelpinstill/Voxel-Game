@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*, void*))
+Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*))
 {
 	this->texture = texture;
 	this->drawFunc = drawFunction;
@@ -12,7 +12,7 @@ Mesh::Mesh(
 	const std::vector<glm::vec3>& verts,
 	unsigned int texture,
 	const std::string& uv_filepath,
-	void (*drawFunction)(Mesh*, Camera*, void*)
+	void (*drawFunction)(Mesh*, Camera*)
 ) {
 	this->texture = texture;
 	this->drawFunc = drawFunction;
@@ -29,7 +29,7 @@ Mesh::Mesh(
 	const std::vector<glm::vec3>& verts,
 	unsigned int texture,
 	const std::vector<glm::vec2>& uv_coords,
-	void (*drawFunction)(Mesh*, Camera*, void*)
+	void (*drawFunction)(Mesh*, Camera*)
 ) {
 	this->texture = texture;
 	this->drawFunc = drawFunction;
@@ -46,7 +46,7 @@ Mesh::Mesh(
 Mesh::Mesh(
 	const std::vector<glm::vec3>& verts,
 	glm::vec3 color,
-	void (*drawFunction)(Mesh*, Camera*, void*)
+	void (*drawFunction)(Mesh*, Camera*)
 ) {
 	this->color = color;
 	this->drawFunc = drawFunction;
@@ -66,7 +66,7 @@ Mesh::~Mesh()
 void Mesh::draw(Camera* camera)
 {
 	if(drawFunc)
-		drawFunc(this, camera, parent_obj);
+		drawFunc(this, camera);
 }
 
 void Mesh::attachShader(Shader* shader)
@@ -99,7 +99,7 @@ void Mesh::getUVMap(const std::string& filepath)
 	file.close();
 }
 
-void Mesh::drawTriangles(Mesh* mesh, Camera* camera, void* obj)
+void Mesh::drawTriangles(Mesh* mesh, Camera* camera)
 {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
@@ -120,7 +120,7 @@ void Mesh::drawTriangles(Mesh* mesh, Camera* camera, void* obj)
 	glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
 }
 
-void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera, void* obj)
+void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera)
 {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat());

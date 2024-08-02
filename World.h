@@ -43,7 +43,7 @@ public:
 
 	int encodeChunkPos(Chunk* chunk);
 
-	static void drawWorld(Mesh* mesh, Camera* camera, void* obj);
+	static void drawWorld(Mesh* mesh, Camera* camera);
 };
 
 #endif

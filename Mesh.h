@@ -22,29 +22,29 @@ public:
 	unsigned int texture;
 	std::string uv_filepath;
 	glm::vec3 color;
-	void (*drawFunc)(Mesh* mesh, Camera* camera, void* obj);
+	void (*drawFunc)(Mesh* mesh, Camera* camera);
 
 	std::vector<glm::vec3> verts;
 	std::vector<int> instance_data;
 	std::vector<glm::vec2> uv_coords;
 
-	Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*, void*) = drawTriangles);
+	Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*) = drawTriangles);
 	Mesh(
 		const std::vector<glm::vec3>& verts,
 		unsigned int texture,
 		const std::string& uv_filepath,
-		void (*drawFunction)(Mesh*, Camera*, void*) = drawTriangles
+		void (*drawFunction)(Mesh*, Camera*) = drawTriangles
 	);
 	Mesh(
 		const std::vector<glm::vec3>& verts,
 		unsigned int texture,
 		const std::vector<glm::vec2>& uv_coords,
-		void (*drawFunc)(Mesh*, Camera*, void*) = drawTriangles
+		void (*drawFunc)(Mesh*, Camera*) = drawTriangles
 	);
 	Mesh(
 		const std::vector<glm::vec3>& verts,
 		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5),
-		void (*drawFunc)(Mesh*, Camera*, void*) = drawTriangles
+		void (*drawFunc)(Mesh*, Camera*) = drawTriangles
 	);
 	
 	~Mesh();
@@ -67,8 +67,8 @@ public:
 		const glm::vec3& color = glm::vec3(0.5, 0.5, 0.5)
 	);
 	
-	static void drawTriangles(Mesh* mesh, Camera* camera, void* obj);
-	static void drawInstancedStrip(Mesh* mesh, Camera* camera, void* obj);
+	static void drawTriangles(Mesh* mesh, Camera* camera);
+	static void drawInstancedStrip(Mesh* mesh, Camera* camera);
 };
 
 #endif

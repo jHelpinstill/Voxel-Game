@@ -14,7 +14,7 @@ void Decal::draw()
 {
 	//std::cout << "decal draw called" << std::endl;
 	if (drawFunc && window && awake)
-		drawFunc(this, window, attached_obj);
+		drawFunc(this, window);
 }
 
 glm::vec2 Decal::getScreenCoords()
@@ -37,7 +37,7 @@ glm::mat4 Decal::getMat(bool with_proj)
 	return mat;
 }
 
-void Decal::drawDefault(Decal* decal, GLFWwindow* window, void* obj)
+void Decal::drawDefault(Decal* decal, GLFWwindow* window)
 {
 	decal->shader->use();
 

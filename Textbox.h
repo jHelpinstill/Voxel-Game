@@ -20,7 +20,7 @@ public:
 	Textbox(const std::string& text, Font* font, Shader* shader, float scale, const glm::vec3 color)
 		: text(text), font(font), shader(shader), scale(scale), color(color) {}
 
-	static void drawTextbox(Decal* decal, GLFWwindow* window, void* obj);
+	static void drawTextbox(Decal* decal, GLFWwindow* window);
 };
 
 #endif
