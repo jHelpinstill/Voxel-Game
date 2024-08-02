@@ -47,6 +47,20 @@ void Game::setup()
 	crosshair->origin = glm::vec2(0.5f);
 	crosshair->adjustment = glm::vec2(0.5f);
 
+	//Decal* textbox_test = createDecal("textbox", "white_square", "decal_shader", glm::vec2(100, 200), glm::vec2(0, 50), window);
+	//textbox_test->origin = glm::vec2(0.5, 0);
+	//textbox_test->adjustment = glm::vec2(0.5, 0);
+	//textbox_test->drawFunc = Textbox::drawTextbox;
+	//textbox_test->attached_obj = new Textbox("This is a textbox with wrapping and now there's a lot more text to try to get it to wrap", getFontByName("arial"), getShaderByName("font_shader"), 0.5, glm::vec3(0));
+
+	Decal* pause_text = createDecal("pause_text", "white_square", "decal_shader", glm::vec2(475, 50), glm::vec2(0), window);
+	pause_text->origin = glm::vec2(0.5);
+	pause_text->adjustment = glm::vec2(0.5, 0.5);
+	pause_text->drawFunc = Textbox::drawTextbox;
+	pause_text->texture = 0;
+	pause_text->attached_obj = new Textbox("Game Paused", getFontByName("arial"), getShaderByName("font_shader"), 1.5, glm::vec3(1, 0, 0));
+	
+
 	world.setup();
 }
 
@@ -86,12 +100,14 @@ void Game::stateMachine(double dt)
 			state = RUNNING;
 			input->lockCursor();
 			std::cout << "RUNNING" << std::endl;
+			getDecalByName("pause_text")->awake = false;
+			getDecalByName("crosshair")->awake = true;
 		}
 		
-		//drawMeshes();
+		drawMeshes();
 		drawUI();
 
-		renderText("Game is running", "arial", "font_shader", window, glm::vec2(100, 100), 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		//renderText("Game is paused", getFontByName("arial"), getShaderByName("font_shader"), window, glm::vec2(100, 100), 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		break;
 	}
@@ -105,6 +121,8 @@ void Game::stateMachine(double dt)
 			std::cout << "PAUSED" << std::endl;
 			std::cout << "avg fps: " << avg_fps.avg() << std::endl;
 			std::cout << num_meshes << " meshes" << std::endl;
+			getDecalByName("pause_text")->awake = true;
+			getDecalByName("crosshair")->awake = false;
 		}
 		if (input->keyHeld(GLFW_KEY_LEFT_SHIFT))
 			player->move_speed = 40;

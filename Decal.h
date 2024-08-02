@@ -20,13 +20,16 @@ public:
 	GLFWwindow* window = nullptr;
 	void* attached_obj = nullptr;
 
+	bool awake = true;
+
 	void (*drawFunc)(Decal* decal, GLFWwindow* window, void* obj) = nullptr;
 
 	Decal(unsigned int texture, const glm::vec2& size, const glm::vec2& pos);
 	~Decal();
 
 	void draw();
-	glm::mat4 getMat();
+	glm::mat4 getMat(bool with_proj = true);
+	glm::vec2 getScreenCoords();
 	
 	static void drawDefault(Decal* decal, GLFWwindow* window, void* obj);
 };

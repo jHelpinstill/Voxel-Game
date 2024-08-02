@@ -5,8 +5,8 @@
 
 void renderText(
 	const std::string& text,
-	const std::string& font_nane,
-	const std::string& shader_name,
+	Font* font,
+	Shader* shader,
 	GLFWwindow* window,
 	const glm::vec2& pos,
 	float scale,

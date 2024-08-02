@@ -15,6 +15,7 @@
 #include "Debug.h"
 #include "Font.h"
 #include "RenderText.h"
+#include "Textbox.h"
 
 class Game
 {

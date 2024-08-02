@@ -153,6 +153,7 @@
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="RenderText.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Textbox.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TriangleMesh.cpp" />
     <ClCompile Include="util.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Decal.h" />
+    <ClInclude Include="Textbox.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TriangleMesh.h" />
     <ClInclude Include="util.h" />

@@ -1,6 +1,6 @@
 #include "Font.h"
 
-Font::Font(const std::string& font_filepath, int height)
+Font::Font(const std::string& font_filepath, int height) : height(height)
 {
 	FT_Library ft_lib;
 	if (FT_Init_FreeType(&ft_lib))
@@ -57,4 +57,16 @@ Font::Font(const std::string& font_filepath, int height)
 
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft_lib);
+}
+
+Font::Character Font::getCharacter(char c)
+{
+	try
+	{
+		return characters.at(c);
+	}
+	catch (std::out_of_range)
+	{
+		return Character{};
+	}
 }

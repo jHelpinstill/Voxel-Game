@@ -2,8 +2,8 @@
 
 void renderText(
 	const std::string& text,
-	const std::string& font_name,
-	const std::string& shader_name,
+	Font* font,
+	Shader* shader,
 	GLFWwindow* window,
 	const glm::vec2& pos,
 	float scale,
@@ -11,9 +11,6 @@ void renderText(
 ) {
 	VAO vao;
 	vao.makeFont();
-
-	Font* font = getFontByName(font_name);
-	Shader* shader = getShaderByName(shader_name);
 
 	shader->use();
 	shader->setVec3("text_color", color);
@@ -30,7 +27,7 @@ void renderText(
 	glActiveTexture(GL_TEXTURE0);
 	for (int i = 0; i < text.size(); i++)
 	{
-		Font::Character character = font->characters[text[i]];
+		Font::Character character = font->getCharacter(text[i]);
 
 		glm::vec2 c_pos = cursor;
 		c_pos.x += character.bearing.x * scale;
