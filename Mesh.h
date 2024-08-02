@@ -51,9 +51,6 @@ public:
 
 	void draw(Camera* camera);
 	void attachShader(Shader* shader);
-	//void deleteVAO();
-	//void remakeVAO();
-	//void generateInstancedVAO();
 
 	static Mesh* makeBox(
 		const glm::vec3& size,

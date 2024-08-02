@@ -6,6 +6,7 @@
 std::unordered_map<std::string, Mesh*> meshes;
 std::unordered_map<std::string, Shader*> shaders;
 std::unordered_map<std::string, unsigned int> textures;
+std::unordered_map<std::string, Decal*> decals;
 
 Shader* getShaderByName(const std::string& name)
 {
@@ -49,6 +50,20 @@ unsigned int getTextureByName(const std::string& name)
 	}
 }
 
+Decal* getDecalByName(const std::string& name)
+{
+	try
+	{
+		return decals.at(name);
+	}
+	catch (std::out_of_range)
+	{
+		std::cout << "WARNING: Tried to access nonexistent Decal \"" << name << "\"" << std::endl;
+		while (1)
+			;
+	}
+}
+
 void removeShader(const std::string& name)
 {
 	if (shaders.find(name) == shaders.end())
@@ -79,6 +94,17 @@ void removeTexture(const std::string& name)
 		return;
 	}
 	textures.erase(name);
+}
+void removeDecal(const std::string& name)
+{
+	if (decals.find(name) == decals.end())
+	{
+		//std::cout << "Tried to remove nonexistent mesh: \"" << name << "\"" << std::endl;
+		return;
+	}
+
+	delete decals.at(name);
+	decals.erase(name);
 }
 
 Shader* createShader(
@@ -120,4 +146,14 @@ unsigned int createTexture(const std::string& name, const std::string& filepath,
 
 	textures[name] = texture;
 	return texture;
+}
+
+Decal* createDecal(const std::string& name, const std::string& tex_name, const std::string& shader_name, const glm::vec2& size, const glm::vec2& pos, GLFWwindow* window)
+{
+	Decal* decal = new Decal(getTextureByName(tex_name), size, pos);
+	decal->shader = getShaderByName(shader_name);
+	decal->window = window;
+	decals[name] = decal;
+
+	return decal;
 }

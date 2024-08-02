@@ -28,7 +28,8 @@ void printFileToTerminal(const std::string& filename, bool printname = false);
 
 double getDeltaTime(double fps_limit = 0.0);
 
-std::string vec2string(const glm::vec3 vec);
+std::string vec2string(const glm::vec3& vec);
+std::string mat2string(const glm::mat4& mat);
 
 float max2(float a, float b);
 

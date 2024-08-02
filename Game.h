@@ -11,7 +11,7 @@
 #include "util.h"
 #include "ObjectManager.h"
 #include "World.h"
-#include "HUDElement.h"
+#include "Decal.h"
 #include "Debug.h"
 
 class Game
@@ -30,7 +30,6 @@ public:
 	Camera* camera;
 	CameraController* player;
 	World world;
-	std::unordered_map<std::string, HUDElement*> hud_elements;
 	
 
 	Game(GLFWwindow* window);

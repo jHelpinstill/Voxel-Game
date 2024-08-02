@@ -2,7 +2,6 @@
 
 void VAO::bind()
 {
-	glGenVertexArrays(1, &ID);
 	glBindVertexArray(ID);
 }
 
@@ -28,6 +27,7 @@ void VAO::makeTextured(const std::vector<glm::vec3>& verts, const std::vector<gl
 		data.push_back(uv_coords[vert].y);
 	}
 
+	glGenVertexArrays(1, &ID);
 	bind();
 
 	glGenBuffers(1, &verts_VBO);
@@ -57,6 +57,7 @@ void VAO::makeSolidColored(const std::vector<glm::vec3>& verts, const glm::vec3&
 			data.push_back(vert[i]);
 	}
 
+	glGenVertexArrays(1, &ID);
 	bind();
 
 	glGenBuffers(1, &verts_VBO);
@@ -82,6 +83,7 @@ void VAO::makeInstanced(const std::vector<glm::vec3>& verts, const std::vector<i
 			vert_data.push_back(verts[vert][i]);
 	}
 
+	glGenVertexArrays(1, &ID);
 	bind();
 
 	glGenBuffers(1, &verts_VBO);
@@ -104,11 +106,49 @@ void VAO::makeInstanced(const std::vector<glm::vec3>& verts, const std::vector<i
 	glEnableVertexAttribArray(1);
 }
 
+void VAO::makeDecal()
+{
+	reset();
+
+	style = Style::DECAL;
+
+	std::vector<float> data;
+	const glm::vec2 verts[4] =
+	{
+		glm::vec2(0, 0),
+		glm::vec2(1, 0),
+		glm::vec2(0, 1),
+		glm::vec2(1, 1)
+	};
+
+	for (int i = 0; i < 4; i++)
+	{
+		data.push_back(verts[i].x);
+		data.push_back(verts[i].y);
+		data.push_back(verts[i].x);
+		data.push_back(verts[i].y);
+	}
+
+	glGenVertexArrays(1, &ID);
+	bind();
+
+	glGenBuffers(1, &verts_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, verts_VBO);
+	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_DYNAMIC_DRAW);
+
+	int stride = 4 * sizeof(float);
+
+	// position/texture vec4 (posx, posy, uvx, uvy)
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, stride, (void*)0);
+	glEnableVertexAttribArray(0);
+}
+
 void VAO::reset()
 {
 	switch(style)
 	{
 	case Style::INSTANCED:
+	case Style::DECAL:
 		glDeleteBuffers(1, &data_VBO);
 	default:
 		glDeleteVertexArrays(1, &ID);

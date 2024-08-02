@@ -28,7 +28,7 @@ void Game::setup()
 	createShader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
 	createShader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
 	createShader("chunk_shader", "shaders/chunkVertex.txt", "shaders/meshFragment.txt");
-	createShader("solid_UI_shader", "shaders/UIColorVertex.txt", "shaders/UIColorFragment.txt");
+	createShader("decal_shader", "shaders/DecalVertex.txt", "shaders/DecalFragment.txt");
 
 	createTexture("smiley", "textures/smiley.png", true);
 	createTexture("crate", "textures/crate.jpg");
@@ -39,16 +39,10 @@ void Game::setup()
 	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 3, 2), "crate", "meshes/box_two_face_UV.txt");
 	createTexturedBox("test_block", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), "crate", "meshes/box_two_face_UV.txt");
 
-	//HUDElement* crosshair = new HUDElement();
-	//hud_elements["crosshair"] = crosshair;
-	//crosshair->shader = getShaderByName("solid_UI_shader");
-	//crosshair->addRect(-0.007, -0.007, 0.014, 0.014);
-	//crosshair->createVAO();
-	//crosshair->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
+	Decal* test = createDecal("test_decal", "crate", "decal_shader", glm::vec2(300, 200), glm::vec2(0), window);
+	test->drawFunc = Decal::drawCentered;
 
 	world.setup();
-
-	glEnable(GL_CULL_FACE);
 }
 
 #define AVG_FPS_HISTORY_SIZE 100
@@ -89,7 +83,7 @@ void Game::stateMachine(double dt)
 			std::cout << "RUNNING" << std::endl;
 		}
 		
-		drawMeshes();
+		//drawMeshes();
 		drawUI();
 
 		break;
@@ -124,6 +118,7 @@ void Game::stateMachine(double dt)
 
 void Game::drawMeshes()
 {
+	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	for (auto& mesh : meshes)
 		mesh.second->draw(camera);
@@ -131,7 +126,8 @@ void Game::drawMeshes()
 
 void Game::drawUI()
 {
+	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
-	for (auto& hud_elem : hud_elements)
-		hud_elem.second->draw();
+	for (auto& decal : decals)
+		decal.second->draw();
 }

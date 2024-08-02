@@ -63,13 +63,16 @@
     <ClCompile Include="world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HUDElement.cpp">
+    <ClCompile Include="Decal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VAO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChunkManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,7 +119,7 @@
     <ClInclude Include="ObjectManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HUDElement.h">
+    <ClInclude Include="Decal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VAO.h">
@@ -126,6 +129,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChunkManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -141,8 +147,8 @@
     <Text Include="shaders\chunkVertex.txt" />
     <Text Include="shaders\worldVertex.txt" />
     <Text Include="shaders\worldFragment.txt" />
-    <Text Include="shaders\UIColorVertex.txt" />
-    <Text Include="shaders\UIColorFragment.txt" />
+    <Text Include="shaders\DecalVertex.txt" />
+    <Text Include="shaders\DecalFragment.txt" />
     <Text Include="shaders\worldColorFragment.txt" />
   </ItemGroup>
 </Project>

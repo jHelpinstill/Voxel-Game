@@ -43,7 +43,7 @@ int main()
 		if (window_resized)
 		{
 			window_resized = false;
-			game.camera->findAspectRatio(window);//camera.findAspectRatio(window);
+			game.camera->findAspectRatio(window);
 		}
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
