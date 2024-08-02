@@ -33,14 +33,15 @@ void Game::setup()
 	createTexture("smiley", "textures/smiley.png", true);
 	createTexture("crate", "textures/crate.jpg");
 	createTexture("chunk_texture", "textures/dirt_block.png", true);
+	createTexture("white_square", "textures/white_square.png", true);
 
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 3, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 3, -2), "crate", "meshes/box_two_face_UV.txt");
 	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 3, 2), "crate", "meshes/box_two_face_UV.txt");
 	createTexturedBox("test_block", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), "crate", "meshes/box_two_face_UV.txt");
 
-	Decal* test = createDecal("test_decal", "crate", "decal_shader", glm::vec2(300, 200), glm::vec2(0), window);
-	test->drawFunc = Decal::drawCentered;
+	Decal* crosshair = createDecal("crosshair", "white_square", "decal_shader", glm::vec2(3), glm::vec2(0), window);
+	crosshair->drawFunc = Decal::drawCentered;
 
 	world.setup();
 }
