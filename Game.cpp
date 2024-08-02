@@ -29,6 +29,7 @@ void Game::setup()
 	createShader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
 	createShader("chunk_shader", "shaders/chunkVertex.txt", "shaders/meshFragment.txt");
 	createShader("decal_shader", "shaders/DecalVertex.txt", "shaders/DecalFragment.txt");
+	createShader("font_shader", "shaders/FontVertex.txt", "shaders/FontFragment.txt");
 
 	createTexture("smiley", "textures/smiley.png", true);
 	createTexture("crate", "textures/crate.jpg");
@@ -40,8 +41,11 @@ void Game::setup()
 	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 3, 2), "crate", "meshes/box_two_face_UV.txt");
 	createTexturedBox("test_block", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), "crate", "meshes/box_two_face_UV.txt");
 
+	fonts["arial"] = new Font("fonts/arial.ttf", 48);
+
 	Decal* crosshair = createDecal("crosshair", "white_square", "decal_shader", glm::vec2(3), glm::vec2(0), window);
-	crosshair->drawFunc = Decal::drawCentered;
+	crosshair->origin = glm::vec2(0.5f);
+	crosshair->adjustment = glm::vec2(0.5f);
 
 	world.setup();
 }
@@ -86,6 +90,8 @@ void Game::stateMachine(double dt)
 		
 		//drawMeshes();
 		drawUI();
+
+		renderText("Game is running", "arial", "font_shader", window, glm::vec2(100, 100), 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		break;
 	}

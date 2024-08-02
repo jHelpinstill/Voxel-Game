@@ -7,6 +7,7 @@ std::unordered_map<std::string, Mesh*> meshes;
 std::unordered_map<std::string, Shader*> shaders;
 std::unordered_map<std::string, unsigned int> textures;
 std::unordered_map<std::string, Decal*> decals;
+std::unordered_map<std::string, Font*> fonts;
 
 Shader* getShaderByName(const std::string& name)
 {
@@ -64,6 +65,20 @@ Decal* getDecalByName(const std::string& name)
 	}
 }
 
+Font* getFontByName(const std::string& name)
+{
+	try
+	{
+		return fonts.at(name);
+	}
+	catch (std::out_of_range)
+	{
+		std::cout << "WARNING: Tried to access nonexistent Font \"" << name << "\"" << std::endl;
+		while (1)
+			;
+	}
+}
+
 void removeShader(const std::string& name)
 {
 	if (shaders.find(name) == shaders.end())
@@ -105,6 +120,18 @@ void removeDecal(const std::string& name)
 
 	delete decals.at(name);
 	decals.erase(name);
+}
+
+void removeFont(const std::string& name)
+{
+	if (fonts.find(name) == fonts.end())
+	{
+		//std::cout << "Tried to remove nonexistent mesh: \"" << name << "\"" << std::endl;
+		return;
+	}
+
+	delete fonts.at(name);
+	fonts.erase(name);
 }
 
 Shader* createShader(

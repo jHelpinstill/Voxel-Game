@@ -5,21 +5,25 @@
 #include "config.h"
 #include "Mesh.h"
 #include "Decal.h"
+#include "Font.h"
 
 extern std::unordered_map<std::string, Mesh*> meshes;
 extern std::unordered_map<std::string, Shader*> shaders;
 extern std::unordered_map<std::string, unsigned int> textures;
 extern std::unordered_map<std::string, Decal*> decals;
+extern std::unordered_map<std::string, Font*> fonts;
 
 Shader* getShaderByName(const std::string& name);
 Mesh* getMeshByName(const std::string& name);
 unsigned int getTextureByName(const std::string& name);
 Decal* getDecalByName(const std::string& name);
+Font* getFontByName(const std::string& name);
 
 void removeShader(const std::string& name);
 void removeMesh(const std::string& name);
 void removeTexture(const std::string& name);
 void removeDecal(const std::string& name);
+void removeFont(const std::string& name);
 
 Shader* createShader(
 	const std::string& name,

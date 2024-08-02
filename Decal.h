@@ -15,8 +15,10 @@ public:
 	unsigned int texture;
 	glm::vec2 size;
 	glm::vec2 pos;
+	glm::vec2 origin;
+	glm::vec2 adjustment;
 	GLFWwindow* window = nullptr;
-	void* parent_obj = nullptr;
+	void* attached_obj = nullptr;
 
 	void (*drawFunc)(Decal* decal, GLFWwindow* window, void* obj) = nullptr;
 
@@ -24,10 +26,9 @@ public:
 	~Decal();
 
 	void draw();
+	glm::mat4 getMat();
 	
-	static void drawRelative(Decal* decal, GLFWwindow* window, void* obj);
-	static void drawAbsolute(Decal* decal, GLFWwindow* window, void* obj);
-	static void drawCentered(Decal* decal, GLFWwindow* window, void* obj);
+	static void drawDefault(Decal* decal, GLFWwindow* window, void* obj);
 };
 
 #endif

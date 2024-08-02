@@ -13,6 +13,7 @@ public:
 		SOLID_COLORED,
 		INSTANCED,
 		DECAL,
+		FONT,
 		NONE
 	} style;
 	unsigned int ID, verts_VBO, data_VBO;
@@ -26,6 +27,7 @@ public:
 	void makeSolidColored(const std::vector<glm::vec3>& verts, const glm::vec3& color);
 	void makeInstanced(const std::vector<glm::vec3>& verts, const std::vector<int>& instance_data);
 	void makeDecal();
+	void makeFont();
 
 	void reset();
 };

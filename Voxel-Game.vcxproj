@@ -114,7 +114,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\dependencies\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,6 +142,7 @@
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkManager.cpp" />
     <ClCompile Include="Debug.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Decal.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshPrimitives.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="RenderText.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TriangleMesh.cpp" />
@@ -165,9 +167,11 @@
     <ClInclude Include="ChunkManager.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="RenderText.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Decal.h" />
@@ -180,6 +184,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\chunkVertex.txt" />
+    <Text Include="shaders\FontFragment.txt" />
+    <Text Include="shaders\FontVertex.txt" />
     <Text Include="shaders\meshColorFragment.txt" />
     <Text Include="shaders\meshFragment.txt" />
     <Text Include="shaders\meshVertex.txt" />

@@ -13,6 +13,8 @@
 #include "World.h"
 #include "Decal.h"
 #include "Debug.h"
+#include "Font.h"
+#include "RenderText.h"
 
 class Game
 {
