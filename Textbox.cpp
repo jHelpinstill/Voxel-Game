@@ -16,6 +16,11 @@ void Textbox::drawTextbox(Decal* decal, GLFWwindow* window)
 		int i = 0;
 		while (start + i < textbox->text.size())
 		{
+			if (textbox->text[start + i] == '\n')
+			{
+				i++;
+				break;
+			}
 			current_width += textbox->font->getCharacter(textbox->text[start + i]).advance * textbox->scale / 64;
 			i++;
 			if (current_width >= decal->size.x)

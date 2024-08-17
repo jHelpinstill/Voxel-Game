@@ -1,0 +1,62 @@
+#version 460 core
+
+layout (location=0) in vec3 vertex_pos;
+layout (location=1) in vec2 in_tex_coord;
+layout (location=2) in int instance_data;
+
+out vec2 tex_coord;
+
+uniform mat4 projection;
+uniform float unit_length;
+
+void main()
+{
+	int data = instance_data;
+	int xi = data & 31;
+	int yi = (data >> 5) & 31;
+	int zi = (data >> 10) & 31;
+	int face = (data >> 15) & 7;
+	int tex_id = (data >> 18) & 1;
+
+	float x = float(xi);
+	float y = float(yi);
+	float z = float(zi);
+	vec3 offset = vec3(x, y, z);
+	
+	vec3 pos = vertex_pos;
+	switch(face)
+	{
+	case 0:
+		break;
+	case 1:
+		pos.y++;
+		pos.xz = pos.zx;
+		break;
+	case 2:
+		pos.xy = pos.yx;
+		pos.yz = pos.zy;
+		break;
+	case 3:
+		pos.xy = pos.yx;
+		pos.x++;
+		break;
+	case 4:
+		pos.yz = pos.zy;
+		pos.xy = pos.yx;
+		break;
+	case 5:
+		pos.yz = pos.zy;
+		pos.z++;
+		break;
+	}
+
+	pos = pos + offset;
+	pos *= unit_length;
+
+	vec2 tc = in_tex_coord;
+	if(tex_id == 1)
+		tc.x += 0.5;
+
+	gl_Position = projection * vec4(pos, 1.0);
+	tex_coord = tc;
+}

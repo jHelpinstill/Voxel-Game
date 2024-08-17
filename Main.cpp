@@ -2,6 +2,8 @@
 #include "util.h"
 #include "Game.h"
 
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+
 bool window_resized = false;
 
 void windowSizeCallback(GLFWwindow* window, int width, int height)

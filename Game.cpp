@@ -47,11 +47,11 @@ void Game::setup()
 	crosshair->origin = glm::vec2(0.5f);
 	crosshair->adjustment = glm::vec2(0.5f);
 
-	Decal* textbox_test = createDecal("textbox", "white_square", "decal_shader", glm::vec2(100, 200), glm::vec2(0, 50), window);
-	textbox_test->origin = glm::vec2(0.5, 0);
-	textbox_test->adjustment = glm::vec2(0.5, 0);
+	Decal* textbox_test = createDecal("textbox", "white_square", "decal_shader", glm::vec2(200, 350), glm::vec2(25, 0), window);
+	textbox_test->origin = glm::vec2(0, 0.5);
+	textbox_test->adjustment = glm::vec2(0, 0.5);
 	textbox_test->drawFunc = Textbox::drawTextbox;
-	textbox_test->attached_obj = new Textbox("This is a textbox with wrapping and now there's a lot more text to try to get it to wrap", getFontByName("arial"), getShaderByName("font_shader"), 0.5, glm::vec3(0));
+	textbox_test->attached_obj = new Textbox("-Controls-\n\nESC: pause\n\nW,A,S,D: move\n\nspace,ctrl: up/down\n\nshift: sprint\n\nleft click: mine block\n\nright click: place block\n\nQ: placement mode", getFontByName("arial"), getShaderByName("font_shader"), 0.4, glm::vec3(0));
 
 	Decal* pause_text = createDecal("pause_text", "white_square", "decal_shader", glm::vec2(475, 50), glm::vec2(0), window);
 	pause_text->origin = glm::vec2(0.5);
@@ -102,6 +102,7 @@ void Game::stateMachine(double dt)
 			std::cout << "RUNNING" << std::endl;
 			getDecalByName("pause_text")->awake = false;
 			getDecalByName("crosshair")->awake = true;
+			getDecalByName("textbox")->awake = false;
 		}
 		
 		drawMeshes();
@@ -123,6 +124,7 @@ void Game::stateMachine(double dt)
 			std::cout << num_meshes << " meshes" << std::endl;
 			getDecalByName("pause_text")->awake = true;
 			getDecalByName("crosshair")->awake = false;
+			getDecalByName("textbox")->awake = true;
 		}
 		if (input->keyHeld(GLFW_KEY_LEFT_SHIFT))
 			player->move_speed = 40;

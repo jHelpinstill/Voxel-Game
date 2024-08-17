@@ -27,6 +27,11 @@ void renderText(
 	glActiveTexture(GL_TEXTURE0);
 	for (int i = 0; i < text.size(); i++)
 	{
+		switch (text[i])
+		{
+		case '\n':
+			continue;
+		}
 		Font::Character character = font->getCharacter(text[i]);
 
 		glm::vec2 c_pos = cursor;
