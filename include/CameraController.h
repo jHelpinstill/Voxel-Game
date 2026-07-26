@@ -8,8 +8,8 @@
 
 class CameraController {
 private:
-	Input* input;
-	Camera* camera;
+	Input *input;
+	Camera *camera;
 	
 	bool constrain_up = false;
 	glm::vec3 up_vec;

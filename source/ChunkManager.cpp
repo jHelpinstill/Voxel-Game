@@ -5,14 +5,14 @@ bool ChunkManager::add(int x, int y, int z) {
 	if (chunks.find(key) != chunks.end()) {
 		return false;
 	}
-	Chunk* chunk = new Chunk(x, y, z, std::rand(), shader_info, unit_length);
+	Chunk *chunk = new Chunk(x, y, z, std::rand(), shader_info, unit_length);
 	chunks[key] = chunk;
 	bvh.root->addDataNode((glm::vec3(x, y, z) + glm::vec3(0.5)) * (float)CHUNK_SIZE * unit_length, chunk); // position is center of chunk to prevent floating point errors
 	bvh.rebuild();
 	return true;
 }
 
-Chunk* ChunkManager::get(const glm::vec3 &pos) {
+Chunk *ChunkManager::get(const glm::vec3 &pos) {
 	glm::vec3 block_pos = pos / unit_length;
 	int x, y, z;
 	x = floor(block_pos.x / CHUNK_SIZE);
@@ -22,7 +22,7 @@ Chunk* ChunkManager::get(const glm::vec3 &pos) {
 	return get(x, y, z);
 }
 
-Chunk* ChunkManager::get(int x, int y, int z) {
+Chunk *ChunkManager::get(int x, int y, int z) {
 	Chunk::Key key(x, y, z);
 	if (chunks.find(key) != chunks.end())
 		return chunks[key];
@@ -30,7 +30,7 @@ Chunk* ChunkManager::get(int x, int y, int z) {
 	return nullptr;
 }
 
-Chunk* ChunkManager::getNeighbor(Chunk* chunk, int face) {
+Chunk *ChunkManager::getNeighbor(Chunk *chunk, int face) {
 	int x = chunk->x; int y = chunk->y; int z = chunk->z;
 	switch (face) {
 		case 0: return get(x, y + 1, z);
@@ -43,7 +43,7 @@ Chunk* ChunkManager::getNeighbor(Chunk* chunk, int face) {
 	}
 }
 
-Chunk::Group ChunkManager::getNeighbors(Chunk* chunk) {
+Chunk::Group ChunkManager::getNeighbors(Chunk *chunk) {
 	Chunk::Group neighbors(6);
 	int x = chunk->x; int y = chunk->y; int z = chunk->z;
 
@@ -76,10 +76,10 @@ ChunkManager::RaycastResult ChunkManager::raycast(const glm::vec3 &pos, const gl
 	return result;
 }
 
-bool ChunkManager::raycastChunk(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &chunk_pos, Chunk** chunk) {
+bool ChunkManager::raycastChunk(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &chunk_pos, Chunk **chunk) {
 	return (*chunk)->raycast(pos, ray).hit;
 }
-void ChunkManager::expandToFitChunk(const glm::vec3 &pos, Chunk** chunk, glm::vec3 &min, glm::vec3 &max) {
+void ChunkManager::expandToFitChunk(const glm::vec3 &pos, Chunk **chunk, glm::vec3 &min, glm::vec3 &max) {
 	glm::vec3 half_diameter = util::XYZ * (float)CHUNK_SIZE * (*chunk)->unit_length * 0.5f;
 	min = glm::min(min, pos - half_diameter);
 	max = glm::max(max, pos + half_diameter);

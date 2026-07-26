@@ -1,10 +1,10 @@
 #include "Textbox.h"
 
-void Textbox::drawTextbox(Decal* decal, GLFWwindow* window) {
+void Textbox::drawTextbox(Decal *decal, GLFWwindow *window) {
 	if(decal->texture)
 		Decal::drawDefault(decal, window);
 
-	Textbox* textbox = (Textbox*)decal->attached_obj;
+	Textbox *textbox = (Textbox*)decal->attached_obj;
 
 	glm::vec2 cursor = decal->getScreenCoords();
 	cursor.y += decal->size.y;

@@ -10,16 +10,16 @@
 
 class Textbox {
 public:
-	Font* font;
-	Shader* shader;
+	Font *font;
+	Shader *shader;
 	std::string text;
 	float scale;
 	glm::vec3 color;
 
-	Textbox(const std::string &text, Font* font, Shader* shader, float scale, const glm::vec3 color)
+	Textbox(const std::string &text, Font *font, Shader *shader, float scale, const glm::vec3 color)
 		: text(text), font(font), shader(shader), scale(scale), color(color) {}
 
-	static void drawTextbox(Decal* decal, GLFWwindow* window);
+	static void drawTextbox(Decal *decal, GLFWwindow *window);
 };
 
 #endif

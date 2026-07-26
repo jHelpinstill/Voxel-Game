@@ -77,7 +77,7 @@ unsigned int Shader::makeModule(const std::string &filepath, unsigned int module
 	std::string shader_string = buffered_lines.str();
 	replaceDefines(shader_string);
 
-	const char* shader_src = shader_string.c_str();
+	const char *shader_src = shader_string.c_str();
 	file.close();
 
 	unsigned int shader_module = glCreateShader(module_type);

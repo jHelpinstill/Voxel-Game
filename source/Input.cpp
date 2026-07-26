@@ -1,6 +1,6 @@
 #include "Input.h"
 
-Input::Input(GLFWwindow* window) {
+Input::Input(GLFWwindow *window) {
 	this->window = window;
 	objects.push_back(this);
 
@@ -62,13 +62,13 @@ void Input::freeCursor() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
-void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void Input::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	//std::cout << key << std::endl;
 
 	if (action == GLFW_REPEAT)
 		return;
 
-	for (Input* input : objects) {
+	for (Input *input : objects) {
 		if (input->window == window) {
 			input->keys[key].state = action;
 			break;
@@ -76,8 +76,8 @@ void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 	}
 }
 
-void Input::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-	for (Input* input : objects) {
+void Input::mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
+	for (Input *input : objects) {
 		if (input->window == window) {
 			input->mouse.buttons[button].state = action;
 			break;

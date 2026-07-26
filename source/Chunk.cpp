@@ -88,7 +88,7 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 				};
 
 				for (int dir = 0; dir < 6; dir++) {
-					BlockType* block = nullptr;
+					BlockType *block = nullptr;
 
 					if (inside_boundaries[dir])
 						block = &blocks(surrounding_block_coords[dir][0], surrounding_block_coords[dir][1], surrounding_block_coords[dir][2]);
@@ -156,13 +156,13 @@ Chunk::RaycastResult Chunk::raycast(const glm::vec3 &pos, const glm::vec3 &ray) 
 	return result;
 }
 
-bool Chunk::raycastFace(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &face_pos, Face* face) {
+bool Chunk::raycastFace(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &face_pos, Face *face) {
 	//td::cout << "raycastFace called with face direction: " << *face << std::endl;
 	Quad quad(face_pos, face->norm);
 	return rayIntersectsPoly(pos, ray, quad.verts, 4, util::PolyCulling::CCW);
 }
 
-void Chunk::expandToFitFace(const glm::vec3 &pos, Face* face, glm::vec3 &min, glm::vec3 &max) {
+void Chunk::expandToFitFace(const glm::vec3 &pos, Face *face, glm::vec3 &min, glm::vec3 &max) {
 	glm::vec3 face_min, face_max;
 	switch (face->norm) {
 	case 0:
@@ -213,7 +213,7 @@ Chunk::Group::Group(Group &&other) noexcept
 	other.size = 0;
 }
 
-Chunk* &Chunk::Group::operator[](int i) {
+Chunk *&Chunk::Group::operator[](int i) {
 	return chunks[i];
 }
 
@@ -231,11 +231,11 @@ BlockType &Chunk::Blocks::operator()(int x, int y, int z) {
 	return data[x + CHUNK_SIZE * y + CHUNK_AREA * z];
 }
 
-int Chunk::Blocks::getIndex(BlockType* block) {
+int Chunk::Blocks::getIndex(BlockType *block) {
 	return (block - data);
 }
 
-bool Chunk::Blocks::getCoords(BlockType* block, int &x, int &y, int &z) {
+bool Chunk::Blocks::getCoords(BlockType *block, int &x, int &y, int &z) {
 	int i = getIndex(block);
 	if (i < 0 || i >= CHUNK_VOLUME)
 		return false;
@@ -246,7 +246,7 @@ bool Chunk::Blocks::getCoords(BlockType* block, int &x, int &y, int &z) {
 	return true;
 }
 
-bool Chunk::Blocks::onBoundary(BlockType* block, int* face) {
+bool Chunk::Blocks::onBoundary(BlockType *block, int *face) {
 	int x, y, z;
 	if (!getCoords(block, x, y, z))
 		return true;
@@ -285,7 +285,7 @@ bool Chunk::Blocks::onBoundary(BlockType* block, int* face) {
 	return false;
 }
 
-BlockType* Chunk::Blocks::getNeighbor(BlockType* block, int face, int dist) {
+BlockType *Chunk::Blocks::getNeighbor(BlockType *block, int face, int dist) {
 	int x, y, z;
 	if (!getCoords(block, x, y, z))
 		return nullptr;

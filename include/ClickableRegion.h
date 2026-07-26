@@ -8,14 +8,14 @@
 #include "Input.h"
 
 class ClickableRegion {
-	Decal* decal;
-	void* attached_obj;
+	Decal *decal;
+	void *attached_obj;
 
-	void (*actionFunc)(ClickableRegion* cr, Input* input);
+	void (*actionFunc)(ClickableRegion *cr, Input *input);
 
 	ClickableRegion() {}
 
-	void performAction(Input* input);
+	void performAction(Input *input);
 
 };
 

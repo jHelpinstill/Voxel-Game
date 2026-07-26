@@ -2,7 +2,7 @@
 
 void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string &mesh_name) {
 	if (cast.hit) {
-		Mesh* test_block = getMeshByName(mesh_name);
+		Mesh *test_block = getMeshByName(mesh_name);
 		float length = cast.chunk->unit_length;
 		static glm::vec3 offset[6] = {
 			glm::vec3(0, length, 0),
@@ -16,7 +16,7 @@ void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string &me
 	}
 }
 
-void printBlockInfo(BlockType* block, Chunk* chunk) {
+void printBlockInfo(BlockType *block, Chunk *chunk) {
 	std::cout << "block data:  " << std::endl;
 	std::cout << "\ttype:      " << getBlockName(*block) << std::endl;
 	int x, y, z; chunk->blocks.getCoords(block, x, y, z);
@@ -50,7 +50,7 @@ void traceBVHface(BVH<Chunk::Face> &bvh) {
 	std::cout << std::endl;
 }
 
-void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface &monitor) {
+void traceBVHface(BVH<Chunk::Face>::Box *box, MonitorBVHface &monitor) {
 	monitor.num_boxes++;
 	if (!box->data)
 		monitor.boxes_without_data++;
@@ -58,7 +58,7 @@ void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface &monitor) {
 		monitor.num_leaf_boxes++;
 
 		int num_data_nodes = 0;
-		BVH<Chunk::Face>::DataNode* node = box->data;
+		BVH<Chunk::Face>::DataNode *node = box->data;
 		while (node) {
 			monitor.num_faces[node->obj.norm]++;
 			num_data_nodes++;
@@ -102,7 +102,7 @@ void traceBVHchunk(BVH<Chunk*> &bvh) {
 	std::cout << "avg data nodes: " << monitor.avg_data_nodes << "\n" << std::endl;
 }
 
-void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk &monitor) {
+void traceBVHchunk(BVH<Chunk*>::Box *box, MonitorBVHchunk &monitor) {
 	monitor.num_boxes++;
 	if (!box->data)
 		monitor.boxes_without_data++;
@@ -110,7 +110,7 @@ void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk &monitor) {
 		monitor.num_leaf_boxes++;
 
 		int num_data_nodes = 0;
-		BVH<Chunk*>::DataNode* node = box->data;
+		BVH<Chunk*>::DataNode *node = box->data;
 		while (node) {
 			num_data_nodes++;
 			node = node->next;

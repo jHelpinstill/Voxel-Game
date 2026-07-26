@@ -6,7 +6,7 @@
 
 class Input {
 private:
-	GLFWwindow* window;
+	GLFWwindow *window;
 	struct Key  {
 		int state, prev_state;
 		bool pressed, held, released;
@@ -29,7 +29,7 @@ public:
 
 	} mouse;
 
-	Input(GLFWwindow* window);
+	Input(GLFWwindow *window);
 
 	void update();
 
@@ -40,8 +40,8 @@ public:
 	void lockCursor();
 	void freeCursor();
 
-	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+	static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+	static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
 };
 
 #endif

@@ -9,7 +9,7 @@
 
 void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string &mesh_name);
 
-void printBlockInfo(BlockType* block, Chunk* chunk);
+void printBlockInfo(BlockType *block, Chunk *chunk);
 
 struct MonitorBVHface {
 	int boxes_without_data;
@@ -26,7 +26,7 @@ struct MonitorBVHface {
 };
 
 void traceBVHface(BVH<Chunk::Face> &bvh);
-void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface &monitor);
+void traceBVHface(BVH<Chunk::Face>::Box *box, MonitorBVHface &monitor);
 
 struct MonitorBVHchunk {
 	int boxes_without_data;
@@ -41,6 +41,6 @@ struct MonitorBVHchunk {
 };
 
 void traceBVHchunk(BVH<Chunk*> &bvh);
-void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk &monitor);
+void traceBVHchunk(BVH<Chunk*>::Box *box, MonitorBVHchunk &monitor);
 
 #endif

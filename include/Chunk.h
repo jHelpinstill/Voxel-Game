@@ -39,7 +39,7 @@ public:
 	// Group allows the easiy manipulation of collections of chunks. 
 	class Group {
 	public:
-		Chunk** chunks;
+		Chunk **chunks;
 		int size;
 
 		Group() : chunks(nullptr), size(0) {}	// default ctor (constructor)
@@ -47,7 +47,7 @@ public:
 		Group(const Group &other);				// copy ctor
 		Group(Group &&other) noexcept;			// move ctor
 
-		Chunk* &operator[](int i);
+		Chunk *&operator[](int i);
 
 		~Group();
 	};
@@ -58,11 +58,11 @@ public:
 		BlockType &operator[](int index);
 		BlockType &operator()(int x, int y, int z);
 
-		int getIndex(BlockType* block);
-		bool getCoords(BlockType* block, int &x, int &y, int &z);
-		bool onBoundary(BlockType* block, int* face = nullptr);
+		int getIndex(BlockType *block);
+		bool getCoords(BlockType *block, int &x, int &y, int &z);
+		bool onBoundary(BlockType *block, int *face = nullptr);
 
-		BlockType* getNeighbor(BlockType* block, int face, int dist = 1);
+		BlockType *getNeighbor(BlockType *block, int face, int dist = 1);
 	} blocks;
 
 	int x, y, z, ID, faces;
@@ -75,12 +75,12 @@ public:
 	
 	// face type containes pointer to parent block, and the direction of the face
 	struct Face {
-		BlockType* block;
+		BlockType *block;
 		int norm;
 	};
 	BVH<Face> faces_BVH;	// Bounded Volume Hierarchy of faces is used to retrieve a block pointer through raycasting
-	static bool raycastFace(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &face_pos, Face* face);
-	static void expandToFitFace(const glm::vec3 &pos, Face* face, glm::vec3 &min, glm::vec3 &max);
+	static bool raycastFace(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &face_pos, Face *face);
+	static void expandToFitFace(const glm::vec3 &pos, Face *face, glm::vec3 &min, glm::vec3 &max);
 
 	typedef BVH<Face>::RaycastResult RaycastResult;
 	RaycastResult raycast(const glm::vec3 &pos, const glm::vec3 &ray);

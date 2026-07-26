@@ -10,18 +10,18 @@
 
 class Mesh {
 public:
-	VAO* vao = nullptr;
+	VAO *vao = nullptr;
 	void getUVMap(const std::string &filepath);
 
 	Transform transform;
-	Shader* shader;
-	void* parent_obj = nullptr;
+	Shader *shader;
+	void *parent_obj = nullptr;
 
 	VAO::Style style;
 	unsigned int texture;
 	std::string uv_filepath;
 	glm::vec3 color;
-	void (*drawFunc)(Mesh* mesh, Camera* camera);
+	void (*drawFunc)(Mesh *mesh, Camera *camera);
 
 	std::vector<glm::vec3> verts;
 	std::vector<int> instance_data;
@@ -48,17 +48,17 @@ public:
 	
 	~Mesh();
 
-	void draw(Camera* camera);
-	void attachShader(Shader* shader);
+	void draw(Camera *camera);
+	void attachShader(Shader *shader);
 
-	static Mesh* makeBox(
+	static Mesh *makeBox(
 		const glm::vec3 &size,
 		unsigned int texture,
 		const std::string &uv_filepath,
 		const glm::vec3 &pos = glm::vec3(0, 0, 0),
 		const glm::vec3 &color = glm::vec3(0.5, 0.5, 0.5)
 	);
-	static Mesh* makePlane(
+	static Mesh *makePlane(
 		const glm::vec2 &size,
 		unsigned int texture,
 		const std::string &uv_filepath,
@@ -66,8 +66,8 @@ public:
 		const glm::vec3 &color = glm::vec3(0.5, 0.5, 0.5)
 	);
 	
-	static void drawTriangles(Mesh* mesh, Camera* camera);
-	static void drawInstancedStrip(Mesh* mesh, Camera* camera);
+	static void drawTriangles(Mesh *mesh, Camera *camera);
+	static void drawInstancedStrip(Mesh *mesh, Camera *camera);
 };
 
 #endif

@@ -33,7 +33,7 @@ glm::mat4 Decal::getMat(bool with_proj) {
 	return mat;
 }
 
-void Decal::drawDefault(Decal* decal, GLFWwindow* window) {
+void Decal::drawDefault(Decal *decal, GLFWwindow *window) {
 	decal->shader->use();
 
 	decal->shader->setMat4("projection", decal->getMat());

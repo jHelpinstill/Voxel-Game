@@ -50,7 +50,7 @@ void World::setup() {
 	generateMesh();
 }
 
-void World::update(float dt, Camera* camera, Input* input) {
+void World::update(float dt, Camera *camera, Input *input) {
 	//Chunk* current_chunk = nullptr;
 	static bool single_mine = true;
 	if (input->keyPressed('Q'))
@@ -86,7 +86,7 @@ void World::inspectPos(const glm::vec3 &pos, BlockType **block_out, Chunk **chun
 	x_ch = floor(block_pos.x / CHUNK_SIZE);
 	y_ch = floor(block_pos.y / CHUNK_SIZE);
 	z_ch = floor(block_pos.z / CHUNK_SIZE);
-	Chunk* chunk = nullptr;
+	Chunk *chunk = nullptr;
 	if (!(chunk = chunks.get(x_ch, y_ch, z_ch)))
 		return;
 
@@ -101,17 +101,17 @@ void World::inspectPos(const glm::vec3 &pos, BlockType **block_out, Chunk **chun
 }
 
 
-BlockType* World::inspectPos(const glm::vec3 &pos) {
-	BlockType* block;
+BlockType *World::inspectPos(const glm::vec3 &pos) {
+	BlockType *block;
 	inspectPos(pos, &block);
 	return block;
 }
 
-bool World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray, BlockType** block_out, Chunk** chunk_out) {
+bool World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray, BlockType **block_out, Chunk **chunk_out) {
 	//std::cout << "Camera Pos: " << vec2string(pos) << std::endl;
 	//std::cout << "look direction: " << vec2string(dir) << std::endl;
 
-	Mesh* world_mesh = getMeshByName("world_mesh");
+	Mesh *world_mesh = getMeshByName("world_mesh");
 
 	glm::vec3 unit_ray = glm::normalize(ray);
 
@@ -120,7 +120,7 @@ bool World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray, BlockType** b
 	chunk_pos[0] = floor(block_pos.x / CHUNK_SIZE);
 	chunk_pos[1] = floor(block_pos.y / CHUNK_SIZE);
 	chunk_pos[2] = floor(block_pos.z / CHUNK_SIZE);
-	Chunk* chunk;
+	Chunk *chunk;
 	if (!(chunk = chunks.get(chunk_pos[0], chunk_pos[1], chunk_pos[2])))
 		return false;
 	
@@ -185,14 +185,14 @@ bool World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray, BlockType** b
 	return true;
 }
 
-BlockType* World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray) {
-	BlockType* block;
+BlockType *World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray) {
+	BlockType *block;
 	if (!inspectRay(pos, ray, &block))
 		return nullptr;
 	return block;
 }
 
-void World::updateBlock(BlockType* block, Chunk* chunk, BlockType new_type) {
+void World::updateBlock(BlockType *block, Chunk *chunk, BlockType new_type) {
 	if (!block)
 		return;
 	*block = new_type;
@@ -219,8 +219,8 @@ void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type) {
 	case 5: pos.z -= chunks.unit_length; break;
 	}
 
-	BlockType* block;
-	Chunk* chunk;
+	BlockType *block;
+	Chunk *chunk;
 	inspectPos(pos, &block, &chunk);
 	if (block && chunk)
 		updateBlock(block, chunk, new_type);
@@ -230,7 +230,7 @@ void World::generateMesh() {
 	std::cout << "Generating World mesh..." << std::endl;
 
 	removeMesh("world_mesh");
-	Mesh* world_mesh = new Mesh(getTextureByName("chunk_texture"));
+	Mesh *world_mesh = new Mesh(getTextureByName("chunk_texture"));
 	meshes["world_mesh"] = world_mesh;
 
 	world_mesh->verts.push_back(glm::vec3(0, 0, 0));
@@ -249,7 +249,7 @@ void World::generateMesh() {
 	int chunk_counter = 0;
 	int face_counter = 0;
 	for (auto &bucket : chunks.chunks) {
-		Chunk* chunk = bucket.second;
+		Chunk *chunk = bucket.second;
 
 		int num_instances = chunk->generateFaceData(world_mesh->instance_data, chunks.getNeighbors(chunk));
 		int padding = face_per_chunk - num_instances;
@@ -275,12 +275,12 @@ void World::generateMesh() {
 	std::cout << "Finished world generation. World contains: " << chunks.size() << " chunks with " << face_counter << " faces" << std::endl;
 }
 
-void World::remeshChunk(Chunk* chunk) {
+void World::remeshChunk(Chunk *chunk) {
 	if (!chunk)
 		return;
 	std::cout << "remeshing chunk at: " << chunk->x << ", " << chunk->y << ", " << chunk->z << std::endl;
 
-	ChunkManager::DrawParams* chunk_params = &chunks.draw_params[chunk->ID];
+	ChunkManager::DrawParams *chunk_params = &chunks.draw_params[chunk->ID];
 	std::vector<int> chunk_instance_data;
 
 	int chunk_num_instances = chunk->generateFaceData(chunk_instance_data, chunks.getNeighbors(chunk));
@@ -289,14 +289,14 @@ void World::remeshChunk(Chunk* chunk) {
 		chunk_instance_data.push_back(0);
 	chunk_params->instanceCount = chunk_num_instances;
 
-	Mesh* mesh = getMeshByName("world_mesh");
+	Mesh *mesh = getMeshByName("world_mesh");
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vao->data_VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, chunk_params->baseInstance * sizeof(int), chunk_num_instances * sizeof(int), chunk_instance_data.data());
 }
 
-void World::addChunkToMesh(Chunk* chunk) {
-	Mesh* world_mesh = getMeshByName("world_mesh");
+void World::addChunkToMesh(Chunk *chunk) {
+	Mesh *world_mesh = getMeshByName("world_mesh");
 
 	int num_instances = chunk->generateFaceData(world_mesh->instance_data, chunks.getNeighbors(chunk));
 	int padding = face_per_chunk - num_instances;
@@ -317,7 +317,7 @@ void World::addChunkToMesh(Chunk* chunk) {
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, chunks.pos_SSBO);
 }
 
-int World::encodeChunkPos(Chunk* chunk) {
+int World::encodeChunkPos(Chunk *chunk) {
 	const int chunk_pos_mask = (1 << chunks.chunk_pos_bits) - 1;
 	const int half_chunk_mask = (chunk_pos_mask / 2) + 1;
 
@@ -333,8 +333,8 @@ int World::encodeChunkPos(Chunk* chunk) {
 	return data;
 }
 
-void World::drawWorld(Mesh* mesh, Camera* camera) {
-	World* world = (World*)mesh->parent_obj;
+void World::drawWorld(Mesh *mesh, Camera *camera) {
+	World *world = (World*)mesh->parent_obj;
 
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat() * glm::scale(glm::mat4(1.0), glm::vec3(world->chunks.unit_length)));
@@ -363,7 +363,7 @@ void World::drawWorld(Mesh* mesh, Camera* camera) {
 	glm::vec3 look_dir = camera->getLookDirection();
 	float dot_criteria = cos(glm::radians(camera->aspect_ratio * camera->fov / 2));
 	for (auto &chunk_obj : world->chunks.chunks) {
-		Chunk* chunk = chunk_obj.second;
+		Chunk *chunk = chunk_obj.second;
 
 		glm::vec3 a, b, c, d;
 		float length = CHUNK_SIZE * world->chunks.unit_length;

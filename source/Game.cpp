@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game(GLFWwindow* window) {
+Game::Game(GLFWwindow *window) {
 	this->window = window;
 	state = PAUSED;
 	setup();
@@ -40,17 +40,17 @@ void Game::setup() {
 
 	fonts["arial"] = new Font(ROOT + "fonts/arial.ttf", 48);
 
-	Decal* crosshair = createDecal("crosshair", "white_square", "decal_shader", glm::vec2(3), glm::vec2(0), window);
+	Decal *crosshair = createDecal("crosshair", "white_square", "decal_shader", glm::vec2(3), glm::vec2(0), window);
 	crosshair->origin = glm::vec2(0.5f);
 	crosshair->adjustment = glm::vec2(0.5f);
 
-	Decal* textbox_test = createDecal("textbox", "white_square", "decal_shader", glm::vec2(200, 350), glm::vec2(25, 0), window);
+	Decal *textbox_test = createDecal("textbox", "white_square", "decal_shader", glm::vec2(200, 350), glm::vec2(25, 0), window);
 	textbox_test->origin = glm::vec2(0, 0.5);
 	textbox_test->adjustment = glm::vec2(0, 0.5);
 	textbox_test->drawFunc = Textbox::drawTextbox;
 	textbox_test->attached_obj = new Textbox("-Controls-\n\nESC: pause\n\nW,A,S,D: move\n\nspace,ctrl: up/down\n\nshift: sprint\n\nleft click: mine block\n\nright click: place block\n\nQ: placement mode", getFontByName("arial"), getShaderByName("font_shader"), 0.4, glm::vec3(0));
 
-	Decal* pause_text = createDecal("pause_text", "white_square", "decal_shader", glm::vec2(475, 50), glm::vec2(0), window);
+	Decal *pause_text = createDecal("pause_text", "white_square", "decal_shader", glm::vec2(475, 50), glm::vec2(0), window);
 	pause_text->origin = glm::vec2(0.5);
 	pause_text->adjustment = glm::vec2(0.5, 0.5);
 	pause_text->drawFunc = Textbox::drawTextbox;

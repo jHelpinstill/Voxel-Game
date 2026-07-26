@@ -61,12 +61,12 @@ Mesh::~Mesh() {
 	delete vao;
 }
 
-void Mesh::draw(Camera* camera) {
+void Mesh::draw(Camera *camera) {
 	if(drawFunc)
 		drawFunc(this, camera);
 }
 
-void Mesh::attachShader(Shader* shader) {
+void Mesh::attachShader(Shader *shader) {
 	this->shader = shader;
 }
 
@@ -92,9 +92,9 @@ void Mesh::getUVMap(const std::string &filepath) {
 	file.close();
 }
 
-void Mesh::drawTriangles(Mesh* mesh, Camera* camera) {
+void Mesh::drawTriangles(Mesh *mesh, Camera *camera) {
 	mesh->shader->use();
-	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
+	mesh->shader->setMat4("projection", camera->getProjectionMat()  *mesh->transform.getMat());
 	//mesh->shader->setMat4("transform", mesh->transform.getMat());
 
 	switch (mesh->vao->style) {
@@ -111,7 +111,7 @@ void Mesh::drawTriangles(Mesh* mesh, Camera* camera) {
 	glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
 }
 
-void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera) {
+void Mesh::drawInstancedStrip(Mesh *mesh, Camera *camera) {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat());
 	mesh->shader->setMat4("transform", mesh->transform.getMat());
@@ -130,7 +130,7 @@ void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera) {
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, mesh->verts.size(), mesh->instance_data.size());
 }
 
-Mesh* Mesh::makePlane(
+Mesh *Mesh::makePlane(
 	const glm::vec2 &size,
 	unsigned int texture,
 	const std::string &uv_filepath,
@@ -155,7 +155,7 @@ Mesh* Mesh::makePlane(
 	pos_.x -= w / 2;
 	pos_.z -= l / 2;
 
-	Mesh* mesh;
+	Mesh *mesh;
 	if (texture)
 		mesh = new Mesh(verts, texture, uv_filepath);
 	else
@@ -165,7 +165,7 @@ Mesh* Mesh::makePlane(
 	return mesh;
 }
 
-Mesh* Mesh::makeBox(
+Mesh *Mesh::makeBox(
 	const glm::vec3 &size,
 	unsigned int texture,
 	const std::string &uv_filepath,
@@ -207,7 +207,7 @@ Mesh* Mesh::makeBox(
 		vw0l, v00l, v000		
 	};
 
-	Mesh* mesh;
+	Mesh *mesh;
 	if (texture)
 		mesh = new Mesh(verts, texture, uv_filepath);
 	else

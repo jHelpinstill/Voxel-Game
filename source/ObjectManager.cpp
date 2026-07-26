@@ -9,7 +9,7 @@ std::unordered_map<std::string, unsigned int> textures;
 std::unordered_map<std::string, Decal*> decals;
 std::unordered_map<std::string, Font*> fonts;
 
-Shader* getShaderByName(const std::string &name) {
+Shader *getShaderByName(const std::string &name) {
 	try {
 		return shaders.at(name);
 	}
@@ -20,7 +20,7 @@ Shader* getShaderByName(const std::string &name) {
 	}
 }
 
-Mesh* getMeshByName(const std::string &name) {
+Mesh *getMeshByName(const std::string &name) {
 	try {
 		return meshes.at(name);
 	}
@@ -42,7 +42,7 @@ unsigned int getTextureByName(const std::string &name) {
 	}
 }
 
-Decal* getDecalByName(const std::string &name) {
+Decal *getDecalByName(const std::string &name) {
 	try {
 		return decals.at(name);
 	}
@@ -53,7 +53,7 @@ Decal* getDecalByName(const std::string &name) {
 	}
 }
 
-Font* getFontByName(const std::string &name) {
+Font *getFontByName(const std::string &name) {
 	try {
 		return fonts.at(name);
 	}
@@ -109,13 +109,13 @@ void removeFont(const std::string &name) {
 	fonts.erase(name);
 }
 
-Shader* createShader(
+Shader *createShader(
 	const std::string &name,
 	const std::string &vertex_filepath,
 	const std::string &fragment_filepath,
 	const std::vector<Shader::DefinePair> &defines
 ) {
-	Shader* shader = new Shader(name, vertex_filepath, fragment_filepath, defines);
+	Shader *shader = new Shader(name, vertex_filepath, fragment_filepath, defines);
 	shaders[name] = shader;
 	return shader;
 }
@@ -133,7 +133,7 @@ unsigned int createTexture(const std::string &name, const std::string &filepath,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
+	unsigned char *data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
 	if (data) {
 		int image_type = alpha_channel ? GL_RGBA : GL_RGB;
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, image_type, GL_UNSIGNED_BYTE, data);
@@ -150,8 +150,8 @@ unsigned int createTexture(const std::string &name, const std::string &filepath,
 	return texture;
 }
 
-Decal* createDecal(const std::string &name, const std::string &tex_name, const std::string &shader_name, const glm::vec2 &size, const glm::vec2 &pos, GLFWwindow* window) {
-	Decal* decal = new Decal(getTextureByName(tex_name), size, pos);
+Decal *createDecal(const std::string &name, const std::string &tex_name, const std::string &shader_name, const glm::vec2 &size, const glm::vec2 &pos, GLFWwindow *window) {
+	Decal *decal = new Decal(getTextureByName(tex_name), size, pos);
 	decal->shader = getShaderByName(shader_name);
 	decal->window = window;
 	decals[name] = decal;

@@ -6,7 +6,7 @@
 
 bool window_resized = false;
 
-void windowSizeCallback(GLFWwindow* window, int width, int height) {
+void windowSizeCallback(GLFWwindow *window, int width, int height) {
 	glfwMakeContextCurrent(window);
 	glViewport(0, 0, width, height);
 	window_resized = true;
@@ -21,7 +21,7 @@ int main() {
 #ifndef LOCK_FRAMERATE
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
 #endif
-	GLFWwindow* window = glfwCreateWindow(640, 480, "Voxel Game", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(640, 480, "Voxel Game", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, windowSizeCallback);
 

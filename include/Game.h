@@ -26,14 +26,14 @@ private:
 	} state;
 
 public:
-	GLFWwindow* window;
-	Input* input;
-	Camera* camera;
-	CameraController* player;
+	GLFWwindow *window;
+	Input *input;
+	Camera *camera;
+	CameraController *player;
 	World world;
 	
 
-	Game(GLFWwindow* window);
+	Game(GLFWwindow *window);
 	~Game();
 
 	void stateMachine(double dt);

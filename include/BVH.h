@@ -11,22 +11,22 @@ class BVH {
 public:
 	struct RaycastResult {
 		bool hit;
-		T* obj;
+		T *obj;
 		glm::vec3 pos;
 	};
 	struct DataNode {
 		glm::vec3 pos;
 		T obj;
-		DataNode* next;
+		DataNode *next;
 	};
 	class Box {
 	private:
 		
 		
 	public:
-		DataNode* data;
-		Box* childA;
-		Box* childB;
+		DataNode *data;
+		Box *childA;
+		Box *childB;
 		bool resized;
 
 		glm::vec3 min {};
@@ -35,26 +35,26 @@ public:
 		Box(void (*expandToFit)(const glm::vec3&, T*, glm::vec3&, glm::vec3&));
 		~Box();
 		
-		DataNode* raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*));
+		DataNode *raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*));
 		void split(int min_data_nodes);
 
 		void addDataNode(const glm::vec3 &pos, const T &obj);
-		void addDataNode(DataNode* node);
+		void addDataNode(DataNode *node);
 		int countDataNodes();
 
-		void (*expandToFit)(const glm::vec3 &pos, T* obj, glm::vec3 &min, glm::vec3 &max);
+		void (*expandToFit)(const glm::vec3 &pos, T *obj, glm::vec3 &min, glm::vec3 &max);
 		bool hitByRay(const glm::vec3 &pos, const glm::vec3 &ray);
 
 		// WARNING: renders tree unusable until BVH::rebuild() is called
-		DataNode* getData(DataNode* existing_data = nullptr);
+		DataNode *getData(DataNode *existing_data = nullptr);
 
-		static bool isMonotonicallyCloser(const glm::vec3 &pos, Box** boxes);
+		static bool isMonotonicallyCloser(const glm::vec3 &pos, Box **boxes);
 	};
 	int min_nodes_per_box;
 
-	Box* root;
+	Box *root;
 	bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*);
-	void (*boxExpandToFitFunc)(const glm::vec3 &pos, T* obj, glm::vec3 &min, glm::vec3 &max);
+	void (*boxExpandToFitFunc)(const glm::vec3 &pos, T *obj, glm::vec3 &min, glm::vec3 &max);
 
 	BVH() : root(nullptr), raycastObjFunc(nullptr), boxExpandToFitFunc(nullptr) {}
 	BVH(
@@ -95,7 +95,7 @@ auto BVH<T>::raycast(const glm::vec3 &pos, const glm::vec3 &ray)->RaycastResult 
 		return result;
 	//std::cout << "Raycast begin" << std::endl;
 
-	DataNode* hit_node = nullptr;
+	DataNode *hit_node = nullptr;
 	if (root->hitByRay(pos, ray))
 		hit_node = root->raycast(pos, ray, raycastObjFunc);
 	//else
@@ -148,7 +148,7 @@ BVH<T>::Box::~Box() {
 	delete childB;
 
 	while (data) {
-		DataNode* old = data;
+		DataNode *old = data;
 		data = data->next;
 		delete old;
 	}
@@ -156,7 +156,7 @@ BVH<T>::Box::~Box() {
 
 template <class T>
 void BVH<T>::Box::addDataNode(const glm::vec3 &pos, const T &obj) {
-	DataNode* node = new DataNode;
+	DataNode *node = new DataNode;
 	node->pos = pos;
 	node->obj = obj;
 
@@ -164,7 +164,7 @@ void BVH<T>::Box::addDataNode(const glm::vec3 &pos, const T &obj) {
 }
 
 template <class T>
-void BVH<T>::Box::addDataNode(DataNode* node) {
+void BVH<T>::Box::addDataNode(DataNode *node) {
 	node->next = data;
 	data = node;
 	resized = true;
@@ -174,7 +174,7 @@ void BVH<T>::Box::addDataNode(DataNode* node) {
 template <class T>
 int BVH<T>::Box::countDataNodes() {
 	int count = 0;
-	DataNode* node = data;
+	DataNode *node = data;
 	while (node) {
 		count++;
 		node = node->next;
@@ -183,7 +183,7 @@ int BVH<T>::Box::countDataNodes() {
 }
 
 template <class T>
-auto BVH<T>::Box::getData(DataNode* existing_data)->DataNode* {
+auto BVH<T>::Box::getData(DataNode *existing_data)->DataNode* {
 	if (childA)
 		existing_data = childA->getData(existing_data);
 	if (childB)
@@ -192,7 +192,7 @@ auto BVH<T>::Box::getData(DataNode* existing_data)->DataNode* {
 	if (!data)
 		return existing_data;
 
-	DataNode* tail = data;
+	DataNode *tail = data;
 	while (tail->next)
 		tail = tail->next;
 	tail->next = existing_data;
@@ -228,9 +228,9 @@ void BVH<T>::Box::split(int min_data_nodes) {
 	childB = new Box(expandToFit);
 
 	float splittingPoint = center[longest_axis];
-	DataNode* node = data;
+	DataNode *node = data;
 	while (node) {
-		DataNode* current_node = node;
+		DataNode *current_node = node;
 		node = node->next;
 
 		if (current_node->pos[longest_axis] < splittingPoint) {
@@ -276,7 +276,7 @@ bool BVH<T>::Box::hitByRay(const glm::vec3 &pos, const glm::vec3 &ray) {
 }
 
 template <class T>
-bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3 &pos, Box** boxes) {
+bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3 &pos, Box **boxes) {
 	// find nearest vertice of the closer box
 	float farthest_vert_A = UTIL_NEGATIVE_INFINITY;
 	for (int face = 0; face < 2; face++) {
@@ -302,13 +302,13 @@ bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3 &pos, Box** boxes) {
 }
 
 template <class T>
-auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*))->DataNode* {
-	DataNode* nearest_hit = nullptr;
+auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*))->DataNode *{
+	DataNode *nearest_hit = nullptr;
 	if (!resized)
 		return nearest_hit;	// don't bother if box hasn't been resized yet (not initialized with data)
 
 	// figure out which children to search and, if both, in which order
-	Box* ranked_children[2]{};
+	Box *ranked_children[2]{};
 	bool monotonically_closer = false;
 	bool childA_hit = (childA && childA->hitByRay(pos, ray));
 	bool childB_hit = (childB && childB->hitByRay(pos, ray));
@@ -336,7 +336,7 @@ auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*ray
 
 	// find hits from child nodes
 	std::vector<DataNode*> hit_nodes;
-	DataNode* hit = nullptr;
+	DataNode *hit = nullptr;
 	for (int i = 0; i < 2; i++) {
 		if (ranked_children[i] && (hit = ranked_children[i]->raycast(pos, ray, raycastObj))) {
 			hit_nodes.push_back(hit);
@@ -346,7 +346,7 @@ auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*ray
 	}
 
 	// find hits from own nodes
-	DataNode* node = data;
+	DataNode *node = data;
 	while (node) {
 		if (raycastObj(pos, ray, node->pos, &node->obj))
 			hit_nodes.push_back(node);
