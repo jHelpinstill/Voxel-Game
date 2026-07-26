@@ -1,7 +1,6 @@
 #include "Textbox.h"
 
-void Textbox::drawTextbox(Decal* decal, GLFWwindow* window)
-{
+void Textbox::drawTextbox(Decal* decal, GLFWwindow* window) {
 	if(decal->texture)
 		Decal::drawDefault(decal, window);
 
@@ -10,21 +9,17 @@ void Textbox::drawTextbox(Decal* decal, GLFWwindow* window)
 	glm::vec2 cursor = decal->getScreenCoords();
 	cursor.y += decal->size.y;
 	long start = 0;
-	while(start < textbox->text.size())
-	{
+	while(start < textbox->text.size()) {
 		float current_width = 0;
 		int i = 0;
-		while (start + i < textbox->text.size())
-		{
-			if (textbox->text[start + i] == '\n')
-			{
+		while (start + i < textbox->text.size()) {
+			if (textbox->text[start + i] == '\n') {
 				i++;
 				break;
 			}
 			current_width += textbox->font->getCharacter(textbox->text[start + i]).advance * textbox->scale / 64;
 			i++;
-			if (current_width >= decal->size.x)
-			{
+			if (current_width >= decal->size.x) {
 				i--;
 				break;
 			}

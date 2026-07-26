@@ -1,18 +1,15 @@
 #include "Font.h"
 
-Font::Font(const std::string& font_filepath, int height) : height(height)
-{
+Font::Font(const std::string& font_filepath, int height) : height(height) {
 	FT_Library ft_lib;
-	if (FT_Init_FreeType(&ft_lib))
-	{
+	if (FT_Init_FreeType(&ft_lib)) {
 		std::cout << "ERROR: Could note initilize FreeType library" << std::endl;
 		while (1)
 			;
 	}
 
 	FT_Face face;
-	if (FT_New_Face(ft_lib, font_filepath.c_str(), 0, &face))
-	{
+	if (FT_New_Face(ft_lib, font_filepath.c_str(), 0, &face)) {
 		std::cout << "ERROR: failed to load font" << std::endl;
 		while (1)
 			;
@@ -20,8 +17,7 @@ Font::Font(const std::string& font_filepath, int height) : height(height)
 
 	FT_Set_Pixel_Sizes(face, 0, height);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	for (unsigned char c = 0; c < 128; c++)
-	{
+	for (unsigned char c = 0; c < 128; c++) {
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 			continue;
 
@@ -59,14 +55,11 @@ Font::Font(const std::string& font_filepath, int height) : height(height)
 	FT_Done_FreeType(ft_lib);
 }
 
-Font::Character Font::getCharacter(char c)
-{
-	try
-	{
+Font::Character Font::getCharacter(char c) {
+	try {
 		return characters.at(c);
 	}
-	catch (std::out_of_range)
-	{
+	catch (std::out_of_range) {
 		return Character{};
 	}
 }

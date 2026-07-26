@@ -17,5 +17,6 @@
 #include <unordered_map>
 #include <limits>
 
+#define ROOT std::string("../")
 
 //#define LOCK_FRAMERATE

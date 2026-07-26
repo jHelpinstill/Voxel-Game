@@ -11,8 +11,7 @@
 #include "Camera.h"
 #include "Input.h"
 
-class World
-{
+class World {
 public:
 	int chunk_radius = 10;
 	long seed;

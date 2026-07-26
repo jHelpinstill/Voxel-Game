@@ -4,13 +4,11 @@
 
 #include "Chunk.h"
 
-class ChunkManager
-{
+class ChunkManager {
 public:
 	// Keys are used to distinguish different chunks within unordered maps by using their coordinates 
 
-	struct DrawParams
-	{
+	struct DrawParams {
 		unsigned int count;
 		unsigned int instanceCount;
 		unsigned int first;
@@ -37,8 +35,7 @@ public:
 	static bool raycastChunk(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& chunk_pos, Chunk** chunk);
 	static void expandToFitChunk(const glm::vec3& pos, Chunk** chunk, glm::vec3& min, glm::vec3& max);
 
-	struct RaycastResult
-	{
+	struct RaycastResult {
 		bool hit;
 		Chunk* chunk;
 		BlockType* block;

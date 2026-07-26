@@ -4,20 +4,16 @@
 
 int face_per_chunk;
 
-World::World(long seed) : seed(seed)
-{
+World::World(long seed) : seed(seed) {
 	face_per_chunk = 5 * CHUNK_AREA;
 }
 
-void World::setup()
-{
+void World::setup() {
 	std::srand(seed);
 	int layers = 2;
-	for(int y = 0; y < layers; y++)
-	{
+	for(int y = 0; y < layers; y++) {
 		chunks.add(0, y, 0);// chunks[Key(0, 0, 0)] = new Chunk(glm::ivec3(0, 0, 0));
-		for (int r = 1; r <= chunk_radius; r++)
-		{
+		for (int r = 1; r <= chunk_radius; r++) {
 			int x, z;
 			x = z = r;
 			for (z = r; z > -r; z--)
@@ -38,47 +34,40 @@ void World::setup()
 
 	std::cout << "created " << chunks.size() << " chunks" << std::endl;
 
-	createShader("world_shader", "shaders/worldVertex.txt", "shaders/worldColorFragment.txt");
+	createShader("world_shader", ROOT + "shaders/worldVertex.txt", ROOT + "shaders/worldColorFragment.txt");
 	generateMesh();
 }
 
-void World::update(float dt, Camera* camera, Input* input)
-{
+void World::update(float dt, Camera* camera, Input* input) {
 	//Chunk* current_chunk = nullptr;
 	static bool single_mine = true;
 	if (input->keyPressed('Q'))
 		single_mine = !single_mine;
 
 	ChunkManager::RaycastResult cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());
-	if(cast.hit)
-	{
-		if ((input->mouse.left.held && !single_mine) || (input->mouse.left.pressed && single_mine))
-		{
+	if(cast.hit) {
+		if ((input->mouse.left.held && !single_mine) || (input->mouse.left.pressed && single_mine)) {
 			//std::cout << "MINING ";
 			//printBlockData(cast.block, cast.chunk);
 			updateBlock(cast.block, cast.chunk, BlockType::AIR);
 		}
-		if ((input->mouse.right.held && !single_mine) || (input->mouse.right.pressed && single_mine))
-		{
+		if ((input->mouse.right.held && !single_mine) || (input->mouse.right.pressed && single_mine)) {
 			//std::cout << "PLACING ";
 			//printBlockData(cast.block, cast.chunk);
 			placeBlock(cast, BlockType::DIRT);
 		}
-		if (input->keyPressed('E'))
-		{
+		if (input->keyPressed('E')) {
 			putMeshWhereLooking(cast, "test_block");
 			std::cout << "Inspect ";
 			printBlockInfo(cast.block, cast.chunk);
 		}
-		if (input->keyPressed('I'))
-		{
+		if (input->keyPressed('I')) {
 			traceBVHface(cast.chunk->faces_BVH);
 		}
 	}
 }
 
-void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chunk_out)
-{
+void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chunk_out) {
 	glm::vec3 block_pos = pos / chunks.unit_length;
 
 	int x_ch, y_ch, z_ch;
@@ -100,15 +89,13 @@ void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chun
 }
 
 
-BlockType* World::inspectPos(const glm::vec3& pos)
-{
+BlockType* World::inspectPos(const glm::vec3& pos) {
 	BlockType* block;
 	inspectPos(pos, &block);
 	return block;
 }
 
-bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** block_out, Chunk** chunk_out)
-{
+bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** block_out, Chunk** chunk_out) {
 	//std::cout << "Camera Pos: " << vec2string(pos) << std::endl;
 	//std::cout << "look direction: " << vec2string(dir) << std::endl;
 
@@ -133,17 +120,14 @@ bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** b
 	accumulator.x = block_pos.x - floor(block_pos.x);
 	accumulator.y = block_pos.y - floor(block_pos.y);
 	accumulator.z = block_pos.z - floor(block_pos.z);
-	while (chunk->blocks(x_b, y_b, z_b) == BlockType::AIR)// || chunk->blocks[x_b][y_b][z_b] == BlockType::STONE)
-	{
+	while (chunk->blocks(x_b, y_b, z_b) == BlockType::AIR) { // || chunk->blocks[x_b][y_b][z_b] == BlockType::STONE)
 		//chunk->blocks[x_b][y_b][z_b] = BlockType::STONE;
 		
 		//bool dom_step = true;
 		bool take_step = true;
 		int rank = 0;
-		for (int i = 0; i < 3; i++)
-		{
-			if (accumulator[i] > 1 || accumulator[i] < 0)
-			{
+		for (int i = 0; i < 3; i++) {
+			if (accumulator[i] > 1 || accumulator[i] < 0) {
 				accumulator[i] += (unit_ray[i] < 0) ? 1 : -1;
 				block_pos[i] += (unit_ray[i] < 0) ? -1 : 1;
 				//dom_step = false;
@@ -156,16 +140,13 @@ bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** b
 			accumulator += unit_ray;
 
 		bool next_chunk = false;
-		for (int i = 0; i < 3; i++)
-		{
-			if (block_pos[i] < 0)
-			{
+		for (int i = 0; i < 3; i++) {
+			if (block_pos[i] < 0) {
 				block_pos[i] = CHUNK_SIZE + block_pos[i];
 				chunk_pos[i]--;
 				next_chunk = true;
 			}
-			else if (block_pos[i] >= CHUNK_SIZE)
-			{
+			else if (block_pos[i] >= CHUNK_SIZE) {
 				block_pos[i] = CHUNK_SIZE - block_pos[i];
 				chunk_pos[i]++;
 				next_chunk = true;
@@ -189,18 +170,17 @@ bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** b
 		*block_out = &chunk->blocks(x_b, y_b, z_b);
 	if (chunk_out)
 		*chunk_out = chunk;
+	return true;
 }
 
-BlockType* World::inspectRay(const glm::vec3& pos, const glm::vec3& ray)
-{
+BlockType* World::inspectRay(const glm::vec3& pos, const glm::vec3& ray) {
 	BlockType* block;
 	if (!inspectRay(pos, ray, &block))
 		return nullptr;
 	return block;
 }
 
-void World::updateBlock(BlockType* block, Chunk* chunk, BlockType new_type)
-{
+void World::updateBlock(BlockType* block, Chunk* chunk, BlockType new_type) {
 	if (!block)
 		return;
 	*block = new_type;
@@ -210,18 +190,15 @@ void World::updateBlock(BlockType* block, Chunk* chunk, BlockType new_type)
 	std::cout << "updating block " << std::endl;
 	printBlockInfo(block, chunk);
 
-	if (chunk->blocks.onBoundary(block, &face))
-	{
+	if (chunk->blocks.onBoundary(block, &face)) {
 		std::cout << "remeshing neighboring chunk" << std::endl;
 		remeshChunk(chunks.getNeighbor(chunk, face));
 	}
 }
 
-void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type)
-{
+void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type) {
 	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2); // move to center of block to avoid floating point nonsense
-	switch (cast.face)
-	{
+	switch (cast.face) {
 	case 0: pos.y += chunks.unit_length; break;
 	case 1: pos.y -= chunks.unit_length; break;
 	case 2: pos.x += chunks.unit_length; break;
@@ -237,8 +214,7 @@ void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type)
 		updateBlock(block, chunk, new_type);
 }
 
-void World::generateMesh()
-{
+void World::generateMesh() {
 	std::cout << "Generating World mesh..." << std::endl;
 
 	removeMesh("world_mesh");
@@ -260,8 +236,7 @@ void World::generateMesh()
 
 	int chunk_counter = 0;
 	int face_counter = 0;
-	for (auto& bucket : chunks.chunks)
-	{
+	for (auto& bucket : chunks.chunks) {
 		Chunk* chunk = bucket.second;
 
 		int num_instances = chunk->generateFaceData(world_mesh->instance_data, chunks.getNeighbors(chunk));
@@ -288,8 +263,7 @@ void World::generateMesh()
 	std::cout << "Finished world generation. World contains: " << chunks.size() << " chunks with " << face_counter << " faces" << std::endl;
 }
 
-void World::remeshChunk(Chunk* chunk)
-{
+void World::remeshChunk(Chunk* chunk) {
 	if (!chunk)
 		return;
 	std::cout << "remeshing chunk at: " << chunk->x << ", " << chunk->y << ", " << chunk->z << std::endl;
@@ -309,8 +283,7 @@ void World::remeshChunk(Chunk* chunk)
 	glBufferSubData(GL_ARRAY_BUFFER, chunk_params->baseInstance * sizeof(int), chunk_num_instances * sizeof(int), chunk_instance_data.data());
 }
 
-void World::addChunkToMesh(Chunk* chunk)
-{
+void World::addChunkToMesh(Chunk* chunk) {
 	Mesh* world_mesh = getMeshByName("world_mesh");
 
 	int num_instances = chunk->generateFaceData(world_mesh->instance_data, chunks.getNeighbors(chunk));
@@ -332,8 +305,7 @@ void World::addChunkToMesh(Chunk* chunk)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, chunks.pos_SSBO);
 }
 
-int World::encodeChunkPos(Chunk* chunk)
-{
+int World::encodeChunkPos(Chunk* chunk) {
 	const int chunk_pos_mask = (1 << chunks.chunk_pos_bits) - 1;
 	const int half_chunk_mask = (chunk_pos_mask / 2) + 1;
 
@@ -349,8 +321,7 @@ int World::encodeChunkPos(Chunk* chunk)
 	return data;
 }
 
-void World::drawWorld(Mesh* mesh, Camera* camera)
-{
+void World::drawWorld(Mesh* mesh, Camera* camera) {
 	World* world = (World*)mesh->parent_obj;
 
 	mesh->shader->use();
@@ -367,8 +338,7 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 
 	mesh->shader->setVec3("light_dir", lighting_dir);
 
-	switch (mesh->style)
-	{
+	switch (mesh->style) {
 	case Shader::VAOStyle::TEXTURED:
 		glBindTexture(GL_TEXTURE_2D, mesh->texture);
 		break;
@@ -380,8 +350,7 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 
 	glm::vec3 look_dir = camera->getLookDirection();
 	float dot_criteria = cos(glm::radians(camera->aspect_ratio * camera->fov / 2));
-	for (auto& chunk_obj : world->chunks.chunks)
-	{
+	for (auto& chunk_obj : world->chunks.chunks) {
 		Chunk* chunk = chunk_obj.second;
 
 		glm::vec3 a, b, c, d;
@@ -394,8 +363,7 @@ void World::drawWorld(Mesh* mesh, Camera* camera)
 			glm::dot(look_dir, a - camera->transform.pos) < dot_criteria &&
 			glm::dot(look_dir, b - camera->transform.pos) < dot_criteria &&
 			glm::dot(look_dir, c - camera->transform.pos) < dot_criteria &&
-			glm::dot(look_dir, d - camera->transform.pos) < dot_criteria)
-		{
+			glm::dot(look_dir, d - camera->transform.pos) < dot_criteria) {
 			world->chunks.draw_params[chunk->ID].instanceCount = 0;
 		}
 		else

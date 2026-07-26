@@ -1,0 +1,140 @@
+[
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Camera.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Camera.cpp",
+  "file": "C:/repos/Voxel-Game/source/Camera.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Camera.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\CameraController.cpp.obj -c C:\\repos\\Voxel-Game\\source\\CameraController.cpp",
+  "file": "C:/repos/Voxel-Game/source/CameraController.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/CameraController.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Chunk.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Chunk.cpp",
+  "file": "C:/repos/Voxel-Game/source/Chunk.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Chunk.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\ChunkManager.cpp.obj -c C:\\repos\\Voxel-Game\\source\\ChunkManager.cpp",
+  "file": "C:/repos/Voxel-Game/source/ChunkManager.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/ChunkManager.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\ClickableRegion.cpp.obj -c C:\\repos\\Voxel-Game\\source\\ClickableRegion.cpp",
+  "file": "C:/repos/Voxel-Game/source/ClickableRegion.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/ClickableRegion.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Debug.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Debug.cpp",
+  "file": "C:/repos/Voxel-Game/source/Debug.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Debug.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Decal.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Decal.cpp",
+  "file": "C:/repos/Voxel-Game/source/Decal.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Decal.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Font.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Font.cpp",
+  "file": "C:/repos/Voxel-Game/source/Font.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Font.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Game.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Game.cpp",
+  "file": "C:/repos/Voxel-Game/source/Game.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Game.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Input.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Input.cpp",
+  "file": "C:/repos/Voxel-Game/source/Input.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Input.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Main.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Main.cpp",
+  "file": "C:/repos/Voxel-Game/source/Main.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Main.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Mesh.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Mesh.cpp",
+  "file": "C:/repos/Voxel-Game/source/Mesh.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Mesh.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\MeshPrimitives.cpp.obj -c C:\\repos\\Voxel-Game\\source\\MeshPrimitives.cpp",
+  "file": "C:/repos/Voxel-Game/source/MeshPrimitives.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/MeshPrimitives.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\ObjectManager.cpp.obj -c C:\\repos\\Voxel-Game\\source\\ObjectManager.cpp",
+  "file": "C:/repos/Voxel-Game/source/ObjectManager.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/ObjectManager.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\RenderText.cpp.obj -c C:\\repos\\Voxel-Game\\source\\RenderText.cpp",
+  "file": "C:/repos/Voxel-Game/source/RenderText.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/RenderText.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Shader.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Shader.cpp",
+  "file": "C:/repos/Voxel-Game/source/Shader.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Shader.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Textbox.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Textbox.cpp",
+  "file": "C:/repos/Voxel-Game/source/Textbox.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Textbox.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\Transform.cpp.obj -c C:\\repos\\Voxel-Game\\source\\Transform.cpp",
+  "file": "C:/repos/Voxel-Game/source/Transform.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/Transform.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\TriangleMesh.cpp.obj -c C:\\repos\\Voxel-Game\\source\\TriangleMesh.cpp",
+  "file": "C:/repos/Voxel-Game/source/TriangleMesh.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/TriangleMesh.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\VAO.cpp.obj -c C:\\repos\\Voxel-Game\\source\\VAO.cpp",
+  "file": "C:/repos/Voxel-Game/source/VAO.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/VAO.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\gcc.exe  @CMakeFiles\\voxel_game.dir\\includes_C.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\glad.c.obj -c C:\\repos\\Voxel-Game\\source\\glad.c",
+  "file": "C:/repos/Voxel-Game/source/glad.c",
+  "output": "CMakeFiles/voxel_game.dir/source/glad.c.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\util.cpp.obj -c C:\\repos\\Voxel-Game\\source\\util.cpp",
+  "file": "C:/repos/Voxel-Game/source/util.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/util.cpp.obj"
+},
+{
+  "directory": "C:/repos/Voxel-Game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe  @CMakeFiles\\voxel_game.dir\\includes_CXX.rsp -g -o CMakeFiles\\voxel_game.dir\\source\\world.cpp.obj -c C:\\repos\\Voxel-Game\\source\\world.cpp",
+  "file": "C:/repos/Voxel-Game/source/world.cpp",
+  "output": "CMakeFiles/voxel_game.dir/source/world.cpp.obj"
+}
+]

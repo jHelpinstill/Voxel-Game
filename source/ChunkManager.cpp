@@ -1,10 +1,8 @@
 #include "ChunkManager.h"
 
-bool ChunkManager::add(int x, int y, int z)
-{
+bool ChunkManager::add(int x, int y, int z) {
 	Chunk::Key key(x, y, z);
-	if (chunks.find(key) != chunks.end())
-	{
+	if (chunks.find(key) != chunks.end()) {
 		return false;
 	}
 	Chunk* chunk = new Chunk(x, y, z, std::rand(), shader_info, unit_length);
@@ -14,8 +12,7 @@ bool ChunkManager::add(int x, int y, int z)
 	return true;
 }
 
-Chunk* ChunkManager::get(const glm::vec3& pos)
-{
+Chunk* ChunkManager::get(const glm::vec3& pos) {
 	glm::vec3 block_pos = pos / unit_length;
 	int x, y, z;
 	x = floor(block_pos.x / CHUNK_SIZE);
@@ -25,8 +22,7 @@ Chunk* ChunkManager::get(const glm::vec3& pos)
 	return get(x, y, z);
 }
 
-Chunk* ChunkManager::get(int x, int y, int z)
-{
+Chunk* ChunkManager::get(int x, int y, int z) {
 	Chunk::Key key(x, y, z);
 	if (chunks.find(key) != chunks.end())
 		return chunks[key];
@@ -34,22 +30,20 @@ Chunk* ChunkManager::get(int x, int y, int z)
 	return nullptr;
 }
 
-Chunk* ChunkManager::getNeighbor(Chunk* chunk, int face)
-{
+Chunk* ChunkManager::getNeighbor(Chunk* chunk, int face) {
 	int x = chunk->x; int y = chunk->y; int z = chunk->z;
-	switch (face)
-	{
+	switch (face) {
 		case 0: return get(x, y + 1, z);
 		case 1: return get(x, y - 1, z);
 		case 2: return get(x + 1, y, z);
 		case 3: return get(x - 1, y, z);
 		case 4: return get(x, y, z + 1);
 		case 5: return get(x, y, z - 1);
+		default: return nullptr;
 	}
 }
 
-Chunk::Group ChunkManager::getNeighbors(Chunk* chunk)
-{
+Chunk::Group ChunkManager::getNeighbors(Chunk* chunk) {
 	Chunk::Group neighbors(6);
 	int x = chunk->x; int y = chunk->y; int z = chunk->z;
 
@@ -63,17 +57,14 @@ Chunk::Group ChunkManager::getNeighbors(Chunk* chunk)
 	return neighbors;
 }
 
-int ChunkManager::size()
-{
+int ChunkManager::size() {
 	return chunks.size();
 }
 
-ChunkManager::RaycastResult ChunkManager::raycast(const glm::vec3& pos, const glm::vec3& ray)
-{
+ChunkManager::RaycastResult ChunkManager::raycast(const glm::vec3& pos, const glm::vec3& ray) {
 	BVH<Chunk*>::RaycastResult cast = bvh.raycast(pos, ray);
 	RaycastResult result{};
-	if (cast.hit)
-	{
+	if (cast.hit) {
 		result.hit = cast.hit;
 		result.chunk = *cast.obj;
 
@@ -85,12 +76,10 @@ ChunkManager::RaycastResult ChunkManager::raycast(const glm::vec3& pos, const gl
 	return result;
 }
 
-bool ChunkManager::raycastChunk(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& chunk_pos, Chunk** chunk)
-{
+bool ChunkManager::raycastChunk(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& chunk_pos, Chunk** chunk) {
 	return (*chunk)->raycast(pos, ray).hit;
 }
-void ChunkManager::expandToFitChunk(const glm::vec3& pos, Chunk** chunk, glm::vec3& min, glm::vec3& max)
-{
+void ChunkManager::expandToFitChunk(const glm::vec3& pos, Chunk** chunk, glm::vec3& min, glm::vec3& max) {
 	glm::vec3 half_diameter = util::XYZ * (float)CHUNK_SIZE * (*chunk)->unit_length * 0.5f;
 	min = glm::min(min, pos - half_diameter);
 	max = glm::max(max, pos + half_diameter);

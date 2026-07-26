@@ -7,8 +7,7 @@
 #include "TextBox.h"
 #include "Input.h"
 
-class ClickableRegion
-{
+class ClickableRegion {
 	Decal* decal;
 	void* attached_obj;
 

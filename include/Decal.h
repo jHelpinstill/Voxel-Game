@@ -6,8 +6,7 @@
 #include "Shader.h"
 #include "VAO.h"
 
-class Decal
-{
+class Decal {
 public:
 	VAO* vao = nullptr;
 

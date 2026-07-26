@@ -1,13 +1,10 @@
 #include "Debug.h"
 
-void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string& mesh_name)
-{
-	if (cast.hit)
-	{
+void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string& mesh_name) {
+	if (cast.hit) {
 		Mesh* test_block = getMeshByName(mesh_name);
 		float length = cast.chunk->unit_length;
-		static glm::vec3 offset[6] =
-		{
+		static glm::vec3 offset[6] = {
 			glm::vec3(0, length, 0),
 			glm::vec3(0, -length, 0),
 			glm::vec3(length, 0, 0),
@@ -19,8 +16,7 @@ void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string& me
 	}
 }
 
-void printBlockInfo(BlockType* block, Chunk* chunk)
-{
+void printBlockInfo(BlockType* block, Chunk* chunk) {
 	std::cout << "block data:  " << std::endl;
 	std::cout << "\ttype:      " << getBlockName(*block) << std::endl;
 	int x, y, z; chunk->blocks.getCoords(block, x, y, z);
@@ -31,8 +27,7 @@ void printBlockInfo(BlockType* block, Chunk* chunk)
 	std::cout << std::endl;
 }
 
-void traceBVHface(BVH<Chunk::Face>& bvh)
-{
+void traceBVHface(BVH<Chunk::Face>& bvh) {
 	MonitorBVHface monitor{};
 
 	traceBVHface(bvh.root, monitor);
@@ -49,26 +44,22 @@ void traceBVHface(BVH<Chunk::Face>& bvh)
 	std::cout << "most data nodes: " << monitor.max_data_nodes << std::endl;
 	std::cout << "avg data nodes: " << monitor.avg_data_nodes << std::endl;
 
-	for (int i = 0; i < 6; i++)
-	{
+	for (int i = 0; i < 6; i++) {
 		std::cout << "num faces in direction " << i << ": " << monitor.num_faces[i] << std::endl;
 	}
 	std::cout << std::endl;
 }
 
-void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface& monitor)
-{
+void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface& monitor) {
 	monitor.num_boxes++;
 	if (!box->data)
 		monitor.boxes_without_data++;
-	if (!box->childA && !box->childB)
-	{
+	if (!box->childA && !box->childB) {
 		monitor.num_leaf_boxes++;
 
 		int num_data_nodes = 0;
 		BVH<Chunk::Face>::DataNode* node = box->data;
-		while (node)
-		{
+		while (node) {
 			monitor.num_faces[node->obj.norm]++;
 			num_data_nodes++;
 			node = node->next;
@@ -78,26 +69,22 @@ void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface& monitor)
 		if (num_data_nodes > monitor.max_data_nodes)
 			monitor.max_data_nodes = num_data_nodes;
 	}
-	else if (box->childA && box->childB)
-	{
+	else if (box->childA && box->childB) {
 		monitor.num_with_both_children++;
 		traceBVHface(box->childA, monitor);
 		traceBVHface(box->childB, monitor);
 	}
-	else if (box->childA)
-	{
+	else if (box->childA) {
 		monitor.num_with_single_child++;
 		traceBVHface(box->childA, monitor);
 	}
-	else
-	{
+	else {
 		monitor.num_with_single_child++;
 		traceBVHface(box->childB, monitor);
 	}
 }
 
-void traceBVHchunk(BVH<Chunk*>& bvh)
-{
+void traceBVHchunk(BVH<Chunk*>& bvh) {
 	MonitorBVHchunk monitor{};
 
 	traceBVHchunk(bvh.root, monitor);
@@ -115,19 +102,16 @@ void traceBVHchunk(BVH<Chunk*>& bvh)
 	std::cout << "avg data nodes: " << monitor.avg_data_nodes << "\n" << std::endl;
 }
 
-void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk& monitor)
-{
+void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk& monitor) {
 	monitor.num_boxes++;
 	if (!box->data)
 		monitor.boxes_without_data++;
-	if (!box->childA && !box->childB)
-	{
+	if (!box->childA && !box->childB) {
 		monitor.num_leaf_boxes++;
 
 		int num_data_nodes = 0;
 		BVH<Chunk*>::DataNode* node = box->data;
-		while (node)
-		{
+		while (node) {
 			num_data_nodes++;
 			node = node->next;
 		}
@@ -136,19 +120,16 @@ void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk& monitor)
 		if (num_data_nodes > monitor.max_data_nodes)
 			monitor.max_data_nodes = num_data_nodes;
 	}
-	else if (box->childA && box->childB)
-	{
+	else if (box->childA && box->childB) {
 		monitor.num_with_both_children++;
 		traceBVHchunk(box->childA, monitor);
 		traceBVHchunk(box->childB, monitor);
 	}
-	else if (box->childA)
-	{
+	else if (box->childA) {
 		monitor.num_with_single_child++;
 		traceBVHchunk(box->childA, monitor);
 	}
-	else
-	{
+	else {
 		monitor.num_with_single_child++;
 		traceBVHchunk(box->childB, monitor);
 	}

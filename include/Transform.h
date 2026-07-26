@@ -4,8 +4,7 @@
 
 #include "config.h"
 
-class Transform
-{
+class Transform {
 public:
 	glm::mat4 view;
 	glm::vec3 pos;

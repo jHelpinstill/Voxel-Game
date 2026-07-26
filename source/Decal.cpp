@@ -1,8 +1,7 @@
 #include "Decal.h"
 
 Decal::Decal(unsigned int texture, const glm::vec2& size, const glm::vec2& pos)
-	: texture(texture), drawFunc(drawDefault), size(size), pos(pos)
-{
+	: texture(texture), drawFunc(drawDefault), size(size), pos(pos) {
 	vao = new VAO;
 	vao->makeDecal();
 	origin = glm::vec2(0.0f);
@@ -10,23 +9,20 @@ Decal::Decal(unsigned int texture, const glm::vec2& size, const glm::vec2& pos)
 }
 #include "util.h"
 
-void Decal::draw()
-{
+void Decal::draw() {
 	//std::cout << "decal draw called" << std::endl;
 	if (drawFunc && window && awake)
 		drawFunc(this, window);
 }
 
-glm::vec2 Decal::getScreenCoords()
-{
+glm::vec2 Decal::getScreenCoords() {
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 
 	return adjustment * glm::vec2(width, height) + pos - origin * size;
 }
 
-glm::mat4 Decal::getMat(bool with_proj)
-{
+glm::mat4 Decal::getMat(bool with_proj) {
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 
@@ -37,8 +33,7 @@ glm::mat4 Decal::getMat(bool with_proj)
 	return mat;
 }
 
-void Decal::drawDefault(Decal* decal, GLFWwindow* window)
-{
+void Decal::drawDefault(Decal* decal, GLFWwindow* window) {
 	decal->shader->use();
 
 	decal->shader->setMat4("projection", decal->getMat());
@@ -48,7 +43,6 @@ void Decal::drawDefault(Decal* decal, GLFWwindow* window)
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-Decal::~Decal()
-{
+Decal::~Decal() {
 	delete vao;
 }

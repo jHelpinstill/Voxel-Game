@@ -4,11 +4,9 @@
 
 #include "Config.h"
 
-class VAO
-{
+class VAO { // Vertex Attribute Object
 public:
-	enum Style
-	{
+	enum Style {
 		TEXTURED,
 		SOLID_COLORED,
 		INSTANCED,

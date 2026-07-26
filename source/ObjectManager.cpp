@@ -9,80 +9,63 @@ std::unordered_map<std::string, unsigned int> textures;
 std::unordered_map<std::string, Decal*> decals;
 std::unordered_map<std::string, Font*> fonts;
 
-Shader* getShaderByName(const std::string& name)
-{
-	try
-	{
+Shader* getShaderByName(const std::string& name) {
+	try {
 		return shaders.at(name);
 	}
-	catch (std::out_of_range)
-	{
+	catch (std::out_of_range) {
 		std::cout << "WARNING: Tried to access nonexistent Shader \"" << name << "\"" << std::endl;
 		while (1)
 			;
 	}
 }
 
-Mesh* getMeshByName(const std::string& name)
-{
-	try
-	{
+Mesh* getMeshByName(const std::string& name) {
+	try {
 		return meshes.at(name);
 	}
-	catch (std::out_of_range)
-	{
+	catch (std::out_of_range) {
 		std::cout << "WARNING: Tried to access nonexistent Mesh \"" << name << "\"" << std::endl;
 		while (1)
 			;
 	}
 }
 
-unsigned int getTextureByName(const std::string& name)
-{
-	try
-	{
+unsigned int getTextureByName(const std::string& name) {
+	try {
 		return textures.at(name);
 	}
-	catch (std::out_of_range)
-	{
+	catch (std::out_of_range) {
 		std::cout << "WARNING: Tried to access nonexistent Texture \"" << name << "\"" << std::endl;
 		while (1)
 			;
 	}
 }
 
-Decal* getDecalByName(const std::string& name)
-{
-	try
-	{
+Decal* getDecalByName(const std::string& name) {
+	try {
 		return decals.at(name);
 	}
-	catch (std::out_of_range)
-	{
+	catch (std::out_of_range) {
 		std::cout << "WARNING: Tried to access nonexistent Decal \"" << name << "\"" << std::endl;
 		while (1)
 			;
 	}
 }
 
-Font* getFontByName(const std::string& name)
-{
-	try
-	{
+Font* getFontByName(const std::string& name) {
+	try {
 		return fonts.at(name);
 	}
-	catch (std::out_of_range)
-	{
+	catch (std::out_of_range) {
 		std::cout << "WARNING: Tried to access nonexistent Font \"" << name << "\"" << std::endl;
 		while (1)
 			;
 	}
 }
 
-void removeShader(const std::string& name)
-{
-	if (shaders.find(name) == shaders.end())
-	{
+void removeShader(const std::string& name) {
+	if (shaders.find(name) == shaders.end()) {
 		//std::cout << "Tried to remove nonexistent shader: \"" << name << "\"" << std::endl;
 		return;
 	}
@@ -90,10 +73,8 @@ void removeShader(const std::string& name)
 	delete shaders.at(name);
 	shaders.erase(name);
 }
-void removeMesh(const std::string& name)
-{
-	if (meshes.find(name) == meshes.end())
-	{
+void removeMesh(const std::string& name) {
+	if (meshes.find(name) == meshes.end()) {
 		//std::cout << "Tried to remove nonexistent mesh: \"" << name << "\"" << std::endl;
 		return;
 	}
@@ -101,19 +82,15 @@ void removeMesh(const std::string& name)
 	delete meshes.at(name);
 	meshes.erase(name);
 }
-void removeTexture(const std::string& name)
-{
-	if (textures.find(name) == textures.end())
-	{
+void removeTexture(const std::string& name) {
+	if (textures.find(name) == textures.end()) {
 		//std::cout << "Tried to remove nonexistent texture: \"" << name << "\"" << std::endl;
 		return;
 	}
 	textures.erase(name);
 }
-void removeDecal(const std::string& name)
-{
-	if (decals.find(name) == decals.end())
-	{
+void removeDecal(const std::string& name) {
+	if (decals.find(name) == decals.end()) {
 		//std::cout << "Tried to remove nonexistent mesh: \"" << name << "\"" << std::endl;
 		return;
 	}
@@ -122,10 +99,8 @@ void removeDecal(const std::string& name)
 	decals.erase(name);
 }
 
-void removeFont(const std::string& name)
-{
-	if (fonts.find(name) == fonts.end())
-	{
+void removeFont(const std::string& name) {
+	if (fonts.find(name) == fonts.end()) {
 		//std::cout << "Tried to remove nonexistent mesh: \"" << name << "\"" << std::endl;
 		return;
 	}
@@ -144,8 +119,7 @@ Shader* createShader(
 	return shader;
 }
 
-unsigned int createTexture(const std::string& name, const std::string& filepath, bool alpha_channel)
-{
+unsigned int createTexture(const std::string& name, const std::string& filepath, bool alpha_channel) {
 	stbi_set_flip_vertically_on_load(true);
 
 	unsigned int texture;
@@ -159,14 +133,12 @@ unsigned int createTexture(const std::string& name, const std::string& filepath,
 	// load and generate the texture
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
-	if (data)
-	{
+	if (data) {
 		int image_type = alpha_channel ? GL_RGBA : GL_RGB;
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, image_type, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
-	else
-	{
+	else {
 		std::cout << "Failed to load texture from \"" << filepath << "\"" << std::endl;
 	}
 	stbi_image_free(data);
@@ -175,8 +147,7 @@ unsigned int createTexture(const std::string& name, const std::string& filepath,
 	return texture;
 }
 
-Decal* createDecal(const std::string& name, const std::string& tex_name, const std::string& shader_name, const glm::vec2& size, const glm::vec2& pos, GLFWwindow* window)
-{
+Decal* createDecal(const std::string& name, const std::string& tex_name, const std::string& shader_name, const glm::vec2& size, const glm::vec2& pos, GLFWwindow* window) {
 	Decal* decal = new Decal(getTextureByName(tex_name), size, pos);
 	decal->shader = getShaderByName(shader_name);
 	decal->window = window;

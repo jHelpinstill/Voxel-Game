@@ -13,30 +13,25 @@ constexpr auto CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
 constexpr auto CHUNK_VOLUME = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 
 // manages and organizes a group of blocks
-class Chunk
-{
+class Chunk {
 public:
-	struct ShaderInfo
-	{
+	struct ShaderInfo {
 		int coord_bits;
 		int face_bits;
 		int color_bits;
 	} shader_info;
 
-	struct Key
-	{
+	struct Key {
 		int x, y, z;
 		Key(int x, int y, int z) : x(x), y(y), z(z) {}
-		bool operator==(const Key& other) const
-		{
+		bool operator==(const Key& other) const {
 			return (x == other.x
 				&& y == other.y
 				&& z == other.z);
 		}
 	};
 	// Group allows the easiy manipulation of collections of chunks. 
-	class Group
-	{
+	class Group {
 	public:
 		Chunk** chunks;
 		int size;
@@ -51,8 +46,7 @@ public:
 		~Group();
 	};
 
-	struct Blocks
-	{
+	struct Blocks {
 		BlockType data[CHUNK_VOLUME];
 
 		BlockType& operator[](int index);
@@ -74,8 +68,7 @@ public:
 	long seed;				// unique random number used for various things
 	
 	// face type containes pointer to parent block, and the direction of the face
-	struct Face
-	{
+	struct Face {
 		BlockType* block;
 		int norm;
 	};
@@ -95,19 +88,15 @@ public:
 };
 
 // used for the hashing of chunks using the custom ChunkManager::Key
-template <>
-struct std::hash<Chunk::Key>
-{
-	std::size_t operator()(const Chunk::Key& k) const
-	{
-		using std::size_t;
-		using std::hash;
-		using std::string;
-
-		return ((hash<int>()(k.x)
-			^ (hash<int>()(k.y) << 1)) >> 1)
-			^ (hash<int>()(k.z) << 1);
-	}
-};
+namespace std {
+	template <>
+	struct hash<Chunk::Key> {
+		size_t operator()(const Chunk::Key& k) const {
+			return ((hash<int>()(k.x)
+				^ (hash<int>()(k.y) << 1)) >> 1)
+				^ (hash<int>()(k.z) << 1);
+		}
+	};
+}
 
 #endif

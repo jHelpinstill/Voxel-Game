@@ -1,20 +1,17 @@
 #include "Game.h"
 
-Game::Game(GLFWwindow* window)
-{
+Game::Game(GLFWwindow* window) {
 	this->window = window;
 	state = PAUSED;
 	setup();
 }
 
-Game::~Game()
-{
+Game::~Game() {
 	delete input;
 	delete camera;
 }
 
-void Game::setup()
-{
+void Game::setup() {
 	input = new Input(window);
 
 	camera = new Camera(window);
@@ -25,23 +22,23 @@ void Game::setup()
 	player->constrainLook(glm::vec3(0, 1, 0));
 	player->move_speed = 15;
 
-	createShader("texture_shader", "shaders/meshVertex.txt", "shaders/meshFragment.txt");
-	createShader("color_shader", "shaders/meshColorVertex.txt", "shaders/meshColorFragment.txt");
-	createShader("chunk_shader", "shaders/chunkVertex.txt", "shaders/meshFragment.txt");
-	createShader("decal_shader", "shaders/DecalVertex.txt", "shaders/DecalFragment.txt");
-	createShader("font_shader", "shaders/FontVertex.txt", "shaders/FontFragment.txt");
+	createShader("texture_shader", ROOT + "shaders/meshVertex.txt", ROOT + "shaders/meshFragment.txt");
+	createShader("color_shader", ROOT + "shaders/meshColorVertex.txt", ROOT + "shaders/meshColorFragment.txt");
+	createShader("chunk_shader", ROOT + "shaders/chunkVertex.txt", ROOT + "shaders/meshFragment.txt");
+	createShader("decal_shader", ROOT + "shaders/DecalVertex.txt", ROOT + "shaders/DecalFragment.txt");
+	createShader("font_shader", ROOT + "shaders/FontVertex.txt", ROOT + "shaders/FontFragment.txt");
 
-	createTexture("smiley", "textures/smiley.png", true);
-	createTexture("crate", "textures/crate.jpg");
-	createTexture("chunk_texture", "textures/dirt_block.png", true);
-	createTexture("white_square", "textures/white_square.png", true);
+	createTexture("smiley", ROOT + "textures/smiley.png", true);
+	createTexture("crate", ROOT + "textures/crate.jpg");
+	createTexture("chunk_texture", ROOT + "textures/dirt_block.png", true);
+	createTexture("white_square", ROOT + "textures/white_square.png", true);
 
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 3, 0), "smiley");
-	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 3, -2), "crate", "meshes/box_two_face_UV.txt");
-	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 3, 2), "crate", "meshes/box_two_face_UV.txt");
-	createTexturedBox("test_block", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), "crate", "meshes/box_two_face_UV.txt");
+	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 3, -2), "crate", ROOT + "meshes/box_two_face_UV.txt");
+	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 3, 2), "crate", ROOT + "meshes/box_two_face_UV.txt");
+	createTexturedBox("test_block", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), "crate", ROOT + "meshes/box_two_face_UV.txt");
 
-	fonts["arial"] = new Font("fonts/arial.ttf", 48);
+	fonts["arial"] = new Font(ROOT + "fonts/arial.ttf", 48);
 
 	Decal* crosshair = createDecal("crosshair", "white_square", "decal_shader", glm::vec2(3), glm::vec2(0), window);
 	crosshair->origin = glm::vec2(0.5f);
@@ -65,14 +62,12 @@ void Game::setup()
 }
 
 #define AVG_FPS_HISTORY_SIZE 100
-struct
-{
+struct {
 	double history[AVG_FPS_HISTORY_SIZE]{};
 	int index = 0;
 	double sum = 0;
 	double avg() { return sum / AVG_FPS_HISTORY_SIZE; }
-	void update(double fps)
-	{
+	void update(double fps) {
 		sum += fps;
 		sum -= history[index];
 		history[index] = fps;
@@ -81,8 +76,7 @@ struct
 } avg_fps;
 
 int num_meshes = 0;
-void Game::stateMachine(double dt)
-{
+void Game::stateMachine(double dt) {
 	input->update();
 	double time = glfwGetTime();
 
@@ -91,12 +85,9 @@ void Game::stateMachine(double dt)
 	buf << "fps: " << std::setw(7) << avg_fps.avg();
 	glfwSetWindowTitle(window, buf.str().c_str());
 
-	switch (state)
-	{
-	case PAUSED:
-	{
-		if (input->keyPressed(GLFW_KEY_ESCAPE) || input->mouse.left.pressed)
-		{
+	switch (state) {
+	case PAUSED: {
+		if (input->keyPressed(GLFW_KEY_ESCAPE) || input->mouse.left.pressed) {
 			state = RUNNING;
 			input->lockCursor();
 			std::cout << "RUNNING" << std::endl;
@@ -112,11 +103,9 @@ void Game::stateMachine(double dt)
 
 		break;
 	}
-	case RUNNING:
-	{
+	case RUNNING: {
 
-		if (input->keyPressed(GLFW_KEY_ESCAPE))
-		{
+		if (input->keyPressed(GLFW_KEY_ESCAPE)) {
 			state = PAUSED;
 			input->freeCursor();
 			std::cout << "PAUSED" << std::endl;
@@ -143,16 +132,14 @@ void Game::stateMachine(double dt)
 	}
 }
 
-void Game::drawMeshes()
-{
+void Game::drawMeshes() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	for (auto& mesh : meshes)
 		mesh.second->draw(camera);
 }
 
-void Game::drawUI()
-{
+void Game::drawUI() {
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	for (auto& decal : decals)

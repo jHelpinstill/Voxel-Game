@@ -6,17 +6,14 @@
 
 bool window_resized = false;
 
-void windowSizeCallback(GLFWwindow* window, int width, int height)
-{
+void windowSizeCallback(GLFWwindow* window, int width, int height) {
 	glfwMakeContextCurrent(window);
 	glViewport(0, 0, width, height);
 	window_resized = true;
 }
 
-int main()
-{
-	if (!glfwInit())	// MUST RUN BEFORE GLAD INIT
-	{
+int main() {
+	if (!glfwInit()) {	// MUST RUN BEFORE GLAD INIT
 		std::cout << "GLFW couldn't start" << std::endl;
 		return -1;
 	}
@@ -28,8 +25,7 @@ int main()
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, windowSizeCallback);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))	// MUST RUN BEFORE ANY OTHER OPENGL FUNCTION
-	{
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {	// MUST RUN BEFORE ANY OTHER OPENGL FUNCTION
 		glfwTerminate();
 		std::cout << "Glad couldn't start" << std::endl;
 		return -1;
@@ -40,10 +36,8 @@ int main()
 	Game game(window);
 
 	float frame_rate = 0.0;
-	while (!glfwWindowShouldClose(window))
-	{
-		if (window_resized)
-		{
+	while (!glfwWindowShouldClose(window)) {
+		if (window_resized) {
 			window_resized = false;
 			game.camera->findAspectRatio(window);
 		}

@@ -17,12 +17,10 @@
 #include "RenderText.h"
 #include "Textbox.h"
 
-class Game
-{
+class Game {
 private:
 	void setup();
-	enum
-	{
+	enum {
 		PAUSED,
 		RUNNING
 	} state;

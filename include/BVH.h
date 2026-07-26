@@ -4,25 +4,22 @@
 
 #include "Config.h"
 #include "util.h"
+#include <typeinfo>
 
 template <class T>
-class BVH
-{
+class BVH {
 public:
-	struct RaycastResult
-	{
+	struct RaycastResult {
 		bool hit;
 		T* obj;
 		glm::vec3 pos;
 	};
-	struct DataNode
-	{
+	struct DataNode {
 		glm::vec3 pos;
 		T obj;
 		DataNode* next;
 	};
-	class Box
-	{
+	class Box {
 	private:
 		
 		
@@ -82,20 +79,17 @@ BVH<T>::BVH(
 	int min_nodes
 )	: raycastObjFunc(raycastObjFunc)
 	, boxExpandToFitFunc(boxExpandToFitFunc)
-	, min_nodes_per_box(min_nodes)
-{
+	, min_nodes_per_box(min_nodes) {
 	root = new Box(boxExpandToFitFunc);
 }
 
 template <class T>
-BVH<T>::~BVH()
-{
+BVH<T>::~BVH() {
 	delete root;
 }
 
 template <typename T>
-auto BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray)->RaycastResult
-{
+auto BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray)->RaycastResult {
 	RaycastResult result{};
 	if (!root || !raycastObjFunc)
 		return result;
@@ -116,15 +110,13 @@ auto BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray)->RaycastResult
 }
 
 template <class T>
-void BVH<T>::reset()
-{
+void BVH<T>::reset() {
 	delete root;
 	root = new Box(boxExpandToFitFunc);
 }
 
 template <class T>
-void BVH<T>::rebuild()
-{
+void BVH<T>::rebuild() {
 	root->data = root->getData();
 
 	delete root->childA;
@@ -136,8 +128,7 @@ void BVH<T>::rebuild()
 }
 
 template <class T>
-void BVH<T>::build()
-{
+void BVH<T>::build() {
 	root->split(min_nodes_per_box);
 }
 
@@ -146,20 +137,17 @@ void BVH<T>::build()
 template <class T>
 BVH<T>::Box::Box(void (*expandToFit)(const glm::vec3&, T*, glm::vec3&, glm::vec3&))
 	: expandToFit(expandToFit)
-	, data(nullptr), childA(nullptr), childB(nullptr), resized(false)
-{
+	, data(nullptr), childA(nullptr), childB(nullptr), resized(false) {
 	min = glm::vec3(std::numeric_limits<float>::infinity());
 	max = glm::vec3(-std::numeric_limits<float>::infinity());
 }
 
 template <class T>
-BVH<T>::Box::~Box()
-{
+BVH<T>::Box::~Box() {
 	delete childA;
 	delete childB;
 
-	while (data)
-	{
+	while (data) {
 		DataNode* old = data;
 		data = data->next;
 		delete old;
@@ -167,8 +155,7 @@ BVH<T>::Box::~Box()
 }
 
 template <class T>
-void BVH<T>::Box::addDataNode(const glm::vec3& pos, const T& obj)
-{
+void BVH<T>::Box::addDataNode(const glm::vec3& pos, const T& obj) {
 	DataNode* node = new DataNode;
 	node->pos = pos;
 	node->obj = obj;
@@ -177,8 +164,7 @@ void BVH<T>::Box::addDataNode(const glm::vec3& pos, const T& obj)
 }
 
 template <class T>
-void BVH<T>::Box::addDataNode(DataNode* node)
-{
+void BVH<T>::Box::addDataNode(DataNode* node) {
 	node->next = data;
 	data = node;
 	resized = true;
@@ -186,12 +172,10 @@ void BVH<T>::Box::addDataNode(DataNode* node)
 }
 
 template <class T>
-int BVH<T>::Box::countDataNodes()
-{
+int BVH<T>::Box::countDataNodes() {
 	int count = 0;
 	DataNode* node = data;
-	while (node)
-	{
+	while (node) {
 		count++;
 		node = node->next;
 	}
@@ -199,8 +183,7 @@ int BVH<T>::Box::countDataNodes()
 }
 
 template <class T>
-auto BVH<T>::Box::getData(DataNode* existing_data)->DataNode*
-{
+auto BVH<T>::Box::getData(DataNode* existing_data)->DataNode* {
 	if (childA)
 		existing_data = childA->getData(existing_data);
 	if (childB)
@@ -222,16 +205,13 @@ auto BVH<T>::Box::getData(DataNode* existing_data)->DataNode*
 class Chunk;
 
 template <class T>
-void BVH<T>::Box::split(int min_data_nodes)
-{
+void BVH<T>::Box::split(int min_data_nodes) {
 	static int split_depth = 0;
 	split_depth++;
 
-	if (typeid(T) == typeid(Chunk*))
-	{
+	if (typeid(T) == typeid(Chunk*)) {
 		
-		if (split_depth > 20)
-		{
+		if (split_depth > 20) {
 			std::cout << "max depth exceeded: splits: " << split_depth << std::endl;
 		}
 	}
@@ -249,39 +229,32 @@ void BVH<T>::Box::split(int min_data_nodes)
 
 	float splittingPoint = center[longest_axis];
 	DataNode* node = data;
-	while (node)
-	{
+	while (node) {
 		DataNode* current_node = node;
 		node = node->next;
 
-		if (current_node->pos[longest_axis] < splittingPoint)
-		{
+		if (current_node->pos[longest_axis] < splittingPoint) {
 			childA->addDataNode(current_node);
 		}
-		else
-		{
+		else {
 			childB->addDataNode(current_node);
 		}
 	}
 
 	data = nullptr;
 
-	if (childA)
-	{
+	if (childA) {
 		int num_nodes = childA->countDataNodes();
-		if (!num_nodes)
-		{
+		if (!num_nodes) {
 			delete childA;
 			childA = nullptr;
 		}
 		else if (num_nodes > min_data_nodes)
 			childA->split(min_data_nodes);
 	}
-	if (childB)
-	{
+	if (childB) {
 		int num_nodes = childB->countDataNodes();
-		if (!num_nodes)
-		{
+		if (!num_nodes) {
 			delete childB;
 			childB = nullptr;
 		}
@@ -293,10 +266,8 @@ void BVH<T>::Box::split(int min_data_nodes)
 }
 
 template <class T>
-bool BVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
-{
-	for (int face = 0; face < 6; face++)
-	{
+bool BVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray) {
+	for (int face = 0; face < 6; face++) {
 		Quad quad(min, max, face);
 		if (rayIntersectsPoly(pos, ray, quad.verts, 4))
 			return true;
@@ -305,15 +276,12 @@ bool BVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray)
 }
 
 template <class T>
-bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3& pos, Box** boxes)
-{
+bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3& pos, Box** boxes) {
 	// find nearest vertice of the closer box
 	float farthest_vert_A = UTIL_NEGATIVE_INFINITY;
-	for (int face = 0; face < 2; face++)
-	{
+	for (int face = 0; face < 2; face++) {
 		Quad quad_top(boxes[0]->min, boxes[0]->max, face);
-		for (int vert = face * 4; vert < 4 * (face + 1); vert++)
-		{
+		for (int vert = face * 4; vert < 4 * (face + 1); vert++) {
 			float dist = glm::length(quad_top.verts[vert - (face * 4)] - pos);
 			if (dist > farthest_vert_A)
 				farthest_vert_A = dist;
@@ -322,11 +290,9 @@ bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3& pos, Box** boxes)
 	
 	// if a single vertice of the far box is closer than the farthest vert of the near box,
 	// then the near box is not closer monotonitcally (and the far box cannot be discarded)
-	for (int face = 0; face < 2; face++)
-	{
+	for (int face = 0; face < 2; face++) {
 		Quad quad_top(boxes[1]->min, boxes[1]->max, face);
-		for (int vert = face * 4; vert < 4 * (face + 1); vert++)
-		{
+		for (int vert = face * 4; vert < 4 * (face + 1); vert++) {
 			float dist = glm::length(quad_top.verts[vert - (face * 4)] - pos);
 			if (dist < farthest_vert_A)
 				return false;
@@ -336,8 +302,7 @@ bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3& pos, Box** boxes)
 }
 
 template <class T>
-auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*))->DataNode*
-{
+auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*))->DataNode* {
 	DataNode* nearest_hit = nullptr;
 	if (!resized)
 		return nearest_hit;	// don't bother if box hasn't been resized yet (not initialized with data)
@@ -354,18 +319,15 @@ auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*ray
 	else if (!childA_hit && childB_hit) // will only search childB
 		ranked_children[0] = childB;
 
-	else if (childA_hit && childB_hit) // will be searching both children
-	{
+	else if (childA_hit && childB_hit) { // will be searching both children
 		float distA, distB;
 		distA = glm::length((childA->max - childA->min) - pos);
 		distB = glm::length((childB->max - childB->min) - pos);
-		if (distA < distB) // childA is closer
-		{
+		if (distA < distB) { // childA is closer
 			ranked_children[0] = childA;
 			ranked_children[1] = childB;
 		}
-		else // childB is closer
-		{
+		else { // childB is closer
 			ranked_children[0] = childB;
 			ranked_children[1] = childA;
 		}
@@ -375,10 +337,8 @@ auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*ray
 	// find hits from child nodes
 	std::vector<DataNode*> hit_nodes;
 	DataNode* hit = nullptr;
-	for (int i = 0; i < 2; i++)
-	{
-		if (ranked_children[i] && (hit = ranked_children[i]->raycast(pos, ray, raycastObj)))
-		{
+	for (int i = 0; i < 2; i++) {
+		if (ranked_children[i] && (hit = ranked_children[i]->raycast(pos, ray, raycastObj))) {
 			hit_nodes.push_back(hit);
 			if (monotonically_closer)
 				break;
@@ -387,8 +347,7 @@ auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*ray
 
 	// find hits from own nodes
 	DataNode* node = data;
-	while (node)
-	{
+	while (node) {
 		if (raycastObj(pos, ray, node->pos, &node->obj))
 			hit_nodes.push_back(node);
 
@@ -396,15 +355,12 @@ auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*ray
 	}
 
 	// find nearest hit
-	if (hit_nodes.size())
-	{
+	if (hit_nodes.size()) {
 		int nearest = 0;
 		float nearest_dist = glm::length(hit_nodes[0]->pos - pos);
-		for (int i = 1; i < hit_nodes.size(); i++)
-		{
+		for (int i = 1; i < hit_nodes.size(); i++) {
 			float dist = glm::length(hit_nodes[i]->pos - pos);
-			if (dist < nearest_dist)
-			{
+			if (dist < nearest_dist) {
 				nearest = i;
 				nearest_dist = dist;
 			}

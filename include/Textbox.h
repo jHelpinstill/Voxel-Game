@@ -8,8 +8,7 @@
 #include "Decal.h"
 #include "RenderText.h"
 
-class Textbox
-{
+class Textbox {
 public:
 	Font* font;
 	Shader* shader;

@@ -25,10 +25,8 @@ void renderText(
 
 	vao.bind();
 	glActiveTexture(GL_TEXTURE0);
-	for (int i = 0; i < text.size(); i++)
-	{
-		switch (text[i])
-		{
+	for (int i = 0; i < text.size(); i++) {
+		switch (text[i]) {
 		case '\n':
 			continue;
 		}

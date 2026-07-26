@@ -5,8 +5,7 @@
 #include "config.h"
 #include "Transform.h"
 
-class Camera
-{
+class Camera {
 public:
 	float fov;	// degrees
 	float aspect_ratio;

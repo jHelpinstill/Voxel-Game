@@ -1,0 +1,3 @@
+C:/repos/Voxel-Game/build/CMakeFiles/voxel_game.dir
+C:/repos/Voxel-Game/build/CMakeFiles/edit_cache.dir
+C:/repos/Voxel-Game/build/CMakeFiles/rebuild_cache.dir

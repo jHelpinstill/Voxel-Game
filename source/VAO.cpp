@@ -1,15 +1,12 @@
 #include "VAO.h"
 
-void VAO::bind()
-{
+void VAO::bind() {
 	glBindVertexArray(ID);
 }
 
-void VAO::makeTextured(const std::vector<glm::vec3>& verts, const std::vector<glm::vec2>& uv_coords)
-{
+void VAO::makeTextured(const std::vector<glm::vec3>& verts, const std::vector<glm::vec2>& uv_coords) {
 	reset();
-	if (verts.size() != uv_coords.size())
-	{
+	if (verts.size() != uv_coords.size()) {
 		std::cout << "Vertex and UV_coords size mismatch (";
 		std::cout << verts.size() << ", " << uv_coords.size() << "), aborting VAO creation" << std::endl;
 		style = Style::NONE;
@@ -18,8 +15,7 @@ void VAO::makeTextured(const std::vector<glm::vec3>& verts, const std::vector<gl
 	style = Style::TEXTURED;
 
 	std::vector<float> data;
-	for (int vert = 0; vert < verts.size(); vert++)
-	{
+	for (int vert = 0; vert < verts.size(); vert++) {
 		for (int i = 0; i < 3; i++)
 			data.push_back(verts[vert][i]);
 
@@ -45,14 +41,12 @@ void VAO::makeTextured(const std::vector<glm::vec3>& verts, const std::vector<gl
 	glEnableVertexAttribArray(1);
 }
 
-void VAO::makeSolidColored(const std::vector<glm::vec3>& verts, const glm::vec3& color)
-{
+void VAO::makeSolidColored(const std::vector<glm::vec3>& verts, const glm::vec3& color) {
 	reset();
 	style = Style::SOLID_COLORED;
 
 	std::vector<float> data;
-	for (const glm::vec3& vert : verts)
-	{
+	for (const glm::vec3& vert : verts) {
 		for (int i = 0; i < 3; i++)
 			data.push_back(vert[i]);
 	}
@@ -71,14 +65,12 @@ void VAO::makeSolidColored(const std::vector<glm::vec3>& verts, const glm::vec3&
 	glEnableVertexAttribArray(0);
 }
 
-void VAO::makeInstanced(const std::vector<glm::vec3>& verts, const std::vector<int>& instance_data)
-{
+void VAO::makeInstanced(const std::vector<glm::vec3>& verts, const std::vector<int>& instance_data) {
 	reset();
 	style = Style::INSTANCED;
 
 	std::vector<float> vert_data;
-	for (int vert = 0; vert < verts.size(); vert++)
-	{
+	for (int vert = 0; vert < verts.size(); vert++) {
 		for (int i = 0; i < 3; i++)
 			vert_data.push_back(verts[vert][i]);
 	}
@@ -106,23 +98,20 @@ void VAO::makeInstanced(const std::vector<glm::vec3>& verts, const std::vector<i
 	glEnableVertexAttribArray(1);
 }
 
-void VAO::makeDecal()
-{
+void VAO::makeDecal() {
 	reset();
 
 	style = Style::DECAL;
 
 	std::vector<float> data;
-	const glm::vec2 verts[4] =
-	{
+	const glm::vec2 verts[4] = {
 		glm::vec2(0, 0),
 		glm::vec2(1, 0),
 		glm::vec2(0, 1),
 		glm::vec2(1, 1)
 	};
 
-	for (int i = 0; i < 4; i++)
-	{
+	for (int i = 0; i < 4; i++) {
 		data.push_back(verts[i].x);
 		data.push_back(verts[i].y);
 		data.push_back(verts[i].x);
@@ -143,23 +132,20 @@ void VAO::makeDecal()
 	glEnableVertexAttribArray(0);
 }
 
-void VAO::makeFont()
-{
+void VAO::makeFont() {
 	reset();
 
 	style = Style::FONT;
 
 	std::vector<float> data;
-	const glm::vec2 verts[4] =
-	{
+	const glm::vec2 verts[4] = {
 		glm::vec2(0, 0),
 		glm::vec2(1, 0),
 		glm::vec2(0, 1),
 		glm::vec2(1, 1)
 	};
 
-	for (int i = 0; i < 4; i++)
-	{
+	for (int i = 0; i < 4; i++) {
 		data.push_back(verts[i].x);
 		data.push_back(verts[i].y);
 		data.push_back(verts[i].x);
@@ -180,10 +166,8 @@ void VAO::makeFont()
 	glEnableVertexAttribArray(0);
 }
 
-void VAO::reset()
-{
-	switch(style)
-	{
+void VAO::reset() {
+	switch(style) {
 	case Style::INSTANCED:
 		glDeleteBuffers(1, &data_VBO);
 	default:
@@ -194,8 +178,7 @@ void VAO::reset()
 	}
 }
 
-VAO::~VAO()
-{
+VAO::~VAO() {
 	glDeleteBuffers(1, &data_VBO);
 	glDeleteVertexArrays(1, &ID);
 	glDeleteBuffers(1, &verts_VBO);

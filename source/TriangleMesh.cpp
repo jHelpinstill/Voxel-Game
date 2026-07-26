@@ -1,7 +1,6 @@
 #include "TriangleMesh.h"
 
-TriangleMesh::TriangleMesh()
-{
+TriangleMesh::TriangleMesh() {
     vertex_count = 3;
 
     float verts[9] = {
@@ -17,14 +16,12 @@ TriangleMesh::TriangleMesh()
     createVAO(verts, colors);
 }
 
-TriangleMesh::TriangleMesh(float* verts, float* colors)
-{
+TriangleMesh::TriangleMesh(float* verts, float* colors) {
     vertex_count = 3;
 
     createVAO(verts, colors);
 }
-void TriangleMesh::createVAO(float* verts, float* colors)
-{
+void TriangleMesh::createVAO(float* verts, float* colors) {
     std::vector<float> data;
     for (int i = 0; i < 9; i++)
         data.push_back(verts[i]);

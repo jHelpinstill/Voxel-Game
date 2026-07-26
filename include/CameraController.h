@@ -6,8 +6,7 @@
 #include "Camera.h"
 #include "Input.h"
 
-class CameraController
-{
+class CameraController {
 private:
 	Input* input;
 	Camera* camera;
@@ -15,8 +14,7 @@ private:
 	bool constrain_up = false;
 	glm::vec3 up_vec;
 
-	struct
-	{
+	struct {
 		int forward = 'W';
 		int backward = 'S';
 		int left = 'A';

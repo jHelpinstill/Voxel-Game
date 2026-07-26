@@ -5,11 +5,9 @@
 #include "config.h"
 #include "VAO.h"
 
-class Font
-{
+class Font {
 public:
-	struct Character
-	{
+	struct Character {
 		unsigned int texture;
 		glm::ivec2 size;
 		glm::ivec2 bearing;

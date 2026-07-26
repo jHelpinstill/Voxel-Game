@@ -1,7 +1,6 @@
 #include "Mesh.h"
 
-Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*))
-{
+Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*)) {
 	this->texture = texture;
 	this->drawFunc = drawFunction;
 
@@ -58,36 +57,30 @@ Mesh::Mesh(
 	vao->makeSolidColored(verts, color);
 }
 
-Mesh::~Mesh()
-{
+Mesh::~Mesh() {
 	delete vao;
 }
 
-void Mesh::draw(Camera* camera)
-{
+void Mesh::draw(Camera* camera) {
 	if(drawFunc)
 		drawFunc(this, camera);
 }
 
-void Mesh::attachShader(Shader* shader)
-{
+void Mesh::attachShader(Shader* shader) {
 	this->shader = shader;
 }
 
-void Mesh::getUVMap(const std::string& filepath)
-{
+void Mesh::getUVMap(const std::string& filepath) {
 	std::ifstream file;
 	std::string line;
 
 	file.open(filepath);
-	if (!file.is_open())
-	{
+	if (!file.is_open()) {
 		std::cout << "UV file at \"" << filepath << "\" not found" << std::endl;
 		return;
 	}
 
-	while (std::getline(file, line))
-	{
+	while (std::getline(file, line)) {
 		std::stringstream buffer(line);
 		glm::vec2 coord;
 		buffer >> coord.x;
@@ -99,14 +92,12 @@ void Mesh::getUVMap(const std::string& filepath)
 	file.close();
 }
 
-void Mesh::drawTriangles(Mesh* mesh, Camera* camera)
-{
+void Mesh::drawTriangles(Mesh* mesh, Camera* camera) {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
 	//mesh->shader->setMat4("transform", mesh->transform.getMat());
 
-	switch (mesh->style)
-	{
+	switch (mesh->style) {
 	case Shader::VAOStyle::TEXTURED:
 		glBindTexture(GL_TEXTURE_2D, mesh->texture);
 		break;
@@ -120,14 +111,12 @@ void Mesh::drawTriangles(Mesh* mesh, Camera* camera)
 	glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
 }
 
-void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera)
-{
+void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera) {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat());
 	mesh->shader->setMat4("transform", mesh->transform.getMat());
 
-	switch (mesh->style)
-	{
+	switch (mesh->style) {
 	case Shader::VAOStyle::TEXTURED:
 		glBindTexture(GL_TEXTURE_2D, mesh->texture);
 		break;

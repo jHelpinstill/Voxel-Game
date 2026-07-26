@@ -4,8 +4,7 @@
 
 #include "config.h"
 
-class Shader
-{
+class Shader {
 private:
 	unsigned int makeModule(const std::string& filepath, unsigned int module_type);
 

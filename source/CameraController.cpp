@@ -1,15 +1,12 @@
 #include "CameraController.h"
 
-CameraController::CameraController(Camera& camera, Input& input)
-{
+CameraController::CameraController(Camera& camera, Input& input) {
 	this->camera =& camera;
 	this->input =& input;
 }
 
-void CameraController::update(float dt)
-{
-	if (constrain_up)
-	{
+void CameraController::update(float dt) {
+	if (constrain_up) {
 		camera->transform.rotate(input->mouse.delta.x * mouse_sensitivity / 1000.0, up_vec, false);
 		camera->transform.rotate(input->mouse.delta.y * mouse_sensitivity / 1000.0, glm::vec3(1, 0, 0), true);
 
@@ -27,8 +24,7 @@ void CameraController::update(float dt)
 
 		camera->transform.translate(move_up + move_left + move_fwd);
 	}
-	else
-	{
+	else {
 		camera->transform.rotate(glm::vec3(input->mouse.delta.y * mouse_sensitivity * dt, input->mouse.delta.x * mouse_sensitivity, 0));
 	}
 	
@@ -36,19 +32,16 @@ void CameraController::update(float dt)
 	//camera->translateLocal(getInputVector() * move_speed * dt);
 }
 
-void CameraController::constrainLook(glm::vec3 up)
-{
+void CameraController::constrainLook(glm::vec3 up) {
 	constrain_up = true;
 	up_vec = glm::normalize(up);
 }
 
-void CameraController::freeLook()
-{
+void CameraController::freeLook() {
 	constrain_up = false;
 }
 
-glm::vec3 CameraController::getInputVector()
-{
+glm::vec3 CameraController::getInputVector() {
 	glm::vec3 v(0, 0, 0);
 	v.z = input->keyHeld(inputs.forward) - input->keyHeld(inputs.backward);
 	v.x = input->keyHeld(inputs.left) - input->keyHeld(inputs.right);

@@ -4,12 +4,10 @@
 
 #include "config.h"
 
-class Input
-{
+class Input {
 private:
 	GLFWwindow* window;
-	struct Key 
-	{
+	struct Key  {
 		int state, prev_state;
 		bool pressed, held, released;
 	} keys[GLFW_KEY_LAST + 1];
@@ -17,17 +15,14 @@ private:
 	static std::vector<Input*> objects;
 
 public:
-	struct Mouse
-	{
+	struct Mouse {
 		double x, y;
 		glm::vec2 delta;
-		struct Button
-		{
+		struct Button {
 			int state, prev_state;
 			bool pressed, held, released;
 		};
-		union
-		{
+		union {
 			Button buttons[GLFW_MOUSE_BUTTON_LAST + 1];
 			struct { Button left, right; };
 		};

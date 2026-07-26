@@ -17,67 +17,59 @@ Shader::Shader(
 	glLinkProgram(this->ID);
 
 	int success;
-	glGetProgramiv(this->ID, GL_LINK_STATUS,& success);
-	if (!success)
-	{
-		char error_log[1024];
+	glGetProgramiv(this->ID, GL_LINK_STATUS, &success);
+	if (!success) {
+		char *error_log = new char[1024];
 		glGetProgramInfoLog(this->ID, 1024, NULL, error_log);
-		std::cout << "Shader Linking error:\n" << error_log << std::endl;
+		std::cout << 
+			"Shader Linking error with vertext path '" << vertex_filepath <<
+			"' and shader path '" << fragment_filepath << "': " << error_log << std::endl;
+		delete error_log;
 	}
 
 	glDeleteShader(vertex_module);
 	glDeleteShader(fragment_module);
 }
 
-Shader::~Shader()
-{
+Shader::~Shader() {
 	glDeleteProgram(this->ID);
 }
 
-void Shader::use()
-{
+void Shader::use() {
 	glUseProgram(this->ID);
 }
 
-void Shader::setBool(const std::string& name, bool value) const
-{
+void Shader::setBool(const std::string& name, bool value) const {
 	glUniform1i(glGetUniformLocation(this->ID, name.c_str()), (int)value);
 }
 
-void Shader::setInt(const std::string& name, int value) const
-{
+void Shader::setInt(const std::string& name, int value) const {
 	glUniform1i(glGetUniformLocation(this->ID, name.c_str()), value);
 }
 
-void Shader::setFloat(const std::string& name, float value) const
-{
+void Shader::setFloat(const std::string& name, float value) const {
 	glUniform1f(glGetUniformLocation(this->ID, name.c_str()), value);
 }
 
-void Shader::setMat4(const std::string& name, const glm::mat4& mat) const
-{
+void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
 	glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void Shader::setVec3(const std::string& name, glm::vec3 vec) const
-{
+void Shader::setVec3(const std::string& name, glm::vec3 vec) const {
 	glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
 }
-void Shader::setVec4(const std::string& name, glm::vec4 vec) const
-{
+void Shader::setVec4(const std::string& name, glm::vec4 vec) const {
 	glUniform4fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
 }
 
 unsigned int Shader::makeModule(
-	const std::string& filepath, unsigned int module_type)
-{
+	const std::string& filepath, unsigned int module_type) {
 	std::ifstream file;
 	std::stringstream buffered_lines;
 	std::string line;
 
 	file.open(filepath);
-	while (std::getline(file, line))
-	{
+	while (std::getline(file, line)) {
 		buffered_lines << line << "\n";
 	}
 
@@ -91,8 +83,7 @@ unsigned int Shader::makeModule(
 
 	int success;
 	glGetShaderiv(shader_module, GL_COMPILE_STATUS,& success);
-	if (!success)
-	{
+	if (!success) {
 		char error_log[1024];
 		glGetShaderInfoLog(shader_module, 1024, NULL, error_log);
 		std::cout << "Shader Module \"" << filepath << "\" compilation error : \n" << error_log << std::endl;

@@ -4,8 +4,7 @@
 #define UTIL_INFINITY std::numeric_limits<float>::infinity()
 #define UTIL_NEGATIVE_INFINITY -std::numeric_limits<float>::infinity()
 
-namespace util
-{
+namespace util {
 	extern glm::vec3 X;
 	extern glm::vec3 Y;
 	extern glm::vec3 Z;
@@ -16,8 +15,7 @@ namespace util
 
 	extern glm::vec3 XYZ;
 
-	enum PolyCulling
-	{
+	enum PolyCulling {
 		CW,
 		CCW,
 		NONE
@@ -36,8 +34,7 @@ float max2(float a, float b);
 // returns true if ray intersects polygon, false otherwise
 bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3* verts, int num_sides, util::PolyCulling culling = util::PolyCulling::NONE);
 
-class Quad
-{
+class Quad {
 public:
 	glm::vec3 verts[4];
 	

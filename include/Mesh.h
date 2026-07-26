@@ -8,8 +8,7 @@
 #include "Transform.h"
 #include "VAO.h"
 
-class Mesh
-{
+class Mesh {
 public:
 	VAO* vao = nullptr;
 	void getUVMap(const std::string& filepath);

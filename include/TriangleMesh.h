@@ -1,8 +1,7 @@
 #pragma once
 #include "config.h"
 
-class TriangleMesh
-{
+class TriangleMesh {
 private:
 	unsigned int VBO, VAO, vertex_count;
 	void createVAO(float* verts, float* colors);
