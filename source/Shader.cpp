@@ -3,9 +3,11 @@
 Shader::Shader(
 	const std::string &name,
 	const std::string &vertex_filepath,
-	const std::string &fragment_filepath
+	const std::string &fragment_filepath,
+	const std::vector<DefinePair> &defines
 ){
 	this->name = name;
+	this->defines = defines;
 
 	unsigned int vertex_module = makeModule(vertex_filepath, GL_VERTEX_SHADER);
 	unsigned int fragment_module = makeModule(fragment_filepath, GL_FRAGMENT_SHADER);
@@ -62,8 +64,7 @@ void Shader::setVec4(const std::string &name, glm::vec4 vec) const {
 	glUniform4fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
 }
 
-unsigned int Shader::makeModule(
-	const std::string &filepath, unsigned int module_type) {
+unsigned int Shader::makeModule(const std::string &filepath, unsigned int module_type) {
 	std::ifstream file;
 	std::stringstream buffered_lines;
 	std::string line;
@@ -74,7 +75,7 @@ unsigned int Shader::makeModule(
 	}
 
 	std::string shader_string = buffered_lines.str();
-	replaceDefines(shader_string, defines);
+	replaceDefines(shader_string);
 
 	const char* shader_src = shader_string.c_str();
 	file.close();
@@ -94,19 +95,16 @@ unsigned int Shader::makeModule(
 	return shader_module;
 }
 
-void Shader::replaceDefines(std::string &shader, std::vector<DefinePair> &defines) {
-	for(DefinePair &define : defines) {
+void Shader::replaceDefines(std::string &shader) {
+	for(const DefinePair &define : defines) {
 		size_t pos = shader.find(define.str);
 		while(pos != std::string::npos) {
 			shader.replace(pos, define.str.length(), define.value);
-			std::cout << "replaced '" << define.str << "' at pos '" << pos << "' with '" << define.value << "' in shader file." << std::endl;
+			std::cout << "replaced '" << define.str
+			<< "' at pos '" << pos <<
+			"' with '" << define.value <<
+			"' in shader '" << name << "'." << std::endl;
 			pos = shader.find(define.str, pos);
 		}
 	}
 }
-
-std::vector<Shader::DefinePair> Shader::defines = {
-	{"COLOR_R_BITPOS", "18"},
-	{"COLOR_G_BITPOS", "21"},
-	{"COLOR_B_BITPOS", "24"}
-};

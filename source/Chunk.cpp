@@ -46,10 +46,20 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 
 	int instances = 0;
 	std::srand(seed);
+
+	// int DEBUG_INCREMENT = RAND_MAX / 8;
+	// int DEBUG_INDEX = 0;
+	// int DEBUG_NUM = 0;
+
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int z = 0; z < CHUNK_SIZE; z++) {
 			for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
+
 				int rand_num = std::rand();
+				// int rand_num = DEBUG_NUM;
+				// DEBUG_NUM = ++DEBUG_INDEX * DEBUG_INCREMENT;
+				// if(DEBUG_INDEX > 7) DEBUG_INDEX = 0;
+
 				if (blocks(x, y, z) != BlockType::AIR)
 					continue;
 
@@ -67,10 +77,16 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 					(z != 0), (z != CHUNK_SIZE - 1)
 				};
 
-				int surrounding_block_coords[6][3] = { {x, y - 1, z}, {x, y + 1, z}, {x - 1, y, z}, {x + 1, y, z}, {x, y, z - 1}, {x, y, z + 1}
+				int surrounding_block_coords[6][3] = {
+					{x, y - 1, z}, {x, y + 1, z},
+					{x - 1, y, z}, {x + 1, y, z},
+					{x, y, z - 1}, {x, y, z + 1}
 				};
 
-				int neighboring_chunks_block_coords[6][3] = { {x, CHUNK_SIZE - 1, z}, {x, 0, z}, {CHUNK_SIZE - 1, y, z}, {0, y, z}, {x, y, CHUNK_SIZE - 1}, {x, y, 0}
+				int neighboring_chunks_block_coords[6][3] = {
+					{x, CHUNK_SIZE - 1, z}, {x, 0, z},
+					{CHUNK_SIZE - 1, y, z}, {0, y, z},
+					{x, y, CHUNK_SIZE - 1}, {x, y, 0}
 				};
 
 				for (int dir = 0; dir < 6; dir++) {
@@ -81,7 +97,7 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 					else if (neighboring_chunks[dir])
 						block = &neighboring_chunks[dir]->blocks(neighboring_chunks_block_coords[dir][0], neighboring_chunks_block_coords[dir][1], neighboring_chunks_block_coords[dir][2]);
 
-					if (block  &&*block != BlockType::AIR) {
+					if (block && *block != BlockType::AIR) {
 						data.push_back(encodeFaceData(x, y, z, dir, getBlockColor(*block, dir, rand_num)));
 						Face face = { block, dir };
 						faces_BVH.root->addDataNode(surrounding_block_positions[dir], face);
@@ -106,26 +122,34 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 * 
 * Encodes info about a face into a single 32-bit int. x, y, z are in block coordinates within the chunk
 * (i.e. 0 -> CHUNK_SIZE - 1), face is the normal direction in standard format (0, 1, 2, 3, 4, 5 -> up, down, left, right, forward, back).
-* Color param is a float vector, but is convereted into a reduced-bit version when encoded (3 bits per channel currently). 
+* Color param is an int vector that must give the color value directly for each channel. 
 */
-int Chunk::encodeFaceData(int x, int y, int z, int face, const glm::vec3 &color) { // int texture_id)
+int Chunk::encodeFaceData(int x, int y, int z, int face, const glm::ivec3 &color) { // int texture_id)
 	const int coord_mask = (1 << shader_info.coord_bits) - 1;
 	const int face_mask = (1 << shader_info.face_bits) - 1;
 	const int color_mask = (1 << shader_info.color_bits) - 1;
-	
-	glm::vec3 reduced_color = color * (float)(color_mask + 1);
-	int offset = 0;
+	// int offset = 0;
 	int data = 0;
 
-	data |= (x & coord_mask) << offset; (offset += shader_info.coord_bits);
-	data |= (y & coord_mask) << offset; (offset += shader_info.coord_bits);
-	data |= (z & coord_mask) << offset; (offset += shader_info.coord_bits);
+	data |= (x & coord_mask) << shader_info.getXPos();
+	data |= (y & coord_mask) << shader_info.getYPos();
+	data |= (z & coord_mask) << shader_info.getZPos();
+	
+	data |= (face & face_mask) << shader_info.getFacePos();
 
-	data |= (face & face_mask) << offset; (offset += shader_info.face_bits);
+	data |= (color.x & color_mask) << shader_info.getRPos();
+	data |= (color.y & color_mask) << shader_info.getGPos();
+	data |= (color.z & color_mask) << shader_info.getBPos();
 
-	data |= ((int)reduced_color.x & color_mask) << offset; (offset += shader_info.color_bits);
-	data |= ((int)reduced_color.y & color_mask) << offset; (offset += shader_info.color_bits);
-	data |= ((int)reduced_color.z & color_mask) << offset; (offset += shader_info.color_bits);
+	// data |= (x & coord_mask) << offset; (offset += shader_info.coord_bits);
+	// data |= (y & coord_mask) << offset; (offset += shader_info.coord_bits);
+	// data |= (z & coord_mask) << offset; (offset += shader_info.coord_bits);
+
+	// data |= (face & face_mask) << offset; (offset += shader_info.face_bits);
+
+	// data |= ((int)reduced_color.x & color_mask) << offset; (offset += shader_info.color_bits);
+	// data |= ((int)reduced_color.y & color_mask) << offset; (offset += shader_info.color_bits);
+	// data |= ((int)reduced_color.z & color_mask) << offset; (offset += shader_info.color_bits);
 
 	return data;
 }

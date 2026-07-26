@@ -115,7 +115,7 @@ Shader* createShader(
 	const std::string &fragment_filepath,
 	const std::vector<Shader::DefinePair> &defines
 ) {
-	Shader* shader = new Shader(name, vertex_filepath, fragment_filepath);
+	Shader* shader = new Shader(name, vertex_filepath, fragment_filepath, defines);
 	shaders[name] = shader;
 	return shader;
 }

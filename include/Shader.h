@@ -13,18 +13,19 @@ public:
 
 private:
 	unsigned int makeModule(const std::string &filepath, unsigned int module_type);
-	static std::vector<DefinePair> defines;
-	void replaceDefines(std::string &shader, std::vector<DefinePair> &defines);
+	void replaceDefines(std::string &shader);
 	
 public:
 	unsigned int ID;
 	std::string name;
+	std::vector<DefinePair> defines = {};
 
 	Shader() : ID(-1) {}
 	Shader(
 		const std::string &name,
 		const std::string &vertex_filepath,
-		const std::string &fragment_filepath		
+		const std::string &fragment_filepath,
+		const std::vector<DefinePair> &defines = {}
 	);
 
 	void use();

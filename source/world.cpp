@@ -31,10 +31,16 @@ void World::setup() {
 	}
 
 	traceBVHchunk(chunks.bvh);
-
 	std::cout << "created " << chunks.size() << " chunks" << std::endl;
 
-	createShader("world_shader", ROOT + "shaders/worldVertex.txt", ROOT + "shaders/worldColorFragment.txt");
+	std::vector<Shader::DefinePair> shader_defines = {
+		{"COLOR_R_BITPOS", std::to_string(chunks.shader_info.getRPos())},
+		{"COLOR_G_BITPOS", std::to_string(chunks.shader_info.getGPos())},
+		{"COLOR_B_BITPOS", std::to_string(chunks.shader_info.getBPos())},
+		{"COLOR_MAX", std::to_string((int)((1 << chunks.shader_info.color_bits) - 1))}
+	};
+
+	createShader("world_shader", ROOT + "shaders/worldVertex.txt", ROOT + "shaders/worldColorFragment.txt", shader_defines);
 	generateMesh();
 }
 
