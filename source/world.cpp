@@ -34,9 +34,15 @@ void World::setup() {
 	std::cout << "created " << chunks.size() << " chunks" << std::endl;
 
 	std::vector<Shader::DefinePair> shader_defines = {
-		{"COLOR_R_BITPOS", std::to_string(chunks.shader_info.getRPos())},
-		{"COLOR_G_BITPOS", std::to_string(chunks.shader_info.getGPos())},
-		{"COLOR_B_BITPOS", std::to_string(chunks.shader_info.getBPos())},
+		{"COORD_X_BITPOS", std::to_string(chunks.shader_info.getCoordBitPos(0))},
+		{"COORD_Y_BITPOS", std::to_string(chunks.shader_info.getCoordBitPos(1))},
+		{"COORD_Z_BITPOS", std::to_string(chunks.shader_info.getCoordBitPos(2))},
+		{"COORD_BITMASK", std::to_string(chunks.shader_info.getCoordBitMask())},
+		
+		{"COLOR_R_BITPOS", std::to_string(chunks.shader_info.getColorBitPos(0))},
+		{"COLOR_G_BITPOS", std::to_string(chunks.shader_info.getColorBitPos(1))},
+		{"COLOR_B_BITPOS", std::to_string(chunks.shader_info.getColorBitPos(2))},
+		{"COLOR_BITMASK", std::to_string(chunks.shader_info.getColorBitMask())},
 		{"COLOR_MAX", std::to_string((int)((1 << chunks.shader_info.color_bits) - 1))}
 	};
 
@@ -73,7 +79,7 @@ void World::update(float dt, Camera* camera, Input* input) {
 	}
 }
 
-void World::inspectPos(const glm::vec3 &pos, BlockType** block_out, Chunk** chunk_out) {
+void World::inspectPos(const glm::vec3 &pos, BlockType **block_out, Chunk **chunk_out) {
 	glm::vec3 block_pos = pos / chunks.unit_length;
 
 	int x_ch, y_ch, z_ch;

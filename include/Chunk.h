@@ -19,13 +19,12 @@ public:
 		int coord_bits;
 		int face_bits;
 		int color_bits;
-		int getXPos() {return 0;}
-		int getYPos() {return coord_bits;}
-		int getZPos() {return coord_bits * 2;}
-		int getFacePos() {return coord_bits * 3;}
-		int getRPos() {return coord_bits * 3 + face_bits;}
-		int getGPos(){return coord_bits * 3 + face_bits + color_bits;}
-		int getBPos(){return coord_bits * 3 + face_bits + color_bits * 2;}
+		int getCoordBitPos(int i);
+		int getFaceBitPos();
+		int getColorBitPos(int i);
+		int getCoordBitMask();
+		int getFaceBitMask();
+		int getColorBitMask();
 	} shader_info;
 
 	struct Key {

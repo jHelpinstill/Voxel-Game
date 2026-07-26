@@ -6,7 +6,7 @@
 
 #define COORD_BITS 5
 #define FACE_BITS 3
-#define COLOR_BITS 3
+#define COLOR_BITS 4
 
 class ChunkManager {
 public:

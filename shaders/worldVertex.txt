@@ -23,15 +23,15 @@ uniform int chunk_size;
 void main()
 {
 	ivec3 offseti, colori;
-	offseti.x = instance_data & 31;
-	offseti.y = (instance_data >> 5) & 31;
-	offseti.z = (instance_data >> 10) & 31;
+	offseti.x = (instance_data >> COORD_X_BITPOS) & COORD_BITMASK;
+	offseti.y = (instance_data >> COORD_Y_BITPOS) & COORD_BITMASK;
+	offseti.z = (instance_data >> COORD_Z_BITPOS) & COORD_BITMASK;
 
 	int aface = (instance_data >> 15) & 7;
 
-	colori.r = (instance_data >> COLOR_R_BITPOS) & 7;
-	colori.g = (instance_data >> COLOR_G_BITPOS) & 7;
-	colori.b = (instance_data >> COLOR_B_BITPOS) & 7;
+	colori.r = (instance_data >> COLOR_R_BITPOS) & COLOR_BITMASK;
+	colori.g = (instance_data >> COLOR_G_BITPOS) & COLOR_BITMASK;
+	colori.b = (instance_data >> COLOR_B_BITPOS) & COLOR_BITMASK;
 	
 	int chunk_data = chunk_positions[gl_DrawID];
 	offseti.x += ((chunk_data & 1023) - 512) * chunk_size;

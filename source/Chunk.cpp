@@ -46,7 +46,6 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 
 	int instances = 0;
 	std::srand(seed);
-
 	// int DEBUG_INCREMENT = RAND_MAX / 8;
 	// int DEBUG_INDEX = 0;
 	// int DEBUG_NUM = 0;
@@ -54,7 +53,6 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int z = 0; z < CHUNK_SIZE; z++) {
 			for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
-
 				int rand_num = std::rand();
 				// int rand_num = DEBUG_NUM;
 				// DEBUG_NUM = ++DEBUG_INDEX * DEBUG_INCREMENT;
@@ -95,7 +93,11 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 					if (inside_boundaries[dir])
 						block = &blocks(surrounding_block_coords[dir][0], surrounding_block_coords[dir][1], surrounding_block_coords[dir][2]);
 					else if (neighboring_chunks[dir])
-						block = &neighboring_chunks[dir]->blocks(neighboring_chunks_block_coords[dir][0], neighboring_chunks_block_coords[dir][1], neighboring_chunks_block_coords[dir][2]);
+						block = &neighboring_chunks[dir]->blocks(
+							neighboring_chunks_block_coords[dir][0],
+							neighboring_chunks_block_coords[dir][1],
+							neighboring_chunks_block_coords[dir][2]
+						);
 
 					if (block && *block != BlockType::AIR) {
 						data.push_back(encodeFaceData(x, y, z, dir, getBlockColor(*block, dir, rand_num)));
@@ -131,25 +133,15 @@ int Chunk::encodeFaceData(int x, int y, int z, int face, const glm::ivec3 &color
 	// int offset = 0;
 	int data = 0;
 
-	data |= (x & coord_mask) << shader_info.getXPos();
-	data |= (y & coord_mask) << shader_info.getYPos();
-	data |= (z & coord_mask) << shader_info.getZPos();
+	data |= (x & coord_mask) << shader_info.getCoordBitPos(0);
+	data |= (y & coord_mask) << shader_info.getCoordBitPos(1);
+	data |= (z & coord_mask) << shader_info.getCoordBitPos(2);
 	
-	data |= (face & face_mask) << shader_info.getFacePos();
+	data |= (face & face_mask) << shader_info.getFaceBitPos();
 
-	data |= (color.x & color_mask) << shader_info.getRPos();
-	data |= (color.y & color_mask) << shader_info.getGPos();
-	data |= (color.z & color_mask) << shader_info.getBPos();
-
-	// data |= (x & coord_mask) << offset; (offset += shader_info.coord_bits);
-	// data |= (y & coord_mask) << offset; (offset += shader_info.coord_bits);
-	// data |= (z & coord_mask) << offset; (offset += shader_info.coord_bits);
-
-	// data |= (face & face_mask) << offset; (offset += shader_info.face_bits);
-
-	// data |= ((int)reduced_color.x & color_mask) << offset; (offset += shader_info.color_bits);
-	// data |= ((int)reduced_color.y & color_mask) << offset; (offset += shader_info.color_bits);
-	// data |= ((int)reduced_color.z & color_mask) << offset; (offset += shader_info.color_bits);
+	data |= (color.x & color_mask) << shader_info.getColorBitPos(0);
+	data |= (color.y & color_mask) << shader_info.getColorBitPos(1);
+	data |= (color.z & color_mask) << shader_info.getColorBitPos(2);
 
 	return data;
 }
@@ -298,13 +290,44 @@ BlockType* Chunk::Blocks::getNeighbor(BlockType* block, int face, int dist) {
 	if (!getCoords(block, x, y, z))
 		return nullptr;
 	switch (face) {
-	case 0: y++; if (y > 31) return nullptr; break;
-	case 1: y--; if (y < 0) return nullptr; break;
-	case 2: x++; if (x > 31) return nullptr; break;
-	case 3: x--; if (x < 0) return nullptr; break;
-	case 4: z++; if (z > 31) return nullptr; break;
-	case 5: z--; if (z < 0) return nullptr; break;
+		case 0: y++; if (y > 31) return nullptr; break;
+		case 1: y--; if (y < 0) return nullptr; break;
+		case 2: x++; if (x > 31) return nullptr; break;
+		case 3: x--; if (x < 0) return nullptr; break;
+		case 4: z++; if (z > 31) return nullptr; break;
+		case 5: z--; if (z < 0) return nullptr; break;
 	}
 
 	return &(*this)(x, y, z);
+}
+
+int getXPos(int coord_bits, int face_bits, int color_bits) { return 0;}
+int getYPos(int coord_bits, int face_bits, int color_bits) { return coord_bits;}
+int getZPos(int coord_bits, int face_bits, int color_bits) { return coord_bits * 2;}
+int getRPos(int coord_bits, int face_bits, int color_bits) { return coord_bits * 3 + face_bits;}
+int getGPos(int coord_bits, int face_bits, int color_bits) { return coord_bits * 3 + face_bits + color_bits;}
+int getBPos(int coord_bits, int face_bits, int color_bits) { return coord_bits * 3 + face_bits + color_bits * 2;}
+
+typedef int (*ShaderInfoGetter)(int, int, int);
+
+ShaderInfoGetter coordBitPos[3] = {getXPos, getYPos, getZPos};
+ShaderInfoGetter colorBitPos[3] = {getRPos, getGPos, getBPos};
+
+int Chunk::ShaderInfo::getCoordBitPos(int i) {
+	return coordBitPos[i](coord_bits, face_bits, color_bits);
+}
+int Chunk::ShaderInfo::getFaceBitPos() {
+	return coord_bits * 3;
+}
+int Chunk::ShaderInfo::getColorBitPos(int i) {
+	return colorBitPos[i](coord_bits, face_bits, color_bits);
+}
+int Chunk::ShaderInfo::getCoordBitMask() {
+	return (1 << coord_bits) - 1;
+}
+int Chunk::ShaderInfo::getFaceBitMask() {
+	return (1 << face_bits) - 1;
+}
+int Chunk::ShaderInfo::getColorBitMask() {
+	return (1 << color_bits) - 1;
 }
