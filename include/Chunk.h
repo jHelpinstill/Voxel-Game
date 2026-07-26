@@ -24,7 +24,7 @@ public:
 	struct Key {
 		int x, y, z;
 		Key(int x, int y, int z) : x(x), y(y), z(z) {}
-		bool operator==(const Key& other) const {
+		bool operator==(const Key &other) const {
 			return (x == other.x
 				&& y == other.y
 				&& z == other.z);
@@ -38,10 +38,10 @@ public:
 
 		Group() : chunks(nullptr), size(0) {}	// default ctor (constructor)
 		Group(int size);						// ctor with size
-		Group(const Group& other);				// copy ctor
-		Group(Group&& other) noexcept;			// move ctor
+		Group(const Group &other);				// copy ctor
+		Group(Group &&other) noexcept;			// move ctor
 
-		Chunk*& operator[](int i);
+		Chunk* &operator[](int i);
 
 		~Group();
 	};
@@ -49,11 +49,11 @@ public:
 	struct Blocks {
 		BlockType data[CHUNK_VOLUME];
 
-		BlockType& operator[](int index);
-		BlockType& operator()(int x, int y, int z);
+		BlockType &operator[](int index);
+		BlockType &operator()(int x, int y, int z);
 
 		int getIndex(BlockType* block);
-		bool getCoords(BlockType* block, int& x, int& y, int& z);
+		bool getCoords(BlockType* block, int &x, int &y, int &z);
 		bool onBoundary(BlockType* block, int* face = nullptr);
 
 		BlockType* getNeighbor(BlockType* block, int face, int dist = 1);
@@ -73,25 +73,25 @@ public:
 		int norm;
 	};
 	BVH<Face> faces_BVH;	// Bounded Volume Hierarchy of faces is used to retrieve a block pointer through raycasting
-	static bool raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, Face* face);
-	static void expandToFitFace(const glm::vec3& pos, Face* face, glm::vec3& min, glm::vec3& max);
+	static bool raycastFace(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &face_pos, Face* face);
+	static void expandToFitFace(const glm::vec3 &pos, Face* face, glm::vec3 &min, glm::vec3 &max);
 
 	typedef BVH<Face>::RaycastResult RaycastResult;
-	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);
+	RaycastResult raycast(const glm::vec3 &pos, const glm::vec3 &ray);
 	RaycastResult last_successful_raycast;
 	
 	Chunk(int x, int y, int z, long seed, ShaderInfo shader_info, float unit_length = 1);
 	
 	glm::vec3 getPosf();
-	int generateFaceData(std::vector<int>& data, Group neighboring_chunks);
-	int encodeFaceData(int x, int y, int z, int face, const glm::vec3& color);
+	int generateFaceData(std::vector<int> &data, Group neighboring_chunks);
+	int encodeFaceData(int x, int y, int z, int face, const glm::vec3 &color);
 };
 
 // used for the hashing of chunks using the custom ChunkManager::Key
 namespace std {
 	template <>
 	struct hash<Chunk::Key> {
-		size_t operator()(const Chunk::Key& k) const {
+		size_t operator()(const Chunk::Key &k) const {
 			return ((hash<int>()(k.x)
 				^ (hash<int>()(k.y) << 1)) >> 1)
 				^ (hash<int>()(k.z) << 1);

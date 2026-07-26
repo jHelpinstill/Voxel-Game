@@ -7,7 +7,7 @@
 #include "Chunk.h"
 #include "ChunkManager.h"
 
-void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string& mesh_name);
+void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string &mesh_name);
 
 void printBlockInfo(BlockType* block, Chunk* chunk);
 
@@ -25,8 +25,8 @@ struct MonitorBVHface {
 	int num_faces[6];
 };
 
-void traceBVHface(BVH<Chunk::Face>& bvh);
-void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface& monitor);
+void traceBVHface(BVH<Chunk::Face> &bvh);
+void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface &monitor);
 
 struct MonitorBVHchunk {
 	int boxes_without_data;
@@ -40,7 +40,7 @@ struct MonitorBVHchunk {
 	int sum_data_nodes;
 };
 
-void traceBVHchunk(BVH<Chunk*>& bvh);
-void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk& monitor);
+void traceBVHchunk(BVH<Chunk*> &bvh);
+void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk &monitor);
 
 #endif

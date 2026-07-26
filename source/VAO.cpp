@@ -4,7 +4,7 @@ void VAO::bind() {
 	glBindVertexArray(ID);
 }
 
-void VAO::makeTextured(const std::vector<glm::vec3>& verts, const std::vector<glm::vec2>& uv_coords) {
+void VAO::makeTextured(const std::vector<glm::vec3> &verts, const std::vector<glm::vec2> &uv_coords) {
 	reset();
 	if (verts.size() != uv_coords.size()) {
 		std::cout << "Vertex and UV_coords size mismatch (";
@@ -41,12 +41,12 @@ void VAO::makeTextured(const std::vector<glm::vec3>& verts, const std::vector<gl
 	glEnableVertexAttribArray(1);
 }
 
-void VAO::makeSolidColored(const std::vector<glm::vec3>& verts, const glm::vec3& color) {
+void VAO::makeSolidColored(const std::vector<glm::vec3> &verts, const glm::vec3 &color) {
 	reset();
 	style = Style::SOLID_COLORED;
 
 	std::vector<float> data;
-	for (const glm::vec3& vert : verts) {
+	for (const glm::vec3 &vert : verts) {
 		for (int i = 0; i < 3; i++)
 			data.push_back(vert[i]);
 	}
@@ -65,7 +65,7 @@ void VAO::makeSolidColored(const std::vector<glm::vec3>& verts, const glm::vec3&
 	glEnableVertexAttribArray(0);
 }
 
-void VAO::makeInstanced(const std::vector<glm::vec3>& verts, const std::vector<int>& instance_data) {
+void VAO::makeInstanced(const std::vector<glm::vec3> &verts, const std::vector<int> &instance_data) {
 	reset();
 	style = Style::INSTANCED;
 

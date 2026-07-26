@@ -1,13 +1,13 @@
 #include "RenderText.h"
 
 void renderText(
-	const std::string& text,
+	const std::string &text,
 	Font* font,
 	Shader* shader,
 	GLFWwindow* window,
-	const glm::vec2& pos,
+	const glm::vec2 &pos,
 	float scale,
-	const glm::vec3& color
+	const glm::vec3 &color
 ) {
 	VAO vao;
 	vao.makeFont();

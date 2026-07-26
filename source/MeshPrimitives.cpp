@@ -1,11 +1,11 @@
 #include "ObjectManager.h"
 
 Mesh* createTexturedBox(
-	const std::string& name,
+	const std::string &name,
 	glm::vec3 size,
 	glm::vec3 pos,
-	const std::string& tex_name,
-	const std::string& uv_filepath
+	const std::string &tex_name,
+	const std::string &uv_filepath
 ) {
 	Mesh* box = Mesh::makeBox(size, getTextureByName(tex_name), uv_filepath, pos);
 	box->attachShader(getShaderByName("texture_shader"));
@@ -15,7 +15,7 @@ Mesh* createTexturedBox(
 }
 
 Mesh* createBox(
-	const std::string& name,
+	const std::string &name,
 	glm::vec3 size,
 	glm::vec3 pos,
 	glm::vec3 color
@@ -28,11 +28,11 @@ Mesh* createBox(
 }
 
 Mesh* createTexturedPlane(
-	const std::string& name,
+	const std::string &name,
 	glm::vec2 size,
 	glm::vec3 pos,
-	const std::string& tex_name,
-	const std::string& uv_filepath
+	const std::string &tex_name,
+	const std::string &uv_filepath
 ) {
 	Mesh* plane = Mesh::makePlane(size, getTextureByName(tex_name), uv_filepath, pos);
 	plane->attachShader(getShaderByName("texture_shader"));
@@ -42,7 +42,7 @@ Mesh* createTexturedPlane(
 }
 
 Mesh* createPlane(
-	const std::string& name,
+	const std::string &name,
 	glm::vec2 size,
 	glm::vec3 pos,
 	glm::vec3 color

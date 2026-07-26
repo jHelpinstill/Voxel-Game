@@ -4,6 +4,10 @@
 
 #include "Chunk.h"
 
+#define COORD_BITS 5
+#define FACE_BITS 3
+#define COLOR_BITS 3
+
 class ChunkManager {
 public:
 	// Keys are used to distinguish different chunks within unordered maps by using their coordinates 
@@ -23,7 +27,7 @@ public:
 	};
 
 	unsigned int pos_SSBO = 0;
-	Chunk::ShaderInfo shader_info = {5, 3, 4};
+	Chunk::ShaderInfo shader_info = {COORD_BITS, FACE_BITS, COLOR_BITS}; // coord_bits, face_bits, color_bits
 	int chunk_pos_bits = 10;
 	float unit_length = 0.1;
 
@@ -32,8 +36,8 @@ public:
 	std::vector<DrawParams> draw_params;
 
 	BVH<Chunk*> bvh;
-	static bool raycastChunk(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& chunk_pos, Chunk** chunk);
-	static void expandToFitChunk(const glm::vec3& pos, Chunk** chunk, glm::vec3& min, glm::vec3& max);
+	static bool raycastChunk(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &chunk_pos, Chunk** chunk);
+	static void expandToFitChunk(const glm::vec3 &pos, Chunk** chunk, glm::vec3 &min, glm::vec3 &max);
 
 	struct RaycastResult {
 		bool hit;
@@ -42,11 +46,11 @@ public:
 		int face;
 		glm::vec3 pos;
 	};
-	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);
+	RaycastResult raycast(const glm::vec3 &pos, const glm::vec3 &ray);
 
 	ChunkManager() : bvh(raycastChunk, expandToFitChunk, 1) {}
 
-	Chunk* get(const glm::vec3& pos);
+	Chunk* get(const glm::vec3 &pos);
 	Chunk* get(int x, int y, int z);
 	bool add(int x, int y, int z);
 

@@ -1,8 +1,8 @@
 #include "CameraController.h"
 
-CameraController::CameraController(Camera& camera, Input& input) {
-	this->camera =& camera;
-	this->input =& input;
+CameraController::CameraController(Camera &camera, Input &input) {
+	this->camera = &camera;
+	this->input = &input;
 }
 
 void CameraController::update(float dt) {

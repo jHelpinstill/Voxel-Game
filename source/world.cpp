@@ -67,7 +67,7 @@ void World::update(float dt, Camera* camera, Input* input) {
 	}
 }
 
-void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chunk_out) {
+void World::inspectPos(const glm::vec3 &pos, BlockType** block_out, Chunk** chunk_out) {
 	glm::vec3 block_pos = pos / chunks.unit_length;
 
 	int x_ch, y_ch, z_ch;
@@ -89,13 +89,13 @@ void World::inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chun
 }
 
 
-BlockType* World::inspectPos(const glm::vec3& pos) {
+BlockType* World::inspectPos(const glm::vec3 &pos) {
 	BlockType* block;
 	inspectPos(pos, &block);
 	return block;
 }
 
-bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** block_out, Chunk** chunk_out) {
+bool World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray, BlockType** block_out, Chunk** chunk_out) {
 	//std::cout << "Camera Pos: " << vec2string(pos) << std::endl;
 	//std::cout << "look direction: " << vec2string(dir) << std::endl;
 
@@ -173,7 +173,7 @@ bool World::inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** b
 	return true;
 }
 
-BlockType* World::inspectRay(const glm::vec3& pos, const glm::vec3& ray) {
+BlockType* World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray) {
 	BlockType* block;
 	if (!inspectRay(pos, ray, &block))
 		return nullptr;
@@ -236,7 +236,7 @@ void World::generateMesh() {
 
 	int chunk_counter = 0;
 	int face_counter = 0;
-	for (auto& bucket : chunks.chunks) {
+	for (auto &bucket : chunks.chunks) {
 		Chunk* chunk = bucket.second;
 
 		int num_instances = chunk->generateFaceData(world_mesh->instance_data, chunks.getNeighbors(chunk));
@@ -350,7 +350,7 @@ void World::drawWorld(Mesh* mesh, Camera* camera) {
 
 	glm::vec3 look_dir = camera->getLookDirection();
 	float dot_criteria = cos(glm::radians(camera->aspect_ratio * camera->fov / 2));
-	for (auto& chunk_obj : world->chunks.chunks) {
+	for (auto &chunk_obj : world->chunks.chunks) {
 		Chunk* chunk = chunk_obj.second;
 
 		glm::vec3 a, b, c, d;

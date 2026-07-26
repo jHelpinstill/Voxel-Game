@@ -35,26 +35,26 @@ public:
 		Box(void (*expandToFit)(const glm::vec3&, T*, glm::vec3&, glm::vec3&));
 		~Box();
 		
-		DataNode* raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*));
+		DataNode* raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*));
 		void split(int min_data_nodes);
 
-		void addDataNode(const glm::vec3& pos, const T& obj);
+		void addDataNode(const glm::vec3 &pos, const T &obj);
 		void addDataNode(DataNode* node);
 		int countDataNodes();
 
-		void (*expandToFit)(const glm::vec3& pos, T* obj, glm::vec3& min, glm::vec3& max);
-		bool hitByRay(const glm::vec3& pos, const glm::vec3& ray);
+		void (*expandToFit)(const glm::vec3 &pos, T* obj, glm::vec3 &min, glm::vec3 &max);
+		bool hitByRay(const glm::vec3 &pos, const glm::vec3 &ray);
 
 		// WARNING: renders tree unusable until BVH::rebuild() is called
 		DataNode* getData(DataNode* existing_data = nullptr);
 
-		static bool isMonotonicallyCloser(const glm::vec3& pos, Box** boxes);
+		static bool isMonotonicallyCloser(const glm::vec3 &pos, Box** boxes);
 	};
 	int min_nodes_per_box;
 
 	Box* root;
 	bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*);
-	void (*boxExpandToFitFunc)(const glm::vec3& pos, T* obj, glm::vec3& min, glm::vec3& max);
+	void (*boxExpandToFitFunc)(const glm::vec3 &pos, T* obj, glm::vec3 &min, glm::vec3 &max);
 
 	BVH() : root(nullptr), raycastObjFunc(nullptr), boxExpandToFitFunc(nullptr) {}
 	BVH(
@@ -64,7 +64,7 @@ public:
 	);
 	~BVH();
 
-	RaycastResult raycast(const glm::vec3& pos, const glm::vec3& ray);
+	RaycastResult raycast(const glm::vec3 &pos, const glm::vec3 &ray);
 	void reset();
 	void rebuild();
 	void build();
@@ -89,7 +89,7 @@ BVH<T>::~BVH() {
 }
 
 template <typename T>
-auto BVH<T>::raycast(const glm::vec3& pos, const glm::vec3& ray)->RaycastResult {
+auto BVH<T>::raycast(const glm::vec3 &pos, const glm::vec3 &ray)->RaycastResult {
 	RaycastResult result{};
 	if (!root || !raycastObjFunc)
 		return result;
@@ -155,7 +155,7 @@ BVH<T>::Box::~Box() {
 }
 
 template <class T>
-void BVH<T>::Box::addDataNode(const glm::vec3& pos, const T& obj) {
+void BVH<T>::Box::addDataNode(const glm::vec3 &pos, const T &obj) {
 	DataNode* node = new DataNode;
 	node->pos = pos;
 	node->obj = obj;
@@ -266,7 +266,7 @@ void BVH<T>::Box::split(int min_data_nodes) {
 }
 
 template <class T>
-bool BVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray) {
+bool BVH<T>::Box::hitByRay(const glm::vec3 &pos, const glm::vec3 &ray) {
 	for (int face = 0; face < 6; face++) {
 		Quad quad(min, max, face);
 		if (rayIntersectsPoly(pos, ray, quad.verts, 4))
@@ -276,7 +276,7 @@ bool BVH<T>::Box::hitByRay(const glm::vec3& pos, const glm::vec3& ray) {
 }
 
 template <class T>
-bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3& pos, Box** boxes) {
+bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3 &pos, Box** boxes) {
 	// find nearest vertice of the closer box
 	float farthest_vert_A = UTIL_NEGATIVE_INFINITY;
 	for (int face = 0; face < 2; face++) {
@@ -302,7 +302,7 @@ bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3& pos, Box** boxes) {
 }
 
 template <class T>
-auto BVH<T>::Box::raycast(const glm::vec3& pos, const glm::vec3& ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*))->DataNode* {
+auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*))->DataNode* {
 	DataNode* nearest_hit = nullptr;
 	if (!resized)
 		return nearest_hit;	// don't bother if box hasn't been resized yet (not initialized with data)

@@ -16,7 +16,7 @@ public:
 	std::unordered_map<char, Character> characters;
 	int height;
 
-	Font(const std::string& font_filepath, int height);
+	Font(const std::string &font_filepath, int height);
 
 	Character getCharacter(char c);
 };

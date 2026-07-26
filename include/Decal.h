@@ -25,7 +25,7 @@ public:
 
 	void (*drawFunc)(Decal* decal, GLFWwindow* window) = nullptr;
 
-	Decal(unsigned int texture, const glm::vec2& size, const glm::vec2& pos);
+	Decal(unsigned int texture, const glm::vec2 &size, const glm::vec2 &pos);
 	~Decal();
 
 	void draw();

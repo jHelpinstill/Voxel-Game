@@ -1,6 +1,6 @@
 #include "Font.h"
 
-Font::Font(const std::string& font_filepath, int height) : height(height) {
+Font::Font(const std::string &font_filepath, int height) : height(height) {
 	FT_Library ft_lib;
 	if (FT_Init_FreeType(&ft_lib)) {
 		std::cout << "ERROR: Could note initilize FreeType library" << std::endl;

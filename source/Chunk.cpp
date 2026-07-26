@@ -41,7 +41,7 @@ glm::vec3 Chunk::getPosf() {
 * opaque block: as a face between two opaque blocks is obscured by the blocks,
 * and obviously two transparent blocks have no visible faces.
 */
-int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks) {
+int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 	faces_BVH.reset();
 
 	int instances = 0;
@@ -81,7 +81,7 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks) {
 					else if (neighboring_chunks[dir])
 						block = &neighboring_chunks[dir]->blocks(neighboring_chunks_block_coords[dir][0], neighboring_chunks_block_coords[dir][1], neighboring_chunks_block_coords[dir][2]);
 
-					if (block && *block != BlockType::AIR) {
+					if (block  &&*block != BlockType::AIR) {
 						data.push_back(encodeFaceData(x, y, z, dir, getBlockColor(*block, dir, rand_num)));
 						Face face = { block, dir };
 						faces_BVH.root->addDataNode(surrounding_block_positions[dir], face);
@@ -108,7 +108,7 @@ int Chunk::generateFaceData(std::vector<int>& data, Group neighboring_chunks) {
 * (i.e. 0 -> CHUNK_SIZE - 1), face is the normal direction in standard format (0, 1, 2, 3, 4, 5 -> up, down, left, right, forward, back).
 * Color param is a float vector, but is convereted into a reduced-bit version when encoded (3 bits per channel currently). 
 */
-int Chunk::encodeFaceData(int x, int y, int z, int face, const glm::vec3& color) { // int texture_id)
+int Chunk::encodeFaceData(int x, int y, int z, int face, const glm::vec3 &color) { // int texture_id)
 	const int coord_mask = (1 << shader_info.coord_bits) - 1;
 	const int face_mask = (1 << shader_info.face_bits) - 1;
 	const int color_mask = (1 << shader_info.color_bits) - 1;
@@ -130,7 +130,7 @@ int Chunk::encodeFaceData(int x, int y, int z, int face, const glm::vec3& color)
 	return data;
 }
 
-Chunk::RaycastResult Chunk::raycast(const glm::vec3& pos, const glm::vec3& ray) {
+Chunk::RaycastResult Chunk::raycast(const glm::vec3 &pos, const glm::vec3 &ray) {
 	glm::vec3 chunk_space_pos = (pos - getPosf()) * (1.0f / unit_length);
 	RaycastResult result = faces_BVH.raycast(chunk_space_pos, ray);
 	if (result.hit) {
@@ -140,13 +140,13 @@ Chunk::RaycastResult Chunk::raycast(const glm::vec3& pos, const glm::vec3& ray) 
 	return result;
 }
 
-bool Chunk::raycastFace(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3& face_pos, Face* face) {
+bool Chunk::raycastFace(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &face_pos, Face* face) {
 	//td::cout << "raycastFace called with face direction: " << *face << std::endl;
 	Quad quad(face_pos, face->norm);
 	return rayIntersectsPoly(pos, ray, quad.verts, 4, util::PolyCulling::CCW);
 }
 
-void Chunk::expandToFitFace(const glm::vec3& pos, Face* face, glm::vec3& min, glm::vec3& max) {
+void Chunk::expandToFitFace(const glm::vec3 &pos, Face* face, glm::vec3 &min, glm::vec3 &max) {
 	glm::vec3 face_min, face_max;
 	switch (face->norm) {
 	case 0:
@@ -184,20 +184,20 @@ Chunk::Group::Group(int size) : size(size) {
 	chunks = new Chunk * [size];
 }
 
-Chunk::Group::Group(const Group& other) {
+Chunk::Group::Group(const Group &other) {
 	this->size = other.size;
 	for (int i = 0; i < size; i++)
 		this->chunks[i] = other.chunks[i];
 }
 
-Chunk::Group::Group(Group&& other) noexcept
+Chunk::Group::Group(Group &&other) noexcept
 	: chunks(other.size ? other.chunks : nullptr)
 	, size(other.size) {
 	other.chunks = nullptr;
 	other.size = 0;
 }
 
-Chunk*& Chunk::Group::operator[](int i) {
+Chunk* &Chunk::Group::operator[](int i) {
 	return chunks[i];
 }
 
@@ -207,11 +207,11 @@ Chunk::Group::~Group() {
 
 //////////////////// FUNCTION DEFINIIONS (Blocks) /////////////////////////
 
-BlockType& Chunk::Blocks::operator[](int index) {
+BlockType &Chunk::Blocks::operator[](int index) {
 	return data[index];
 }
 
-BlockType& Chunk::Blocks::operator()(int x, int y, int z) {
+BlockType &Chunk::Blocks::operator()(int x, int y, int z) {
 	return data[x + CHUNK_SIZE * y + CHUNK_AREA * z];
 }
 
@@ -219,7 +219,7 @@ int Chunk::Blocks::getIndex(BlockType* block) {
 	return (block - data);
 }
 
-bool Chunk::Blocks::getCoords(BlockType* block, int& x, int& y, int& z) {
+bool Chunk::Blocks::getCoords(BlockType* block, int &x, int &y, int &z) {
 	int i = getIndex(block);
 	if (i < 0 || i >= CHUNK_VOLUME)
 		return false;

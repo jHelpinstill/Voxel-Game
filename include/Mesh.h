@@ -11,7 +11,7 @@
 class Mesh {
 public:
 	VAO* vao = nullptr;
-	void getUVMap(const std::string& filepath);
+	void getUVMap(const std::string &filepath);
 
 	Transform transform;
 	Shader* shader;
@@ -29,19 +29,19 @@ public:
 
 	Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*) = drawTriangles);
 	Mesh(
-		const std::vector<glm::vec3>& verts,
+		const std::vector<glm::vec3> &verts,
 		unsigned int texture,
-		const std::string& uv_filepath,
+		const std::string &uv_filepath,
 		void (*drawFunction)(Mesh*, Camera*) = drawTriangles
 	);
 	Mesh(
-		const std::vector<glm::vec3>& verts,
+		const std::vector<glm::vec3> &verts,
 		unsigned int texture,
-		const std::vector<glm::vec2>& uv_coords,
+		const std::vector<glm::vec2> &uv_coords,
 		void (*drawFunc)(Mesh*, Camera*) = drawTriangles
 	);
 	Mesh(
-		const std::vector<glm::vec3>& verts,
+		const std::vector<glm::vec3> &verts,
 		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5),
 		void (*drawFunc)(Mesh*, Camera*) = drawTriangles
 	);
@@ -52,18 +52,18 @@ public:
 	void attachShader(Shader* shader);
 
 	static Mesh* makeBox(
-		const glm::vec3& size,
+		const glm::vec3 &size,
 		unsigned int texture,
-		const std::string& uv_filepath,
-		const glm::vec3& pos = glm::vec3(0, 0, 0),
-		const glm::vec3& color = glm::vec3(0.5, 0.5, 0.5)
+		const std::string &uv_filepath,
+		const glm::vec3 &pos = glm::vec3(0, 0, 0),
+		const glm::vec3 &color = glm::vec3(0.5, 0.5, 0.5)
 	);
 	static Mesh* makePlane(
-		const glm::vec2& size,
+		const glm::vec2 &size,
 		unsigned int texture,
-		const std::string& uv_filepath,
-		const glm::vec3& pos = glm::vec3(0, 0, 0),
-		const glm::vec3& color = glm::vec3(0.5, 0.5, 0.5)
+		const std::string &uv_filepath,
+		const glm::vec3 &pos = glm::vec3(0, 0, 0),
+		const glm::vec3 &color = glm::vec3(0.5, 0.5, 0.5)
 	);
 	
 	static void drawTriangles(Mesh* mesh, Camera* camera);

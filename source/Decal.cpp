@@ -1,6 +1,6 @@
 #include "Decal.h"
 
-Decal::Decal(unsigned int texture, const glm::vec2& size, const glm::vec2& pos)
+Decal::Decal(unsigned int texture, const glm::vec2 &size, const glm::vec2 &pos)
 	: texture(texture), drawFunc(drawDefault), size(size), pos(pos) {
 	vao = new VAO;
 	vao->makeDecal();

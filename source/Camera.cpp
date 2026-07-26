@@ -6,7 +6,7 @@ Camera::Camera(GLFWwindow* window) : clip_near(0.1f), clip_far(100.f), fov(90.f)
 
 void Camera::findAspectRatio(GLFWwindow* window) {
 	int width, height;
-	glfwGetWindowSize(window,& width,& height);
+	glfwGetWindowSize(window, &width, &height);
 	aspect_ratio = width / (float)height;
 }
 

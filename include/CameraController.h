@@ -27,7 +27,7 @@ public:
 	float move_speed = 1.0;
 	float mouse_sensitivity = 2;
 
-	CameraController(Camera& camera, Input& input);
+	CameraController(Camera &camera, Input &input);
 
 	void update(float dt);
 

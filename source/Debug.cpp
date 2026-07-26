@@ -1,6 +1,6 @@
 #include "Debug.h"
 
-void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string& mesh_name) {
+void putMeshWhereLooking(ChunkManager::RaycastResult cast, const std::string &mesh_name) {
 	if (cast.hit) {
 		Mesh* test_block = getMeshByName(mesh_name);
 		float length = cast.chunk->unit_length;
@@ -27,7 +27,7 @@ void printBlockInfo(BlockType* block, Chunk* chunk) {
 	std::cout << std::endl;
 }
 
-void traceBVHface(BVH<Chunk::Face>& bvh) {
+void traceBVHface(BVH<Chunk::Face> &bvh) {
 	MonitorBVHface monitor{};
 
 	traceBVHface(bvh.root, monitor);
@@ -50,11 +50,11 @@ void traceBVHface(BVH<Chunk::Face>& bvh) {
 	std::cout << std::endl;
 }
 
-void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface& monitor) {
+void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface &monitor) {
 	monitor.num_boxes++;
 	if (!box->data)
 		monitor.boxes_without_data++;
-	if (!box->childA && !box->childB) {
+	if (!box->childA  &&!box->childB) {
 		monitor.num_leaf_boxes++;
 
 		int num_data_nodes = 0;
@@ -69,7 +69,7 @@ void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface& monitor) {
 		if (num_data_nodes > monitor.max_data_nodes)
 			monitor.max_data_nodes = num_data_nodes;
 	}
-	else if (box->childA && box->childB) {
+	else if (box->childA  &&box->childB) {
 		monitor.num_with_both_children++;
 		traceBVHface(box->childA, monitor);
 		traceBVHface(box->childB, monitor);
@@ -84,7 +84,7 @@ void traceBVHface(BVH<Chunk::Face>::Box* box, MonitorBVHface& monitor) {
 	}
 }
 
-void traceBVHchunk(BVH<Chunk*>& bvh) {
+void traceBVHchunk(BVH<Chunk*> &bvh) {
 	MonitorBVHchunk monitor{};
 
 	traceBVHchunk(bvh.root, monitor);
@@ -102,7 +102,7 @@ void traceBVHchunk(BVH<Chunk*>& bvh) {
 	std::cout << "avg data nodes: " << monitor.avg_data_nodes << "\n" << std::endl;
 }
 
-void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk& monitor) {
+void traceBVHchunk(BVH<Chunk*>::Box* box, MonitorBVHchunk &monitor) {
 	monitor.num_boxes++;
 	if (!box->data)
 		monitor.boxes_without_data++;

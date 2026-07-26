@@ -1,6 +1,6 @@
 #include "util.h"
 
-void printFileToTerminal(const std::string& filename, bool printname) {
+void printFileToTerminal(const std::string &filename, bool printname) {
 	std::ifstream file;
 	std::stringstream buffered_lines;
 	std::string line;
@@ -37,7 +37,7 @@ double getDeltaTime(double fps_limit) {
 	return dt;
 }
 
-std::string vec2string(const glm::vec3& vec) {
+std::string vec2string(const glm::vec3 &vec) {
 	std::string s;
 	s += std::to_string(vec.x);
 	s += ", ";
@@ -47,7 +47,7 @@ std::string vec2string(const glm::vec3& vec) {
 	return s;
 }
 
-std::string mat2string(const glm::mat4& mat) {
+std::string mat2string(const glm::mat4 &mat) {
 	std::string s;
 	for(int i = 0; i < 4; i++) {
 		s += std::to_string(mat[0][i]);
@@ -67,7 +67,7 @@ float max2(float a, float b) {
 }
 
 // returns true if ray intersects polygon, false otherwise
-bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::vec3* verts, int num_sides, util::PolyCulling culling) {
+bool rayIntersectsPoly(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3* verts, int num_sides, util::PolyCulling culling) {
 	glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
 	if (glm::dot(verts[0] - pos, norm) * glm::dot(ray, norm) < 0)
 		return false;
@@ -98,7 +98,7 @@ bool rayIntersectsPoly(const glm::vec3& pos, const glm::vec3& ray, const glm::ve
 	return true;
 }
 
-Quad::Quad(const glm::vec3& pos, int face) {
+Quad::Quad(const glm::vec3 &pos, int face) {
 	switch (face) {
 	case 0:
 		verts[0] = pos + util::Y;
@@ -139,7 +139,7 @@ Quad::Quad(const glm::vec3& pos, int face) {
 	}
 }
 
-Quad::Quad(const glm::vec3& box_min, const glm::vec3& box_max, int face) {
+Quad::Quad(const glm::vec3 &box_min, const glm::vec3 &box_max, int face) {
 	glm::vec3 size = box_max - box_min;
 	switch (face) {
 	case 0:

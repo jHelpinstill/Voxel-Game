@@ -8,15 +8,15 @@ Mesh::Mesh(unsigned int texture, void (*drawFunction)(Mesh*, Camera*)) {
 }
 
 Mesh::Mesh(
-	const std::vector<glm::vec3>& verts,
+	const std::vector<glm::vec3> &verts,
 	unsigned int texture,
-	const std::string& uv_filepath,
+	const std::string &uv_filepath,
 	void (*drawFunction)(Mesh*, Camera*)
 ) {
 	this->texture = texture;
 	this->drawFunc = drawFunction;
 
-	for (const glm::vec3& vert : verts)
+	for (const glm::vec3 &vert : verts)
 		this->verts.push_back(vert);
 	getUVMap(uv_filepath);
 
@@ -25,17 +25,17 @@ Mesh::Mesh(
 }
 
 Mesh::Mesh(
-	const std::vector<glm::vec3>& verts,
+	const std::vector<glm::vec3> &verts,
 	unsigned int texture,
-	const std::vector<glm::vec2>& uv_coords,
+	const std::vector<glm::vec2> &uv_coords,
 	void (*drawFunction)(Mesh*, Camera*)
 ) {
 	this->texture = texture;
 	this->drawFunc = drawFunction;
 
-	for (const glm::vec3& vert : verts)
+	for (const glm::vec3 &vert : verts)
 		this->verts.push_back(vert);
-	for (const glm::vec2& uv_coord : uv_coords)
+	for (const glm::vec2 &uv_coord : uv_coords)
 		this->uv_coords.push_back(uv_coord);
 
 	vao = new VAO;
@@ -43,14 +43,14 @@ Mesh::Mesh(
 }
 
 Mesh::Mesh(
-	const std::vector<glm::vec3>& verts,
+	const std::vector<glm::vec3> &verts,
 	glm::vec3 color,
 	void (*drawFunction)(Mesh*, Camera*)
 ) {
 	this->color = color;
 	this->drawFunc = drawFunction;
 
-	for (const glm::vec3& vert : verts)
+	for (const glm::vec3 &vert : verts)
 		this->verts.push_back(vert);
 
 	vao = new VAO;
@@ -70,7 +70,7 @@ void Mesh::attachShader(Shader* shader) {
 	this->shader = shader;
 }
 
-void Mesh::getUVMap(const std::string& filepath) {
+void Mesh::getUVMap(const std::string &filepath) {
 	std::ifstream file;
 	std::string line;
 
@@ -131,11 +131,11 @@ void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera) {
 }
 
 Mesh* Mesh::makePlane(
-	const glm::vec2& size,
+	const glm::vec2 &size,
 	unsigned int texture,
-	const std::string& uv_filepath,
-	const glm::vec3& pos,
-	const glm::vec3& color
+	const std::string &uv_filepath,
+	const glm::vec3 &pos,
+	const glm::vec3 &color
 ) {
 	float w, l;
 	w = size.x;
@@ -166,11 +166,11 @@ Mesh* Mesh::makePlane(
 }
 
 Mesh* Mesh::makeBox(
-	const glm::vec3& size,
+	const glm::vec3 &size,
 	unsigned int texture,
-	const std::string& uv_filepath,
-	const glm::vec3& pos,
-	const glm::vec3& color
+	const std::string &uv_filepath,
+	const glm::vec3 &pos,
+	const glm::vec3 &color
 ) {
 	float w, h, l;
 	w = size.x;

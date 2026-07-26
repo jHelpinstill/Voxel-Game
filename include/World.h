@@ -30,11 +30,11 @@ public:
 
 	void update(float dt, Camera* camera, Input* input);
 
-	void inspectPos(const glm::vec3& pos, BlockType** block_out, Chunk** chunk_out = nullptr);
+	void inspectPos(const glm::vec3 &pos, BlockType** block_out, Chunk** chunk_out = nullptr);
 	
-	BlockType* inspectPos(const glm::vec3& pos);
-	bool inspectRay(const glm::vec3& pos, const glm::vec3& ray, BlockType** block_out, Chunk** chunk_out = nullptr);
-	BlockType* inspectRay(const glm::vec3& pos, const glm::vec3& ray);
+	BlockType* inspectPos(const glm::vec3 &pos);
+	bool inspectRay(const glm::vec3 &pos, const glm::vec3 &ray, BlockType** block_out, Chunk** chunk_out = nullptr);
+	BlockType* inspectRay(const glm::vec3 &pos, const glm::vec3 &ray);
 
 	void updateBlock(BlockType* block, Chunk* chunk, BlockType new_type);
 	void placeBlock(ChunkManager::RaycastResult cast, BlockType new_type);

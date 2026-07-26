@@ -135,13 +135,13 @@ void Game::stateMachine(double dt) {
 void Game::drawMeshes() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	for (auto& mesh : meshes)
+	for (auto &mesh : meshes)
 		mesh.second->draw(camera);
 }
 
 void Game::drawUI() {
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
-	for (auto& decal : decals)
+	for (auto &decal : decals)
 		decal.second->draw();
 }
