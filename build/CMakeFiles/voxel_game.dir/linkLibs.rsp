@@ -1,1 +1,0 @@
- "C:/repos/Voxel-Game/dependencies/lib/libglfw3.a" C:/repos/freetype/build/libfreetyped.a -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

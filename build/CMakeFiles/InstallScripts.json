@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/repos/Voxel-Game/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
