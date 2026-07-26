@@ -1,9 +1,9 @@
 #include "Shader.h"
 
 Shader::Shader(
-	const std::string& name,
-	const std::string& vertex_filepath,
-	const std::string& fragment_filepath
+	const std::string &name,
+	const std::string &vertex_filepath,
+	const std::string &fragment_filepath
 ){
 	this->name = name;
 
@@ -39,31 +39,31 @@ void Shader::use() {
 	glUseProgram(this->ID);
 }
 
-void Shader::setBool(const std::string& name, bool value) const {
+void Shader::setBool(const std::string &name, bool value) const {
 	glUniform1i(glGetUniformLocation(this->ID, name.c_str()), (int)value);
 }
 
-void Shader::setInt(const std::string& name, int value) const {
+void Shader::setInt(const std::string &name, int value) const {
 	glUniform1i(glGetUniformLocation(this->ID, name.c_str()), value);
 }
 
-void Shader::setFloat(const std::string& name, float value) const {
+void Shader::setFloat(const std::string &name, float value) const {
 	glUniform1f(glGetUniformLocation(this->ID, name.c_str()), value);
 }
 
-void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
+void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
 	glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void Shader::setVec3(const std::string& name, glm::vec3 vec) const {
+void Shader::setVec3(const std::string &name, glm::vec3 vec) const {
 	glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
 }
-void Shader::setVec4(const std::string& name, glm::vec4 vec) const {
+void Shader::setVec4(const std::string &name, glm::vec4 vec) const {
 	glUniform4fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(vec));
 }
 
 unsigned int Shader::makeModule(
-	const std::string& filepath, unsigned int module_type) {
+	const std::string &filepath, unsigned int module_type) {
 	std::ifstream file;
 	std::stringstream buffered_lines;
 	std::string line;
@@ -74,15 +74,17 @@ unsigned int Shader::makeModule(
 	}
 
 	std::string shader_string = buffered_lines.str();
+	replaceDefines(shader_string, defines);
+
 	const char* shader_src = shader_string.c_str();
 	file.close();
 
 	unsigned int shader_module = glCreateShader(module_type);
-	glShaderSource(shader_module, 1,& shader_src, NULL);
+	glShaderSource(shader_module, 1, &shader_src, NULL);
 	glCompileShader(shader_module);
 
 	int success;
-	glGetShaderiv(shader_module, GL_COMPILE_STATUS,& success);
+	glGetShaderiv(shader_module, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		char error_log[1024];
 		glGetShaderInfoLog(shader_module, 1024, NULL, error_log);
@@ -91,3 +93,20 @@ unsigned int Shader::makeModule(
 
 	return shader_module;
 }
+
+void Shader::replaceDefines(std::string &shader, std::vector<DefinePair> &defines) {
+	for(DefinePair &define : defines) {
+		size_t pos = shader.find(define.str);
+		while(pos != std::string::npos) {
+			shader.replace(pos, define.str.length(), define.value);
+			std::cout << "replaced '" << define.str << "' at pos '" << pos << "' with '" << define.value << "' in shader file." << std::endl;
+			pos = shader.find(define.str, pos);
+		}
+	}
+}
+
+std::vector<Shader::DefinePair> Shader::defines = {
+	{"COLOR_R_BITPOS", "18"},
+	{"COLOR_G_BITPOS", "21"},
+	{"COLOR_B_BITPOS", "24"}
+};
