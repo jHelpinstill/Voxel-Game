@@ -47,7 +47,7 @@ public:
 		Group(const Group &other);				// copy ctor
 		Group(Group &&other) noexcept;			// move ctor
 
-		Chunk *&operator[](int i);
+		Chunk*& operator[](int i);
 
 		~Group();
 	};
@@ -55,14 +55,14 @@ public:
 	struct Blocks {
 		BlockType data[CHUNK_VOLUME];
 
-		BlockType &operator[](int index);
-		BlockType &operator()(int x, int y, int z);
+		BlockType& operator[](int index);
+		BlockType& operator()(int x, int y, int z);
 
 		int getIndex(BlockType *block);
 		bool getCoords(BlockType *block, int &x, int &y, int &z);
 		bool onBoundary(BlockType *block, int *face = nullptr);
 
-		BlockType *getNeighbor(BlockType *block, int face, int dist = 1);
+		BlockType* getNeighbor(BlockType *block, int face, int dist = 1);
 	} blocks;
 
 	int x, y, z, ID, faces;

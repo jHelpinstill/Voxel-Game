@@ -12,7 +12,7 @@ bool ChunkManager::add(int x, int y, int z) {
 	return true;
 }
 
-Chunk *ChunkManager::get(const glm::vec3 &pos) {
+Chunk* ChunkManager::get(const glm::vec3 &pos) {
 	glm::vec3 block_pos = pos / unit_length;
 	int x, y, z;
 	x = floor(block_pos.x / CHUNK_SIZE);
@@ -22,7 +22,7 @@ Chunk *ChunkManager::get(const glm::vec3 &pos) {
 	return get(x, y, z);
 }
 
-Chunk *ChunkManager::get(int x, int y, int z) {
+Chunk* ChunkManager::get(int x, int y, int z) {
 	Chunk::Key key(x, y, z);
 	if (chunks.find(key) != chunks.end())
 		return chunks[key];
@@ -30,7 +30,7 @@ Chunk *ChunkManager::get(int x, int y, int z) {
 	return nullptr;
 }
 
-Chunk *ChunkManager::getNeighbor(Chunk *chunk, int face) {
+Chunk* ChunkManager::getNeighbor(Chunk *chunk, int face) {
 	int x = chunk->x; int y = chunk->y; int z = chunk->z;
 	switch (face) {
 		case 0: return get(x, y + 1, z);

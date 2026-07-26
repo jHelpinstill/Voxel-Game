@@ -44,7 +44,7 @@ void Game::setup() {
 	crosshair->origin = glm::vec2(0.5f);
 	crosshair->adjustment = glm::vec2(0.5f);
 
-	Decal *textbox_test = createDecal("textbox", "white_square", "decal_shader", glm::vec2(200, 350), glm::vec2(25, 0), window);
+	Decal *textbox_test = createDecal("textbox", "crate", "decal_shader", glm::vec2(200, 350), glm::vec2(25, 0), window);
 	textbox_test->origin = glm::vec2(0, 0.5);
 	textbox_test->adjustment = glm::vec2(0, 0.5);
 	textbox_test->drawFunc = Textbox::drawTextbox;
@@ -57,7 +57,6 @@ void Game::setup() {
 	pause_text->texture = 0;
 	pause_text->attached_obj = new Textbox("Game Paused", getFontByName("arial"), getShaderByName("font_shader"), 1.5, glm::vec3(1, 0, 0));
 	
-
 	world.setup();
 }
 
@@ -100,35 +99,31 @@ void Game::stateMachine(double dt) {
 		drawUI();
 
 		//renderText("Game is paused", getFontByName("arial"), getShaderByName("font_shader"), window, glm::vec2(100, 100), 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	} break;
+		case RUNNING: {
+			if (input->keyPressed(GLFW_KEY_ESCAPE)) {
+				state = PAUSED;
+				input->freeCursor();
+				std::cout << "PAUSED" << std::endl;
+				std::cout << "avg fps: " << avg_fps.avg() << std::endl;
+				std::cout << num_meshes << " meshes" << std::endl;
+				getDecalByName("pause_text")->awake = true;
+				getDecalByName("crosshair")->awake = false;
+				getDecalByName("textbox")->awake = true;
+			}
+			if (input->keyHeld(GLFW_KEY_LEFT_SHIFT))
+				player->move_speed = 40;
+			else
+				player->move_speed = 5;
 
-		break;
-	}
-	case RUNNING: {
+			player->update(dt);
+			world.update(dt, camera, input);
 
-		if (input->keyPressed(GLFW_KEY_ESCAPE)) {
-			state = PAUSED;
-			input->freeCursor();
-			std::cout << "PAUSED" << std::endl;
-			std::cout << "avg fps: " << avg_fps.avg() << std::endl;
-			std::cout << num_meshes << " meshes" << std::endl;
-			getDecalByName("pause_text")->awake = true;
-			getDecalByName("crosshair")->awake = false;
-			getDecalByName("textbox")->awake = true;
-		}
-		if (input->keyHeld(GLFW_KEY_LEFT_SHIFT))
-			player->move_speed = 40;
-		else
-			player->move_speed = 5;
+			//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
 
-		player->update(dt);
-		world.update(dt, camera, input);
-
-		//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);
-
-		drawMeshes();
-		drawUI();
-		break;
-	}
+			drawMeshes();
+			drawUI();
+		} break;
 	}
 }
 

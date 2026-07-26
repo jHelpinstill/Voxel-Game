@@ -100,95 +100,9 @@ void World::inspectPos(const glm::vec3 &pos, BlockType **block_out, Chunk **chun
 		*chunk_out = chunk;
 }
 
-
-BlockType *World::inspectPos(const glm::vec3 &pos) {
+BlockType* World::inspectPos(const glm::vec3 &pos) {
 	BlockType *block;
 	inspectPos(pos, &block);
-	return block;
-}
-
-bool World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray, BlockType **block_out, Chunk **chunk_out) {
-	//std::cout << "Camera Pos: " << vec2string(pos) << std::endl;
-	//std::cout << "look direction: " << vec2string(dir) << std::endl;
-
-	Mesh *world_mesh = getMeshByName("world_mesh");
-
-	glm::vec3 unit_ray = glm::normalize(ray);
-
-	glm::vec3 block_pos = pos / chunks.unit_length;
-	int chunk_pos[3];
-	chunk_pos[0] = floor(block_pos.x / CHUNK_SIZE);
-	chunk_pos[1] = floor(block_pos.y / CHUNK_SIZE);
-	chunk_pos[2] = floor(block_pos.z / CHUNK_SIZE);
-	Chunk *chunk;
-	if (!(chunk = chunks.get(chunk_pos[0], chunk_pos[1], chunk_pos[2])))
-		return false;
-	
-	int x_b = (int)(block_pos.x -= chunk_pos[0] * CHUNK_SIZE);
-	int y_b = (int)(block_pos.y -= chunk_pos[1] * CHUNK_SIZE);
-	int z_b = (int)(block_pos.z -= chunk_pos[2] * CHUNK_SIZE);
-	
-	glm::vec3 accumulator(0);
-	accumulator.x = block_pos.x - floor(block_pos.x);
-	accumulator.y = block_pos.y - floor(block_pos.y);
-	accumulator.z = block_pos.z - floor(block_pos.z);
-	while (chunk->blocks(x_b, y_b, z_b) == BlockType::AIR) { // || chunk->blocks[x_b][y_b][z_b] == BlockType::STONE)
-		//chunk->blocks[x_b][y_b][z_b] = BlockType::STONE;
-		
-		//bool dom_step = true;
-		bool take_step = true;
-		int rank = 0;
-		for (int i = 0; i < 3; i++) {
-			if (accumulator[i] > 1 || accumulator[i] < 0) {
-				accumulator[i] += (unit_ray[i] < 0) ? 1 : -1;
-				block_pos[i] += (unit_ray[i] < 0) ? -1 : 1;
-				//dom_step = false;
-				take_step = false;
-				//std::cout << "stepping toward " << i << std::endl;
-				break;
-			}
-		}
-		if (take_step)
-			accumulator += unit_ray;
-
-		bool next_chunk = false;
-		for (int i = 0; i < 3; i++) {
-			if (block_pos[i] < 0) {
-				block_pos[i] = CHUNK_SIZE + block_pos[i];
-				chunk_pos[i]--;
-				next_chunk = true;
-			}
-			else if (block_pos[i] >= CHUNK_SIZE) {
-				block_pos[i] = CHUNK_SIZE - block_pos[i];
-				chunk_pos[i]++;
-				next_chunk = true;
-			}
-		}
-		if (next_chunk)
-			if (!(next_chunk = chunks.get(chunk_pos[0], chunk_pos[1], chunk_pos[2])))
-				return false;
-
-		x_b = (int)(block_pos.x);
-		y_b = (int)(block_pos.y);
-		z_b = (int)(block_pos.z);
-
-		//std::cout << "block_pos: " << vec2string(block_pos) << std::endl;
-		//std::cout << "accumulator: " << vec2string(accumulator) << std::endl;
-		//std::cout << "b coords: " << x_b << ", " << y_b << ", " << z_b << "\n" << std::endl;
-
-	}
-
-	if (block_out)
-		*block_out = &chunk->blocks(x_b, y_b, z_b);
-	if (chunk_out)
-		*chunk_out = chunk;
-	return true;
-}
-
-BlockType *World::inspectRay(const glm::vec3 &pos, const glm::vec3 &ray) {
-	BlockType *block;
-	if (!inspectRay(pos, ray, &block))
-		return nullptr;
 	return block;
 }
 
@@ -208,15 +122,20 @@ void World::updateBlock(BlockType *block, Chunk *chunk, BlockType new_type) {
 	}
 }
 
+void World::blockBrushSphere(ChunkManager::RaycastResult cast, float radius, BlockType new_type) {
+	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2);
+
+}
+
 void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type) {
 	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2); // move to center of block to avoid floating point nonsense
 	switch (cast.face) {
-	case 0: pos.y += chunks.unit_length; break;
-	case 1: pos.y -= chunks.unit_length; break;
-	case 2: pos.x += chunks.unit_length; break;
-	case 3: pos.x -= chunks.unit_length; break;
-	case 4: pos.z += chunks.unit_length; break;
-	case 5: pos.z -= chunks.unit_length; break;
+		case 0: pos.y += chunks.unit_length; break;
+		case 1: pos.y -= chunks.unit_length; break;
+		case 2: pos.x += chunks.unit_length; break;
+		case 3: pos.x -= chunks.unit_length; break;
+		case 4: pos.z += chunks.unit_length; break;
+		case 5: pos.z -= chunks.unit_length; break;
 	}
 
 	BlockType *block;

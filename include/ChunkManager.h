@@ -50,13 +50,13 @@ public:
 
 	ChunkManager() : bvh(raycastChunk, expandToFitChunk, 1) {}
 
-	Chunk *get(const glm::vec3 &pos);
-	Chunk *get(int x, int y, int z);
+	Chunk* get(const glm::vec3 &pos);
+	Chunk* get(int x, int y, int z);
 	bool add(int x, int y, int z);
 
 	int size();
 
-	Chunk *getNeighbor(Chunk *chunk, int face);
+	Chunk* getNeighbor(Chunk *chunk, int face);
 	Chunk::Group getNeighbors(Chunk *chunk);
 };
 
