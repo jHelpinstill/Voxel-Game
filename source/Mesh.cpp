@@ -97,14 +97,14 @@ void Mesh::drawTriangles(Mesh* mesh, Camera* camera) {
 	mesh->shader->setMat4("projection", camera->getProjectionMat() * mesh->transform.getMat());
 	//mesh->shader->setMat4("transform", mesh->transform.getMat());
 
-	switch (mesh->style) {
-	case Shader::VAOStyle::TEXTURED:
-		glBindTexture(GL_TEXTURE_2D, mesh->texture);
-		break;
+	switch (mesh->vao->style) {
+		case VAO::Style::TEXTURED:
+			glBindTexture(GL_TEXTURE_2D, mesh->texture);
+			break;
 
-	case Shader::VAOStyle::SOLID_COLORED:
-		mesh->shader->setVec3("color", mesh->color);
-		break;
+		case VAO::Style::SOLID_COLORED:
+			mesh->shader->setVec3("color", mesh->color);
+			break;
 	}
 
 	glBindVertexArray(mesh->vao->ID);
@@ -116,12 +116,12 @@ void Mesh::drawInstancedStrip(Mesh* mesh, Camera* camera) {
 	mesh->shader->setMat4("projection", camera->getProjectionMat());
 	mesh->shader->setMat4("transform", mesh->transform.getMat());
 
-	switch (mesh->style) {
-	case Shader::VAOStyle::TEXTURED:
+	switch (mesh->vao->style) {
+	case VAO::Style::TEXTURED:
 		glBindTexture(GL_TEXTURE_2D, mesh->texture);
 		break;
 
-	case Shader::VAOStyle::SOLID_COLORED:
+	case VAO::Style::SOLID_COLORED:
 		mesh->shader->setVec3("color", mesh->color);
 		break;
 	}

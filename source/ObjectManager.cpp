@@ -137,6 +137,8 @@ unsigned int createTexture(const std::string& name, const std::string& filepath,
 		int image_type = alpha_channel ? GL_RGBA : GL_RGB;
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, image_type, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
+
+		std::cout << "loaded texture '" << name << "' from filepath '" << filepath << "'" << std::endl;
 	}
 	else {
 		std::cout << "Failed to load texture from \"" << filepath << "\"" << std::endl;

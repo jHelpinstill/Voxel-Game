@@ -17,7 +17,7 @@ public:
 	Shader* shader;
 	void* parent_obj = nullptr;
 
-	Shader::VAOStyle style;
+	VAO::Style style;
 	unsigned int texture;
 	std::string uv_filepath;
 	glm::vec3 color;

@@ -338,14 +338,14 @@ void World::drawWorld(Mesh* mesh, Camera* camera) {
 
 	mesh->shader->setVec3("light_dir", lighting_dir);
 
-	switch (mesh->style) {
-	case Shader::VAOStyle::TEXTURED:
-		glBindTexture(GL_TEXTURE_2D, mesh->texture);
-		break;
+	switch (mesh->vao->style) {
+		case VAO::Style::TEXTURED:
+			glBindTexture(GL_TEXTURE_2D, mesh->texture);
+			break;
 
-	case Shader::VAOStyle::SOLID_COLORED:
-		mesh->shader->setVec3("color", mesh->color);
-		break;
+		case VAO::Style::SOLID_COLORED:
+			mesh->shader->setVec3("color", mesh->color);
+			break;
 	}
 
 	glm::vec3 look_dir = camera->getLookDirection();

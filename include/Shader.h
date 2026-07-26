@@ -12,11 +12,6 @@ public:
 	unsigned int ID;
 	std::string name;
 
-	enum VAOStyle {
-		TEXTURED,
-		SOLID_COLORED
-	};
-
 	Shader() : ID(-1) {}
 	Shader(
 		const std::string& name,
