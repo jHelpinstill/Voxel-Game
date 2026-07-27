@@ -28,7 +28,14 @@ public:
 	float move_speed = 1.0;
 	float mouse_sensitivity = 2;
 	glm::vec3 velocity;
+	bool grounded = true;
+	bool flight = false;
+	
 	float height = 1.8;
+	float jump_delta_v = 5;
+	float air_acceleration = 2;
+	float ground_acceleration = 10;
+	float ground_deceleration = 20;
 
 	CameraController(Camera &camera, Input &input);
 
