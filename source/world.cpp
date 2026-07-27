@@ -55,6 +55,11 @@ void World::update(float dt, Camera *camera, Input *input) {
 	static bool single_mine = true;
 	if (input->keyPressed('Q'))
 		single_mine = !single_mine;
+		
+	if (input->keyPressed('R')) {
+		camera->transform.pos = glm::vec3(0, 6, 5);
+		std::cout << "Camera Position reset!" << std::endl;
+	}
 
 	ChunkManager::RaycastResult cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());
 	if(cast.hit) {
