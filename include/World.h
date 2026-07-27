@@ -34,6 +34,7 @@ public:
 	BlockType *inspectPos(const glm::vec3 &pos);
 
 	void updateBlock(BlockType *block, Chunk *chunk, BlockType new_type);
+	void updateBlocks(std::vector<BlockType*> &blocks, Chunk *chunk, BlockType new_type);
 	void blockBrushSphere(ChunkManager::RaycastResult cast, float radius, BlockType new_type);
 	void placeBlock(ChunkManager::RaycastResult cast, BlockType new_type);
 	void removeBlock(ChunkManager::RaycastResult cast, BlockType new_type);

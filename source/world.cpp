@@ -68,6 +68,10 @@ void World::update(float dt, Camera *camera, Input *input) {
 			//printBlockData(cast.block, cast.chunk);
 			placeBlock(cast, BlockType::DIRT);
 		}
+		if(input->mouse.middle.pressed) {
+			std::cout << "Middle Mouse Pressed!" << std::endl;
+			blockBrushSphere(cast, 4, BlockType::DIRT);
+		}
 		if (input->keyPressed('E')) {
 			putMeshWhereLooking(cast, "test_block");
 			std::cout << "Inspect ";
@@ -122,19 +126,53 @@ void World::updateBlock(BlockType *block, Chunk *chunk, BlockType new_type) {
 	}
 }
 
-// void World::blockBrushSphere(ChunkManager::RaycastResult cast, float radius, BlockType new_type) {
-// 	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2);
-// 	inspectPos(pos, &block, &chunk)
-// 	if(!(block = inspectPos(pos)))
-// 		return;
-// 	for(int x = 0; x < radius; x++) {
-// 		for(int y = 0; y < radius; y++) {
-// 			for(int z = 0; z < radius; z++) {
+void World::updateBlocks(std::vector<BlockType*> &blocks, Chunk *chunk, BlockType new_type) {
+	std::vector<Chunk*> modified_neighbors;
+	for(BlockType *block : blocks) {
+		*block = new_type;
+		int face;
+		if(chunk->blocks.onBoundary(block, &face)){
+			Chunk *new_neighbor = chunks.getNeighbor(chunk, face);
+			for(Chunk *neighbor : modified_neighbors) {
+				if(new_neighbor == neighbor) {
+					new_neighbor = nullptr;
+					break;
+				}
+			}
+			if(new_neighbor)
+				modified_neighbors.push_back(chunks.getNeighbor(chunk, face));
+		}
+	}
+	remeshChunk(chunk);
+	for(Chunk *neighbor : modified_neighbors) 
+		remeshChunk(neighbor);
+}
 
-// 			}
-// 		}
-// 	}
-// }
+void World::blockBrushSphere(ChunkManager::RaycastResult cast, float radius, BlockType new_type) {
+	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2);
+	BlockType *block;
+	Chunk *chunk;
+	inspectPos(pos, &block, &chunk);
+	if(block && chunk) {
+		std::cout << "block and chunk valid" << std::endl;
+		std::vector<BlockType*> modified_blocks;
+		int b_x, b_y, b_z;
+		if(chunk->blocks.getCoords(block, b_x, b_y, b_z)) {
+			for(int x = b_x - radius; x < b_x + radius; x++) {
+				for(int y = b_y - radius; y < b_y + radius; y++) {
+					for(int z = b_z - radius; z < b_z + radius; z++) {
+						if(z < 0 || z >= 32 || y < 0 || y >= 32 || x < 0 || x >= 32) {
+							std::cout << "some dimension out of range: " << x << ", " << y << ", " << z << std::endl;
+							continue;
+						}
+						modified_blocks.push_back(&chunk->blocks(x, y, z));
+					}
+				}
+			}
+			updateBlocks(modified_blocks, chunk, new_type);
+		}
+	}
+}
 
 void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type) {
 	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2); // move to center of block to avoid floating point nonsense

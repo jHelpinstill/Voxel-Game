@@ -24,7 +24,7 @@ public:
 		};
 		union {
 			Button buttons[GLFW_MOUSE_BUTTON_LAST + 1];
-			struct { Button left, right; };
+			struct { Button left, right, middle; };
 		};
 
 	} mouse;
