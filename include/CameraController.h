@@ -5,6 +5,7 @@
 #include "config.h"
 #include "Camera.h"
 #include "Input.h"
+#include "World.h"
 
 class CameraController {
 private:
@@ -26,13 +27,16 @@ private:
 public:
 	float move_speed = 1.0;
 	float mouse_sensitivity = 2;
+	glm::vec3 velocity;
+	float height = 1.8;
 
 	CameraController(Camera &camera, Input &input);
 
-	void update(float dt);
+	void update(World &world, float dt);
 
 	void constrainLook(glm::vec3 up);
 	void freeLook();
+	void checkGround(World &world);
 
 	glm::vec3 getInputVector();
 };

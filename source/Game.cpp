@@ -116,7 +116,7 @@ void Game::stateMachine(double dt) {
 			else
 				player->move_speed = 5;
 
-			player->update(dt);
+			player->update(world, dt);
 			world.update(dt, camera, input);
 
 			//world.sun_dir = glm::rotate(glm::mat4(1.0), glm::radians((float)(20 * dt)), glm::vec3(1, 0, 0)) * glm::vec4(world.sun_dir, 1.0);

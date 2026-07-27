@@ -68,9 +68,9 @@ void World::update(float dt, Camera *camera, Input *input) {
 			//printBlockData(cast.block, cast.chunk);
 			placeBlock(cast, BlockType::DIRT);
 		}
-		if(input->mouse.middle.pressed) {
+		if((input->mouse.middle.held && !single_mine) || (input->mouse.middle.pressed && single_mine)) {
 			std::cout << "Middle Mouse Pressed!" << std::endl;
-			blockBrushSphere(cast, 4, BlockType::DIRT);
+			blockBrushSphere(cast, 8, BlockType::DIRT);
 		}
 		if (input->keyPressed('E')) {
 			putMeshWhereLooking(cast, "test_block");
@@ -158,14 +158,16 @@ void World::blockBrushSphere(ChunkManager::RaycastResult cast, float radius, Blo
 		std::vector<BlockType*> modified_blocks;
 		int b_x, b_y, b_z;
 		if(chunk->blocks.getCoords(block, b_x, b_y, b_z)) {
+			glm::vec3 center(b_x, b_y, b_z);
 			for(int x = b_x - radius; x < b_x + radius; x++) {
 				for(int y = b_y - radius; y < b_y + radius; y++) {
 					for(int z = b_z - radius; z < b_z + radius; z++) {
 						if(z < 0 || z >= 32 || y < 0 || y >= 32 || x < 0 || x >= 32) {
-							std::cout << "some dimension out of range: " << x << ", " << y << ", " << z << std::endl;
+							// std::cout << "some dimension out of range: " << x << ", " << y << ", " << z << std::endl;
 							continue;
 						}
-						modified_blocks.push_back(&chunk->blocks(x, y, z));
+						if(glm::length(glm::vec3(x, y, z) - center) < radius)
+							modified_blocks.push_back(&chunk->blocks(x, y, z));
 					}
 				}
 			}
