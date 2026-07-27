@@ -122,10 +122,19 @@ void World::updateBlock(BlockType *block, Chunk *chunk, BlockType new_type) {
 	}
 }
 
-void World::blockBrushSphere(ChunkManager::RaycastResult cast, float radius, BlockType new_type) {
-	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2);
+// void World::blockBrushSphere(ChunkManager::RaycastResult cast, float radius, BlockType new_type) {
+// 	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2);
+// 	inspectPos(pos, &block, &chunk)
+// 	if(!(block = inspectPos(pos)))
+// 		return;
+// 	for(int x = 0; x < radius; x++) {
+// 		for(int y = 0; y < radius; y++) {
+// 			for(int z = 0; z < radius; z++) {
 
-}
+// 			}
+// 		}
+// 	}
+// }
 
 void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type) {
 	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2); // move to center of block to avoid floating point nonsense
@@ -218,10 +227,18 @@ void World::addChunkToMesh(Chunk *chunk) {
 	Mesh *world_mesh = getMeshByName("world_mesh");
 
 	int num_instances = chunk->generateFaceData(world_mesh->instance_data, chunks.getNeighbors(chunk));
+	// The padding seems to be necessary to give each chunk a uniform portion of the VBO, so they can
+	// be re-meshed larger or smaller without overwriting the other chunks
 	int padding = face_per_chunk - num_instances;
 	for (int i = 0; i < padding; i++)
 		world_mesh->instance_data.push_back(0);
-	chunks.draw_params.push_back(ChunkManager::DrawParams(4, num_instances, 0, world_mesh->instance_data.size() - face_per_chunk));
+	// 4 what, bytes? TODO: what is count in DrawParams referring to?
+	chunks.draw_params.push_back(ChunkManager::DrawParams(
+		4, 				// something (bytes?)
+		num_instances, 	// how many instances in this section of the VBO (this chunk)
+		0, 				// first, I guess in the whole VBO? (not just this chunk?)
+		world_mesh->instance_data.size() - face_per_chunk	// Position of the start of this chunk's instances
+	));
 	chunks.pos_data.push_back(encodeChunkPos(chunk));
 
 	chunk->ID = chunks.size();

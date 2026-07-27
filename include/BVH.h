@@ -19,6 +19,12 @@ public:
 		T obj;
 		DataNode *next;
 	};
+
+	typedef bool (*ObjHitFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*);
+	ObjHitFunc objHitFunc;
+	typedef void (*ObjExpansionFunc)(const glm::vec3 &pos, T *obj, glm::vec3 &min, glm::vec3 &max);
+	ObjExpansionFunc objExpansionFunc;
+
 	class Box {
 	private:
 		
@@ -32,17 +38,18 @@ public:
 		glm::vec3 min {};
 		glm::vec3 max {};
 
-		Box(void (*expandToFit)(const glm::vec3&, T*, glm::vec3&, glm::vec3&));
+		ObjExpansionFunc expandToFit;
+
+		Box(ObjExpansionFunc expandToFit);
 		~Box();
 		
-		DataNode *raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*));
+		DataNode *raycast(const glm::vec3 &pos, const glm::vec3 &ray, ObjHitFunc objHit);
 		void split(int min_data_nodes);
 
 		void addDataNode(const glm::vec3 &pos, const T &obj);
 		void addDataNode(DataNode *node);
 		int countDataNodes();
 
-		void (*expandToFit)(const glm::vec3 &pos, T *obj, glm::vec3 &min, glm::vec3 &max);
 		bool hitByRay(const glm::vec3 &pos, const glm::vec3 &ray);
 
 		// WARNING: renders tree unusable until BVH::rebuild() is called
@@ -53,13 +60,11 @@ public:
 	int min_nodes_per_box;
 
 	Box *root;
-	bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*);
-	void (*boxExpandToFitFunc)(const glm::vec3 &pos, T *obj, glm::vec3 &min, glm::vec3 &max);
 
-	BVH() : root(nullptr), raycastObjFunc(nullptr), boxExpandToFitFunc(nullptr) {}
+	BVH() : root(nullptr), objHitFunc(nullptr), objExpansionFunc(nullptr) {}
 	BVH(
-		bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*),
-		void (*boxExpandToFitFunc)(const glm::vec3&, T*, glm::vec3&, glm::vec3&),
+		ObjHitFunc objHitFunc,
+		ObjExpansionFunc objExpansionFunc,
 		int min_nodes = 1
 	);
 	~BVH();
@@ -74,13 +79,13 @@ public:
 
 template <class T>
 BVH<T>::BVH(
-	bool (*raycastObjFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*),
-	void (*boxExpandToFitFunc)(const glm::vec3&, T*, glm::vec3&, glm::vec3&),
+	ObjHitFunc objHitFunc,
+	ObjExpansionFunc objExpansionFunc,
 	int min_nodes
-)	: raycastObjFunc(raycastObjFunc)
-	, boxExpandToFitFunc(boxExpandToFitFunc)
+)	: objHitFunc(objHitFunc)
+	, objExpansionFunc(objExpansionFunc)
 	, min_nodes_per_box(min_nodes) {
-	root = new Box(boxExpandToFitFunc);
+	root = new Box(objExpansionFunc);
 }
 
 template <class T>
@@ -91,13 +96,13 @@ BVH<T>::~BVH() {
 template <typename T>
 auto BVH<T>::raycast(const glm::vec3 &pos, const glm::vec3 &ray)->RaycastResult {
 	RaycastResult result{};
-	if (!root || !raycastObjFunc)
+	if (!root || !objHitFunc)
 		return result;
 	//std::cout << "Raycast begin" << std::endl;
 
 	DataNode *hit_node = nullptr;
 	if (root->hitByRay(pos, ray))
-		hit_node = root->raycast(pos, ray, raycastObjFunc);
+		hit_node = root->raycast(pos, ray, objHitFunc);
 	//else
 		//std::cout << "root box missed" << std::endl;
 	if (!hit_node)
@@ -112,7 +117,7 @@ auto BVH<T>::raycast(const glm::vec3 &pos, const glm::vec3 &ray)->RaycastResult 
 template <class T>
 void BVH<T>::reset() {
 	delete root;
-	root = new Box(boxExpandToFitFunc);
+	root = new Box(objExpansionFunc);
 }
 
 template <class T>
@@ -135,7 +140,7 @@ void BVH<T>::build() {
 /////////////////////////// BOX FUNCTION DEFINITIONS //////////////////////////////
 
 template <class T>
-BVH<T>::Box::Box(void (*expandToFit)(const glm::vec3&, T*, glm::vec3&, glm::vec3&))
+BVH<T>::Box::Box(ObjExpansionFunc expandToFit)
 	: expandToFit(expandToFit)
 	, data(nullptr), childA(nullptr), childB(nullptr), resized(false) {
 	min = glm::vec3(std::numeric_limits<float>::infinity());
@@ -302,7 +307,7 @@ bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3 &pos, Box **boxes) {
 }
 
 template <class T>
-auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*raycastObj)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*))->DataNode *{
+auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, ObjHitFunc objHit)->DataNode *{
 	DataNode *nearest_hit = nullptr;
 	if (!resized)
 		return nearest_hit;	// don't bother if box hasn't been resized yet (not initialized with data)
@@ -338,7 +343,7 @@ auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*ray
 	std::vector<DataNode*> hit_nodes;
 	DataNode *hit = nullptr;
 	for (int i = 0; i < 2; i++) {
-		if (ranked_children[i] && (hit = ranked_children[i]->raycast(pos, ray, raycastObj))) {
+		if (ranked_children[i] && (hit = ranked_children[i]->raycast(pos, ray, objHit))) {
 			hit_nodes.push_back(hit);
 			if (monotonically_closer)
 				break;
@@ -348,7 +353,7 @@ auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, bool (*ray
 	// find hits from own nodes
 	DataNode *node = data;
 	while (node) {
-		if (raycastObj(pos, ray, node->pos, &node->obj))
+		if (objHit(pos, ray, node->pos, &node->obj))
 			hit_nodes.push_back(node);
 
 		node = node->next;
