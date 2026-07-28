@@ -10,7 +10,7 @@ World::World(long seed) : seed(seed) {
 
 void World::setup() {
 	std::srand(seed);
-	int layers = 2;
+	int layers = 3;
 	for(int y = 0; y < layers; y++) {
 		chunks.add(0, y, 0);// chunks[Key(0, 0, 0)] = new Chunk(glm::ivec3(0, 0, 0));
 		for (int r = 1; r <= chunk_radius; r++) {

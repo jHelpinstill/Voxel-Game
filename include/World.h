@@ -16,7 +16,7 @@ public:
 	int chunk_radius = 10;
 	long seed;
 
-	float ambient_lighting = 0.1;
+	float ambient_lighting = 0.5;
 	glm::vec3 sun_dir = glm::vec3(-1);
 
 	ChunkManager chunks;
