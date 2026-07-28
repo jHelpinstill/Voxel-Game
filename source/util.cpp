@@ -66,25 +66,40 @@ float max2(float a, float b) {
 	return a > b ? a : b;
 }
 
+glm::vec3 getPolyNorm(const glm::vec3 *verts, int num_sides, util::PolyCulling culling) {
+	glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
+	switch(culling) {
+		case util::PolyCulling::CW:
+			norm = -norm;
+		case util::PolyCulling::NONE:
+		case util::PolyCulling::CCW:
+		default: break;
+	}
+	return glm::normalize(norm);
+}
+
 // returns true if ray intersects polygon, false otherwise
 bool rayIntersectsPoly(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 *verts, int num_sides, util::PolyCulling culling) {
-	glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
+	// glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
+	glm::vec3 norm = getPolyNorm(verts, num_sides, culling);
 	if (glm::dot(verts[0] - pos, norm) * glm::dot(ray, norm) < 0)
 		return false;
 
-	switch (culling) {
-		using namespace util;
-	case PolyCulling::NONE:
-		break;
-	case PolyCulling::CCW:
-		if (glm::dot(norm, ray) >= 0)
-			return false;
-		break;
-	case PolyCulling::CW:
-		if(glm::dot(norm, ray) < 0)
-			return false;
-		break;
-	}
+	if(culling != util::PolyCulling::NONE && glm::dot(norm, ray) >= 0)
+		return false;
+	// switch (culling) {
+	// 	using namespace util;
+	// 	case PolyCulling::NONE:
+	// 		break;
+	// 	case PolyCulling::CCW:
+	// 		if (glm::dot(norm, ray) >= 0)
+	// 			return false;
+	// 		break;
+	// 	case PolyCulling::CW:
+	// 		if(glm::dot(norm, ray) < 0)
+	// 			return false;
+	// 		break;
+	// }
 
 	glm::vec3 leg = verts[1 % num_sides] - verts[0];
 	bool sign = (glm::dot(glm::cross(ray, verts[0] - pos), leg) > 0);

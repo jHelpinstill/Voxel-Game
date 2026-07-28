@@ -33,6 +33,7 @@ float max2(float a, float b);
 
 // returns true if ray intersects polygon, false otherwise
 bool rayIntersectsPoly(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 *verts, int num_sides, util::PolyCulling culling = util::PolyCulling::NONE);
+glm::vec3 getPolyNorm(const glm::vec3 *verts, int num_sides, util::PolyCulling culling = util::PolyCulling::NONE);
 
 class Quad {
 public:

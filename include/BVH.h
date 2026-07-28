@@ -51,6 +51,7 @@ public:
 		int countDataNodes();
 
 		bool hitByRay(const glm::vec3 &pos, const glm::vec3 &ray);
+		bool intersectsSphere(const glm::vec3 &pos, float radius);
 
 		// WARNING: renders tree unusable until BVH::rebuild() is called
 		DataNode *getData(DataNode *existing_data = nullptr);
@@ -278,6 +279,15 @@ bool BVH<T>::Box::hitByRay(const glm::vec3 &pos, const glm::vec3 &ray) {
 			return true;
 	}
 	return false;
+}
+
+template <class T>
+bool BVH<T>::Box::intersectsSphere(const glm::vec3 &pos, float radius) {
+	for(int face = 0; face < 6; face++) {
+		Quad quad(min, max, face);
+		glm::vec3 norm = getPolyNorm(quad.verts, 4, util::PolyCulling::CCW);
+	}
+	return true;
 }
 
 template <class T>
