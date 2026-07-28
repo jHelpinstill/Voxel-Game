@@ -80,26 +80,13 @@ glm::vec3 getPolyNorm(const glm::vec3 *verts, int num_sides, util::PolyCulling c
 
 // returns true if ray intersects polygon, false otherwise
 bool rayIntersectsPoly(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 *verts, int num_sides, util::PolyCulling culling) {
-	// glm::vec3 norm = glm::cross(verts[1] - verts[0], verts[num_sides - 1] - verts[0]);
 	glm::vec3 norm = getPolyNorm(verts, num_sides, culling);
+
 	if (glm::dot(verts[0] - pos, norm) * glm::dot(ray, norm) < 0)
-		return false;
+		return false; // ray is pointing away from the polygon
 
 	if(culling != util::PolyCulling::NONE && glm::dot(norm, ray) >= 0)
-		return false;
-	// switch (culling) {
-	// 	using namespace util;
-	// 	case PolyCulling::NONE:
-	// 		break;
-	// 	case PolyCulling::CCW:
-	// 		if (glm::dot(norm, ray) >= 0)
-	// 			return false;
-	// 		break;
-	// 	case PolyCulling::CW:
-	// 		if(glm::dot(norm, ray) < 0)
-	// 			return false;
-	// 		break;
-	// }
+		return false; // ray is looking at the polygon in the transparent direction (from the back, according to culling type)
 
 	glm::vec3 leg = verts[1 % num_sides] - verts[0];
 	bool sign = (glm::dot(glm::cross(ray, verts[0] - pos), leg) > 0);
@@ -113,45 +100,21 @@ bool rayIntersectsPoly(const glm::vec3 &pos, const glm::vec3 &ray, const glm::ve
 	return true;
 }
 
+Quad q0 = {util::Y, util::YZ, util::XYZ, util::XY};
+Quad q1 = {glm::vec3(0), util::X, util::ZX, util::Z};
+Quad q2 = {util::X, util::XY, util::XYZ, util::ZX};
+Quad q3 = {glm::vec3(0), util::Z, util::YZ, util::Y};
+Quad q4 = {util::Z, util::ZX, util::XYZ, util::YZ};
+Quad q5 = {glm::vec3(0), util::Y, util::XY, util::X};
+
+Quad default_quads[6] = {
+	q0, q1, q2, q3, q4, q5
+};
+
 Quad::Quad(const glm::vec3 &pos, int face) {
-	switch (face) {
-	case 0:
-		verts[0] = pos + util::Y;
-		verts[1] = pos + util::YZ;
-		verts[2] = pos + util::XYZ;
-		verts[3] = pos + util::XY;
-		break;
-	case 1:
-		verts[0] = pos;
-		verts[1] = pos + util::X;
-		verts[2] = pos + util::ZX;
-		verts[3] = pos + util::Z;
-		break;
-	case 2:
-		verts[0] = pos + util::X;
-		verts[1] = pos + util::XY;
-		verts[2] = pos + util::XYZ;
-		verts[3] = pos + util::ZX;
-		break;
-	case 3:
-		verts[0] = pos;
-		verts[1] = pos + util::Z;
-		verts[2] = pos + util::YZ;
-		verts[3] = pos + util::Y;
-		break;
-	case 4:
-		verts[0] = pos + util::Z;
-		verts[1] = pos + util::ZX;
-		verts[2] = pos + util::XYZ;
-		verts[3] = pos + util::YZ;
-		break;
-	case 5:
-		verts[0] = pos;
-		verts[1] = pos + util::Y;
-		verts[2] = pos + util::XY;
-		verts[3] = pos + util::X;
-		break;
-	}
+	*this = default_quads[face];
+	for(int i = 0; i < 4; i++)
+		verts[i] += pos;
 }
 
 Quad::Quad(const glm::vec3 &box_min, const glm::vec3 &box_max, int face) {

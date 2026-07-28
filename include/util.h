@@ -40,6 +40,9 @@ public:
 	glm::vec3 verts[4];
 	
 	Quad() {}
+	Quad(const glm::vec3 f0, const glm::vec3 f1, const glm::vec3 f2, const glm::vec3 f3) {
+		verts[0] = f0; verts[1] = f1; verts[2] = f2; verts[3] = f3;
+	} 
 	Quad(const glm::vec3 &pos, int face);
 	Quad(const glm::vec3 &box_min, const glm::vec3 &box_max, int face);
 };
