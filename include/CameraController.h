@@ -33,7 +33,7 @@ public:
 	
 	float height = 1.8;
 	float jump_delta_v = 5;
-	float air_acceleration = 2;
+	float air_acceleration = 3;
 	float ground_acceleration = 10;
 	float ground_deceleration = 20;
 
@@ -46,6 +46,8 @@ public:
 	void checkGround(World &world);
 
 	glm::vec3 getInputVector();
+	glm::vec3 getMovementVector();
+	void handleKeyInput();
 };
 
 #endif

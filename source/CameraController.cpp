@@ -12,32 +12,12 @@ void CameraController::update(World &world, float dt) {
 		camera->transform.rotate(input->mouse.delta.x * mouse_sensitivity / 1000.0, up_vec, false);
 		camera->transform.rotate(input->mouse.delta.y * mouse_sensitivity / 1000.0, glm::vec3(1, 0, 0), true);
 
-		glm::vec3 move = getInputVector();
-		move.x *= -1;
-		move.z *= -1;
-
-		move *= move_speed;
-
 		glm::mat4 inv_view = glm::inverse(camera->transform.view);
+		handleKeyInput();
 
-		if(input->keyPressed(inputs.up)) {
-			if(grounded) {
-				std::cout << "jumped!" << std::endl;
-				velocity.y += jump_delta_v;
-				grounded = false;
-			}
-			else {
-				std::cout << "activated flight mode!" << std::endl;
-				flight = true;
-			}
-		}
-
-		
-		glm::vec3 move_up = move.y * up_vec;
-		glm::vec3 move_fwd = glm::cross(glm::vec3(inv_view * glm::vec4(1, 0, 0, 1)), up_vec) * move.z;
-		glm::vec3 move_left = inv_view * glm::vec4(move.x, 0, 0, 1);
-
-		glm::vec3 move_world = move_fwd + move_left;
+		glm::vec3 move_world = getMovementVector();
+		float move_y = move_world.y;
+		move_world.y = 0;
 		if(!flight) {
 			if(!grounded) {
 				float t = 1;
@@ -56,7 +36,7 @@ void CameraController::update(World &world, float dt) {
 			velocity += glm::vec3(0, -9.8 * dt, 0); // gravity
 		}
 		else {
-			move_world += move_up;
+			move_world.y = move_y;
 			velocity += (move_world - velocity) * glm::vec3(ground_acceleration * dt);
 		}
 		
@@ -66,9 +46,26 @@ void CameraController::update(World &world, float dt) {
 	else {
 		camera->transform.rotate(glm::vec3(input->mouse.delta.y * mouse_sensitivity * dt, input->mouse.delta.x * mouse_sensitivity, 0));
 	}
-	
+}
 
-	//camera->translateLocal(getInputVector() * move_speed * dt);
+void CameraController::handleKeyInput() {
+	if(input->keyPressed(inputs.up)) {
+		if(grounded) {
+			std::cout << "jumped!" << std::endl;
+			velocity.y += jump_delta_v;
+			grounded = false;
+		}
+	}
+	if(input->keyPressed('F')) {
+		if(flight) {
+			flight = false;
+			std::cout << "flight mode disabled!" << std::endl;
+		}
+		else {
+			flight = true;
+			std::cout << "activated flight mode!" << std::endl;
+		}
+	}
 }
 
 void CameraController::checkGround(World &world) {
@@ -79,11 +76,8 @@ void CameraController::checkGround(World &world) {
 			camera->transform.pos.y = cast.pos.y + height;
 			velocity.y = 0;
 			grounded = true;
-			if(flight)
-				std::cout << "flight mode disabled!" << std::endl;
-			flight = false;
 		}
-		else if(ground_dist > height + 0.1) {
+		else if(ground_dist > height * 1.1) {
 			grounded = false;
 		}
 	}
@@ -105,4 +99,17 @@ glm::vec3 CameraController::getInputVector() {
 	v.y = input->keyHeld(inputs.up) - input->keyHeld(inputs.down);
 
 	return v;
+}
+
+glm::vec3 CameraController::getMovementVector() {
+	glm::vec3 input_vec = getInputVector();
+
+	input_vec *= move_speed;
+	glm::mat4 inv_view = glm::inverse(camera->transform.view);
+
+	glm::vec3 move_up = input_vec.y * up_vec;
+	glm::vec3 move_fwd = glm::cross(up_vec, glm::vec3(inv_view * glm::vec4(1, 0, 0, 1))) * input_vec.z;
+	glm::vec3 move_left = inv_view * glm::vec4(-input_vec.x, 0, 0, 1);
+
+	return move_up + move_fwd + move_left;
 }
