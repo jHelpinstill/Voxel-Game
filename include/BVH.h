@@ -9,11 +9,6 @@
 template <class T>
 class BVH {
 public:
-	// struct RaycastResult {
-	// 	bool hit;
-	// 	T *obj;
-	// 	glm::vec3 pos;
-	// };
 	struct DataNode {
 		glm::vec3 pos;
 		T obj;
@@ -24,9 +19,6 @@ public:
 	ObjExpansionFunc objExpansionFunc;
 
 	class Box {
-	private:
-		
-		
 	public:
 		DataNode *data;
 		Box *childA;
@@ -54,8 +46,6 @@ public:
 
 		// WARNING: renders tree unusable until BVH::rebuild() is called
 		DataNode *getData(DataNode *existing_data = nullptr);
-
-		static bool isMonotonicallyCloser(const glm::vec3 &pos, Box **boxes);
 	};
 	int min_nodes_per_box;
 
@@ -269,32 +259,6 @@ bool BVH<T>::Box::intersectsSphere(const glm::vec3 &pos, float radius) {
 	for(int face = 0; face < 6; face++) {
 		Quad quad(min, max, face);
 		glm::vec3 norm = getPolyNorm(quad.verts, 4, util::PolyCulling::CCW);
-	}
-	return true;
-}
-
-template <class T>
-bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3 &pos, Box **boxes) {
-	// find nearest vertice of the closer box
-	float farthest_vert_A = UTIL_NEGATIVE_INFINITY;
-	for (int face = 0; face < 2; face++) {
-		Quad quad_top(boxes[0]->min, boxes[0]->max, face);
-		for (int vert = face * 4; vert < 4 * (face + 1); vert++) {
-			float dist = glm::length(quad_top.verts[vert - (face * 4)] - pos);
-			if (dist > farthest_vert_A)
-				farthest_vert_A = dist;
-		}
-	}
-	
-	// if a single vertice of the far box is closer than the farthest vert of the near box,
-	// then the near box is not closer monotonitcally (and the far box cannot be discarded)
-	for (int face = 0; face < 2; face++) {
-		Quad quad_top(boxes[1]->min, boxes[1]->max, face);
-		for (int vert = face * 4; vert < 4 * (face + 1); vert++) {
-			float dist = glm::length(quad_top.verts[vert - (face * 4)] - pos);
-			if (dist < farthest_vert_A)
-				return false;
-		}
 	}
 	return true;
 }

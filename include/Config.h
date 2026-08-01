@@ -19,4 +19,4 @@
 
 #define ROOT std::string("../")
 
-//#define LOCK_FRAMERATE
+// #define LOCK_FRAMERATE

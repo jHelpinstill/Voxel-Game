@@ -56,56 +56,54 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int z = 0; z < CHUNK_SIZE; z++) {
 			for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
-				int rand_num = std::rand();
-				// int rand_num = DEBUG_NUM;
-				// DEBUG_NUM = ++DEBUG_INDEX * DEBUG_INCREMENT;
-				// if(DEBUG_INDEX > 7) DEBUG_INDEX = 0;
-
 				if (blocks(x, y, z) != BlockType::AIR)
 					continue;
-
-				glm::vec3 pos = glm::vec3(x, y, z);
-
-				glm::vec3 surrounding_block_positions[6] = {
-					pos - util::Y, pos + util::Y,
-					pos - util::X, pos + util::X,
-					pos - util::Z, pos + util::Z
-				};
-
+				
+				int rand_num = std::rand();
 				bool inside_boundaries[6] = {
 					(y != 0), (y != CHUNK_SIZE - 1),
 					(x != 0), (x != CHUNK_SIZE - 1),
 					(z != 0), (z != CHUNK_SIZE - 1)
 				};
-
-				int surrounding_block_coords[6][3] = {
-					{x, y - 1, z}, {x, y + 1, z},
-					{x - 1, y, z}, {x + 1, y, z},
-					{x, y, z - 1}, {x, y, z + 1}
-				};
-
-				int neighboring_chunks_block_coords[6][3] = {
-					{x, CHUNK_SIZE - 1, z}, {x, 0, z},
-					{CHUNK_SIZE - 1, y, z}, {0, y, z},
-					{x, y, CHUNK_SIZE - 1}, {x, y, 0}
-				};
-
 				for (int dir = 0; dir < 6; dir++) {
 					BlockType *block = nullptr;
-
-					if (inside_boundaries[dir])
-						block = &blocks(surrounding_block_coords[dir][0], surrounding_block_coords[dir][1], surrounding_block_coords[dir][2]);
-					else if (neighboring_chunks[dir])
-						block = &neighboring_chunks[dir]->blocks(
-							neighboring_chunks_block_coords[dir][0],
-							neighboring_chunks_block_coords[dir][1],
-							neighboring_chunks_block_coords[dir][2]
-						);
-
+					if (inside_boundaries[dir]) {
+						int surrounding_block_coords[3] = {x, y, z};
+						switch(dir) {
+							case 0: surrounding_block_coords[1]--; break;
+							case 1: surrounding_block_coords[1]++; break;
+							case 2: surrounding_block_coords[0]--; break;
+							case 3: surrounding_block_coords[0]++; break;
+							case 4: surrounding_block_coords[2]--; break;
+							case 5: surrounding_block_coords[2]++; break;
+						}
+						block = &blocks(surrounding_block_coords[0], surrounding_block_coords[1], surrounding_block_coords[2]);
+					}
+					else if (neighboring_chunks[dir]) {
+						int neighboring_chunks_block_coords[3] = {x, y, z};
+						switch(dir) {
+							case 0: neighboring_chunks_block_coords[1] = CHUNK_SIZE - 1; break;
+							case 1: neighboring_chunks_block_coords[1] = 0; break;
+							case 2: neighboring_chunks_block_coords[0] = CHUNK_SIZE - 1; break;
+							case 3: neighboring_chunks_block_coords[0] = 0; break;
+							case 4: neighboring_chunks_block_coords[2] = CHUNK_SIZE - 1; break;
+							case 5: neighboring_chunks_block_coords[2] = 0; break;
+						}
+						block = &neighboring_chunks[dir]->blocks(neighboring_chunks_block_coords[0], neighboring_chunks_block_coords[1], neighboring_chunks_block_coords[2]);
+					}
 					if (block && *block != BlockType::AIR) {
 						data.push_back(encodeFaceData(x, y, z, dir, getBlockColor(*block, dir, rand_num)));
 						Face face = { block, dir };
-						faces_BVH.root->createDataNode(surrounding_block_positions[dir], face);
+						glm::vec3 pos = glm::vec3(x, y, z);
+						switch(dir) {
+							case 0: pos = pos - util::Y; break;
+							case 1: pos = pos + util::Y; break;
+							case 2: pos = pos - util::X; break;
+							case 3: pos = pos + util::X; break;
+							case 4: pos = pos - util::Z; break;
+							case 5: pos = pos + util::Z; break;
+						}
+						faces_BVH.root->createDataNode(pos, face);
 						instances++;
 					}
 				}
