@@ -38,6 +38,8 @@ void Game::setup() {
 	createTexturedBox("ruler", glm::vec3(1, 1, 98), glm::vec3(0, 3, 2), "crate", ROOT + "meshes/box_two_face_UV.txt");
 	createTexturedBox("test_block", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), "crate", ROOT + "meshes/box_two_face_UV.txt");
 
+	createBox("wireframe_box", glm::vec3(1), glm::vec3(0, 4, 0), glm::vec3(0, 0, 1), true);
+
 	fonts["arial"] = new Font(ROOT + "fonts/arial.ttf", 48);
 
 	Decal *crosshair = createDecal("crosshair", "white_square", "decal_shader", glm::vec2(3), glm::vec2(0), window);

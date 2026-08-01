@@ -59,7 +59,8 @@ Mesh *createBox(
 	const std::string &name,
 	glm::vec3 size,
 	glm::vec3 pos,
-	glm::vec3 color = glm::vec3(0.5, 0.5, 0.5)
+	glm::vec3 color = glm::vec3(0.5, 0.5, 0.5),
+	bool wireframe = false
 );
 
 Mesh *createTexturedPlane(

@@ -43,7 +43,8 @@ public:
 	Mesh(
 		const std::vector<glm::vec3> &verts,
 		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5),
-		void (*drawFunc)(Mesh*, Camera*) = drawTriangles
+		void (*drawFunc)(Mesh*, Camera*) = drawTriangles,
+		bool wireframe = false
 	);
 	
 	~Mesh();
@@ -56,7 +57,8 @@ public:
 		unsigned int texture,
 		const std::string &uv_filepath,
 		const glm::vec3 &pos = glm::vec3(0, 0, 0),
-		const glm::vec3 &color = glm::vec3(0.5, 0.5, 0.5)
+		const glm::vec3 &color = glm::vec3(0.5, 0.5, 0.5),
+		bool wireframe = false
 	);
 	static Mesh *makePlane(
 		const glm::vec2 &size,

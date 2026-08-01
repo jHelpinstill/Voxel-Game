@@ -45,7 +45,8 @@ Mesh::Mesh(
 Mesh::Mesh(
 	const std::vector<glm::vec3> &verts,
 	glm::vec3 color,
-	void (*drawFunction)(Mesh*, Camera*)
+	void (*drawFunction)(Mesh*, Camera*),
+	bool wireframe
 ) {
 	this->color = color;
 	this->drawFunc = drawFunction;
@@ -54,7 +55,10 @@ Mesh::Mesh(
 		this->verts.push_back(vert);
 
 	vao = new VAO;
-	vao->makeSolidColored(verts, color);
+	if(wireframe)
+		vao->makeWireFrame(verts, color);
+	else
+		vao->makeSolidColored(verts, color);
 }
 
 Mesh::~Mesh() {
@@ -95,20 +99,26 @@ void Mesh::getUVMap(const std::string &filepath) {
 void Mesh::drawTriangles(Mesh *mesh, Camera *camera) {
 	mesh->shader->use();
 	mesh->shader->setMat4("projection", camera->getProjectionMat()  *mesh->transform.getMat());
-	//mesh->shader->setMat4("transform", mesh->transform.getMat());
 
 	switch (mesh->vao->style) {
 		case VAO::Style::TEXTURED:
 			glBindTexture(GL_TEXTURE_2D, mesh->texture);
+			glBindVertexArray(mesh->vao->ID);
+			glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
 			break;
 
 		case VAO::Style::SOLID_COLORED:
 			mesh->shader->setVec3("color", mesh->color);
+			glBindVertexArray(mesh->vao->ID);
+			glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
+			break;
+		
+		case VAO::Style::WIRE_FRAME:
+			mesh->shader->setVec3("color", mesh->color);
+			glBindVertexArray(mesh->vao->ID);
+			glDrawArrays(GL_LINE_STRIP, 0, mesh->verts.size());
 			break;
 	}
-
-	glBindVertexArray(mesh->vao->ID);
-	glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size());
 }
 
 void Mesh::drawInstancedStrip(Mesh *mesh, Camera *camera) {
@@ -170,7 +180,8 @@ Mesh *Mesh::makeBox(
 	unsigned int texture,
 	const std::string &uv_filepath,
 	const glm::vec3 &pos,
-	const glm::vec3 &color
+	const glm::vec3 &color,
+	bool wireframe
 ) {
 	float w, h, l;
 	w = size.x;
@@ -211,7 +222,7 @@ Mesh *Mesh::makeBox(
 	if (texture)
 		mesh = new Mesh(verts, texture, uv_filepath);
 	else
-		mesh = new Mesh(verts, color);
+		mesh = new Mesh(verts, color, Mesh::drawTriangles, wireframe); // TODO: fix the associations between VAO, MESH, wireframe, styles, etc.
 
 	mesh->transform.translate(pos);
 	return mesh;

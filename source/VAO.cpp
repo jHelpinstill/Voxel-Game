@@ -65,6 +65,31 @@ void VAO::makeSolidColored(const std::vector<glm::vec3> &verts, const glm::vec3 
 	glEnableVertexAttribArray(0);
 }
 
+void VAO::makeWireFrame(const std::vector<glm::vec3> &verts, const glm::vec3 &color) {
+	reset();
+	style = Style::WIRE_FRAME;
+
+	std::vector<float> data;
+	for (const glm::vec3 &vert : verts) {
+		for (int i = 0; i < 3; i++)
+			data.push_back(vert[i]);
+		data.push_back(vert[0]);
+	}
+
+	glGenVertexArrays(1, &ID);
+	bind();
+
+	glGenBuffers(1, &verts_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, verts_VBO);
+	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+
+	int stride = 4 * sizeof(float);
+
+	//position
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, stride, (void*)0);
+	glEnableVertexAttribArray(0);
+}
+
 void VAO::makeInstanced(const std::vector<glm::vec3> &verts, const std::vector<int> &instance_data) {
 	reset();
 	style = Style::INSTANCED;

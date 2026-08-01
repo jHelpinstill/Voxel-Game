@@ -18,9 +18,10 @@ Mesh *createBox(
 	const std::string &name,
 	glm::vec3 size,
 	glm::vec3 pos,
-	glm::vec3 color
+	glm::vec3 color,
+	bool wireframe
 ) {
-	Mesh *box = Mesh::makeBox(size, 0, "", pos, color);
+	Mesh *box = Mesh::makeBox(size, 0, "", pos, color, wireframe);
 	box->attachShader(getShaderByName("color_shader"));
 
 	meshes[name] = box;
