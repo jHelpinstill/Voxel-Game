@@ -50,41 +50,38 @@ void World::setup() {
 	generateMesh();
 }
 
-void World::update(float dt, Camera *camera, Input *input) {
+void World::update(float dt, CameraController *player, Input *input) {
 	//Chunk* current_chunk = nullptr;
 	static bool single_mine = true;
 	if (input->keyPressed('Q'))
 		single_mine = !single_mine;
 
 	if (input->keyPressed('R')) {
-		camera->transform.pos = glm::vec3(0, 6, 5);
+		player->setPos(glm::vec3(0, 6, 5));
+		player->velocity = glm::vec3(0);
 		std::cout << "Camera Position reset!" << std::endl;
 	}
 
 	bool has_cast = false;
 	ChunkManager::RaycastResult cast;
 	if ((input->mouse.left.held && !single_mine) || (input->mouse.left.pressed && single_mine)) {
-		//std::cout << "MINING ";
-		//printBlockData(cast.block, cast.chunk);
-		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
 		if(cast.hit)
 			updateBlock(cast.block, cast.chunk, BlockType::AIR);
 	}
 	if ((input->mouse.right.held && !single_mine) || (input->mouse.right.pressed && single_mine)) {
-		//std::cout << "PLACING ";
-		//printBlockData(cast.block, cast.chunk);
-		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
 		if(cast.hit)
 			placeBlock(cast, BlockType::DIRT);
 	}
 	if((input->mouse.middle.held && !single_mine) || (input->mouse.middle.pressed && single_mine)) {
 		std::cout << "Middle Mouse Pressed!" << std::endl;
-		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
 		if(cast.hit)
 			blockBrushSphere(cast, 8, BlockType::DIRT);
 	}
 	if (input->keyPressed('E')) {
-		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
 		if(cast.hit) {
 			putMeshWhereLooking(cast, "test_block");
 			std::cout << "Inspect ";
@@ -92,7 +89,7 @@ void World::update(float dt, Camera *camera, Input *input) {
 		}
 	}
 	if (input->keyPressed('I')) {
-		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
 		if(cast.hit)
 			traceBVHface(cast.chunk->faces_BVH);
 	}

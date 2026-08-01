@@ -1,6 +1,6 @@
 #pragma once
-#ifndef WORLD_
-#define WORLD_
+#ifndef WORLD_H
+#define WORLD_H
 
 #include "config.h"
 #include "ObjectManager.h"
@@ -8,7 +8,7 @@
 #include "Chunk.h"
 #include "ChunkManager.h"
 #include "BVH.h"
-#include "Camera.h"
+#include "CameraController.h"
 #include "Input.h"
 
 class World {
@@ -28,7 +28,7 @@ public:
 	void addChunkToMesh(Chunk *chunk);
 	void remeshChunk(Chunk *chunk);
 
-	void update(float dt, Camera *camera, Input *input);
+	void update(float dt, CameraController *player, Input *input);
 
 	void inspectPos(const glm::vec3 &pos, BlockType **block_out, Chunk **chunk_out = nullptr);
 	BlockType *inspectPos(const glm::vec3 &pos);
@@ -37,7 +37,6 @@ public:
 	void updateBlocks(std::vector<BlockType*> &blocks, Chunk *chunk, BlockType new_type);
 	void blockBrushSphere(ChunkManager::RaycastResult cast, float radius, BlockType new_type);
 	void placeBlock(ChunkManager::RaycastResult cast, BlockType new_type);
-	void removeBlock(ChunkManager::RaycastResult cast, BlockType new_type);
 
 	int encodeChunkPos(Chunk *chunk);
 

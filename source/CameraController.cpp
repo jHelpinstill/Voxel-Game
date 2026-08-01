@@ -96,6 +96,18 @@ void CameraController::freeLook() {
 	constrain_up = false;
 }
 
+glm::vec3 CameraController::getPos() {
+	return camera->transform.pos;
+}
+
+glm::vec3 CameraController::getLookDirection() {
+	return camera->getLookDirection();
+}
+
+void CameraController::setPos(const glm::vec3 &pos) {
+	camera->transform.pos = pos;
+}
+
 glm::vec3 CameraController::getInputVector() {
 	glm::vec3 v(0, 0, 0);
 	v.z = input->keyHeld(inputs.forward) - input->keyHeld(inputs.backward);

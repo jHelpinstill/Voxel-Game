@@ -1,11 +1,12 @@
 #pragma once
-#ifndef CAMERA_CONTROLLER
-#define CAMERA_CONTROLLER
+#ifndef CAMERA_CONTROLLER_H
+#define CAMERA_CONTROLLER_H
 
 #include "config.h"
 #include "Camera.h"
 #include "Input.h"
-#include "World.h"
+
+class World;
 
 class CameraController {
 private:
@@ -44,6 +45,11 @@ public:
 	void constrainLook(glm::vec3 up);
 	void freeLook();
 	void checkGround(World &world);
+
+	glm::vec3 getPos();
+	glm::vec3 getLookDirection();
+
+	void setPos(const glm::vec3 &pos);
 
 	glm::vec3 getInputVector();
 	glm::vec3 getMovementVector();
