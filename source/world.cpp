@@ -354,28 +354,6 @@ void World::drawWorld(Mesh *mesh, Camera *camera) {
 			break;
 	}
 
-	glm::vec3 look_dir = camera->getLookDirection();
-	float dot_criteria = cos(glm::radians(camera->aspect_ratio * camera->fov / 2));
-	for (auto &chunk_obj : world->chunks.chunks) {
-		Chunk *chunk = chunk_obj.second;
-
-		glm::vec3 a, b, c, d;
-		float length = CHUNK_SIZE * world->chunks.unit_length;
-		a = chunk->getPosf();
-		b = a + glm::vec3(0, 0, length);
-		c = a + glm::vec3(length, 0, 0);
-		d = a + glm::vec3(length, 0, length);
-		if (
-			glm::dot(look_dir, a - camera->transform.pos) < dot_criteria &&
-			glm::dot(look_dir, b - camera->transform.pos) < dot_criteria &&
-			glm::dot(look_dir, c - camera->transform.pos) < dot_criteria &&
-			glm::dot(look_dir, d - camera->transform.pos) < dot_criteria) {
-			world->chunks.draw_params[chunk->ID].instanceCount = 0;
-		}
-		else
-			world->chunks.draw_params[chunk->ID].instanceCount = chunk->faces;
-	}
-
 	glBindVertexArray(mesh->vao->ID);
 
 	unsigned int indirect_command_buffer;

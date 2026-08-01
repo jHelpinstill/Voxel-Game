@@ -49,10 +49,6 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 
 	int instances = 0;
 	std::srand(seed);
-	// int DEBUG_INCREMENT = RAND_MAX / 8;
-	// int DEBUG_INDEX = 0;
-	// int DEBUG_NUM = 0;
-
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int z = 0; z < CHUNK_SIZE; z++) {
 			for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
