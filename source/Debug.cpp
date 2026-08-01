@@ -24,6 +24,8 @@ void printBlockInfo(BlockType *block, Chunk *chunk) {
 	std::cout << "\tworld pos: " << vec2string(chunk->getPosf() + glm::vec3(x, y, z) * chunk->unit_length) << std::endl;
 	std::cout << "\tindex:     " << chunk->blocks.getIndex(block) << std::endl;
 	std::cout << "\tpointer:   " << block << std::endl;
+	std::cout << "\tchunk ID:  " << chunk->ID << std::endl;
+	std::cout << "\tchunk pos: " << vec2string(glm::vec3(chunk->x, chunk->y, chunk->z)) << std::endl;
 	std::cout << std::endl;
 }
 
@@ -133,4 +135,46 @@ void traceBVHchunk(BVH<Chunk*>::Box *box, MonitorBVHchunk &monitor) {
 		monitor.num_with_single_child++;
 		traceBVHchunk(box->childB, monitor);
 	}
+}
+
+std::vector<std::string> debug_geometry;
+void clearDebugGeometry() {
+	for(auto &mesh : debug_geometry) {
+		removeMesh(mesh);
+	}
+	debug_geometry.clear();
+}
+
+void addDebugGeometry(const std::string &name) {
+	debug_geometry.push_back(name);
+}
+
+glm::vec3 sizes[6] = {
+	glm::vec3(0.1, 0.0, 0.1),
+	glm::vec3(0.1, 0.0, 0.1),
+	glm::vec3(0.0, 0.1, 0.1),
+	glm::vec3(0.0, 0.1, 0.1),
+	glm::vec3(0.1, 0.1, 0.0),
+	glm::vec3(0.1, 0.1, 0.0)
+};
+glm::vec3 offsets[6] = {
+	glm::vec3(0, 0.1, 0),
+	glm::vec3(0),
+	glm::vec3(0.1, 0, 0),
+	glm::vec3(0),
+	glm::vec3(0, 0, 0.1),
+	glm::vec3(0)
+};
+void createWireFrameFace(const glm::vec3 &pos, Chunk::Face face, const glm::vec3 &color) {
+	static int i = 0;
+	std::string name = "face-box " + std::to_string(i++);
+	createBox(
+		name,
+		sizes[face.norm],
+		pos + offsets[face.norm],
+		color,
+		true
+	);
+	addDebugGeometry(name);
+	std::cout << "created wf face @ " << vec2string(pos) << std::endl;
 }

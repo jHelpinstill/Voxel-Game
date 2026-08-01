@@ -81,8 +81,13 @@ public:
 	BVH<Face> faces_BVH;	// Bounded Volume Hierarchy of faces is used to retrieve a block pointer through raycasting
 	static bool raycastFace(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &face_pos, Face *face);
 	static void expandToFitFace(const glm::vec3 &pos, Face *face, glm::vec3 &min, glm::vec3 &max);
+	
+	struct RaycastResult {
+		bool hit;
+		Face *obj;
+		glm::vec3 pos;
+	};
 
-	typedef BVH<Face>::RaycastResult RaycastResult;
 	RaycastResult raycast(const glm::vec3 &pos, const glm::vec3 &ray);
 	RaycastResult last_successful_raycast;
 	

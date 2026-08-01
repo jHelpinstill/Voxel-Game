@@ -43,4 +43,8 @@ struct MonitorBVHchunk {
 void traceBVHchunk(BVH<Chunk*> &bvh);
 void traceBVHchunk(BVH<Chunk*>::Box *box, MonitorBVHchunk &monitor);
 
+void clearDebugGeometry();
+void addDebugGeometry(const std::string &name);
+void createWireFrameFace(const glm::vec3 &pos, Chunk::Face face, const glm::vec3 &color = glm::vec3(0, 0, 1));
+
 #endif

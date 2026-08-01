@@ -36,7 +36,6 @@ public:
 	std::vector<DrawParams> draw_params;
 
 	BVH<Chunk*> bvh;
-	static bool raycastChunk(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &chunk_pos, Chunk **chunk);
 	static void expandToFitChunk(const glm::vec3 &pos, Chunk **chunk, glm::vec3 &min, glm::vec3 &max);
 
 	struct RaycastResult {
@@ -48,7 +47,7 @@ public:
 	};
 	RaycastResult raycast(const glm::vec3 &pos, const glm::vec3 &ray);
 
-	ChunkManager() : bvh(raycastChunk, expandToFitChunk, 1) {}
+	ChunkManager() : bvh(expandToFitChunk, 1) {}
 
 	Chunk* get(const glm::vec3 &pos);
 	Chunk* get(int x, int y, int z);

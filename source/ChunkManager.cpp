@@ -1,4 +1,6 @@
 #include "ChunkManager.h"
+#include <algorithm>
+#include <numeric>
 
 bool ChunkManager::add(int x, int y, int z) {
 	Chunk::Key key(x, y, z);
@@ -7,7 +9,7 @@ bool ChunkManager::add(int x, int y, int z) {
 	}
 	Chunk *chunk = new Chunk(x, y, z, std::rand(), shader_info, unit_length);
 	chunks[key] = chunk;
-	bvh.root->addDataNode((glm::vec3(x, y, z) + glm::vec3(0.5)) * (float)CHUNK_SIZE * unit_length, chunk); // position is center of chunk to prevent floating point errors
+	bvh.root->createDataNode((glm::vec3(x, y, z) + glm::vec3(0.5)) * (float)CHUNK_SIZE * unit_length, chunk); // position is center of chunk to prevent floating point errors
 	bvh.rebuild();
 	return true;
 }
@@ -62,23 +64,34 @@ int ChunkManager::size() {
 }
 
 ChunkManager::RaycastResult ChunkManager::raycast(const glm::vec3 &pos, const glm::vec3 &ray) {
-	BVH<Chunk*>::RaycastResult cast = bvh.raycast(pos, ray);
 	RaycastResult result{};
-	if (cast.hit) {
-		result.hit = cast.hit;
-		result.chunk = *cast.obj;
-
-		Chunk::RaycastResult hit_block = result.chunk->last_successful_raycast;
-		result.block = hit_block.obj->block;
-		result.face = hit_block.obj->norm;
-		result.pos = hit_block.pos;
+	std::vector<BVH<Chunk*>::DataNode*> hits, sorted_hits;
+	bvh.raycast(pos, ray, hits);
+	if(hits.size()) {
+		std::vector<int> indices(hits.size());
+		std::iota(indices.begin(), indices.end(), 0);
+		
+		std::sort(indices.begin(), indices.end(), [&](const int a, const int b) {
+			return glm::length(hits[a]->pos - pos) < glm::length(hits[b]->pos - pos);
+		});
+		for(int i = 0; i < indices.size(); i++) {
+			sorted_hits.push_back(hits[indices[i]]);
+		}
+		for(auto &hit : sorted_hits) {
+			Chunk::RaycastResult chunk_res = hit->obj->raycast(pos, ray);
+			if(chunk_res.hit) {
+				result.hit = true;
+				result.chunk = hit->obj;
+				result.block = chunk_res.obj->block;
+				result.face = chunk_res.obj->norm;
+				result.pos = chunk_res.pos;
+				break;
+			}
+		}
 	}
 	return result;
 }
 
-bool ChunkManager::raycastChunk(const glm::vec3 &pos, const glm::vec3 &ray, const glm::vec3 &chunk_pos, Chunk **chunk) {
-	return (*chunk)->raycast(pos, ray).hit;
-}
 void ChunkManager::expandToFitChunk(const glm::vec3 &pos, Chunk **chunk, glm::vec3 &min, glm::vec3 &max) {
 	glm::vec3 half_diameter = util::XYZ * (float)CHUNK_SIZE * (*chunk)->unit_length * 0.5f;
 	min = glm::min(min, pos - half_diameter);

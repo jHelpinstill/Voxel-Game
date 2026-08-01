@@ -71,6 +71,7 @@ glm::vec3 getPolyNorm(const glm::vec3 *verts, int num_sides, util::PolyCulling c
 	switch(culling) {
 		case util::PolyCulling::CW:
 			norm = -norm;
+			break;
 		case util::PolyCulling::NONE:
 		case util::PolyCulling::CCW:
 		default: break;

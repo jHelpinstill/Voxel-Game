@@ -34,13 +34,13 @@ void CameraController::update(World &world, float dt) {
 					velocity += (move_world - velocity) * glm::vec3(ground_acceleration * dt);
 			}
 			velocity += glm::vec3(0, -9.8 * dt, 0); // gravity
+			checkGround(world);
 		}
 		else {
 			move_world.y = move_y;
 			velocity += (move_world - velocity) * glm::vec3(ground_acceleration * dt);
 		}
 		
-		checkGround(world);
 		camera->transform.translate(velocity * dt);
 	}
 	else {
@@ -65,6 +65,10 @@ void CameraController::handleKeyInput() {
 			flight = true;
 			std::cout << "activated flight mode!" << std::endl;
 		}
+	}
+	if(input->keyPressed('V')) {
+		std::cout << "velocity: " << vec2string(velocity) << std::endl;
+		std::cout << "position: " << vec2string(camera->transform.pos) << std::endl;
 	}
 }
 

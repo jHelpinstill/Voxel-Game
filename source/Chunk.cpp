@@ -1,9 +1,12 @@
 #include "Chunk.h"
 #include "ChunkManager.h"
 #include "util.h"
+#include "Debug.h"
+#include <algorithm>
+#include <numeric>
 
 Chunk::Chunk(int x, int y, int z, long seed, ShaderInfo shader_info, float unit_length)
-	: faces_BVH(raycastFace, expandToFitFace, 6)
+	: faces_BVH(expandToFitFace, 6)
 	, x(x), y(y), z(z), seed(seed), unit_length(unit_length), shader_info(shader_info) {
 	this->ID = -1;
 
@@ -102,7 +105,7 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 					if (block && *block != BlockType::AIR) {
 						data.push_back(encodeFaceData(x, y, z, dir, getBlockColor(*block, dir, rand_num)));
 						Face face = { block, dir };
-						faces_BVH.root->addDataNode(surrounding_block_positions[dir], face);
+						faces_BVH.root->createDataNode(surrounding_block_positions[dir], face);
 						instances++;
 					}
 				}
@@ -147,11 +150,28 @@ int Chunk::encodeFaceData(int x, int y, int z, int face, const glm::ivec3 &color
 }
 
 Chunk::RaycastResult Chunk::raycast(const glm::vec3 &pos, const glm::vec3 &ray) {
+	RaycastResult result{};
+	std::vector<BVH<Face>::DataNode*> hits, sorted_hits;
 	glm::vec3 chunk_space_pos = (pos - getPosf()) * (1.0f / unit_length);
-	RaycastResult result = faces_BVH.raycast(chunk_space_pos, ray);
-	if (result.hit) {
-		result.pos = getPosf() + result.pos * unit_length;
-		last_successful_raycast = result;
+	faces_BVH.raycast(chunk_space_pos, ray, hits);
+	if(hits.size()) {
+		std::vector<int> indices(hits.size());
+		std::iota(indices.begin(), indices.end(), 0);
+		std::sort(indices.begin(), indices.end(), [&](const int a, const int b) {
+			return glm::length(hits[a]->pos - chunk_space_pos) < glm::length(hits[b]->pos - chunk_space_pos);
+		});
+		glm::vec3 posf = getPosf();
+		for(int i = 0; i < indices.size(); i++) {
+			sorted_hits.push_back(hits[indices[i]]);
+		}
+		for(auto &hit : sorted_hits) {
+			if(raycastFace(chunk_space_pos, ray, hit->pos, &hit->obj)) {
+				result.hit = true;
+				result.obj = &hit->obj;
+				result.pos = posf + (hit->pos * unit_length);
+				break;
+			}
+		}
 	}
 	return result;
 }

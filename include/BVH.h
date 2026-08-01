@@ -9,19 +9,17 @@
 template <class T>
 class BVH {
 public:
-	struct RaycastResult {
-		bool hit;
-		T *obj;
-		glm::vec3 pos;
-	};
+	// struct RaycastResult {
+	// 	bool hit;
+	// 	T *obj;
+	// 	glm::vec3 pos;
+	// };
 	struct DataNode {
 		glm::vec3 pos;
 		T obj;
 		DataNode *next;
 	};
 
-	typedef bool (*ObjHitFunc)(const glm::vec3&, const glm::vec3&, const glm::vec3&, T*);
-	ObjHitFunc objHitFunc;
 	typedef void (*ObjExpansionFunc)(const glm::vec3 &pos, T *obj, glm::vec3 &min, glm::vec3 &max);
 	ObjExpansionFunc objExpansionFunc;
 
@@ -34,6 +32,7 @@ public:
 		Box *childA;
 		Box *childB;
 		bool resized;
+		int depth = 0;
 
 		glm::vec3 min {};
 		glm::vec3 max {};
@@ -43,10 +42,10 @@ public:
 		Box(ObjExpansionFunc expandToFit);
 		~Box();
 		
-		DataNode *raycast(const glm::vec3 &pos, const glm::vec3 &ray, ObjHitFunc objHit);
+		void raycast(const glm::vec3 &pos, const glm::vec3 &ray, std::vector<DataNode*> &hits);
 		void split(int min_data_nodes);
 
-		void addDataNode(const glm::vec3 &pos, const T &obj);
+		void createDataNode(const glm::vec3 &pos, const T &obj);
 		void addDataNode(DataNode *node);
 		int countDataNodes();
 
@@ -62,15 +61,14 @@ public:
 
 	Box *root;
 
-	BVH() : root(nullptr), objHitFunc(nullptr), objExpansionFunc(nullptr) {}
+	BVH() : root(nullptr), objExpansionFunc(nullptr) {}
 	BVH(
-		ObjHitFunc objHitFunc,
 		ObjExpansionFunc objExpansionFunc,
 		int min_nodes = 1
 	);
 	~BVH();
 
-	RaycastResult raycast(const glm::vec3 &pos, const glm::vec3 &ray);
+	void raycast(const glm::vec3 &pos, const glm::vec3 &ray, std::vector<DataNode*> &hits);
 	void reset();
 	void rebuild();
 	void build();
@@ -80,11 +78,9 @@ public:
 
 template <class T>
 BVH<T>::BVH(
-	ObjHitFunc objHitFunc,
 	ObjExpansionFunc objExpansionFunc,
 	int min_nodes
-)	: objHitFunc(objHitFunc)
-	, objExpansionFunc(objExpansionFunc)
+)	: objExpansionFunc(objExpansionFunc)
 	, min_nodes_per_box(min_nodes) {
 	root = new Box(objExpansionFunc);
 }
@@ -95,24 +91,9 @@ BVH<T>::~BVH() {
 }
 
 template <typename T>
-auto BVH<T>::raycast(const glm::vec3 &pos, const glm::vec3 &ray)->RaycastResult {
-	RaycastResult result{};
-	if (!root || !objHitFunc)
-		return result;
-	//std::cout << "Raycast begin" << std::endl;
-
-	DataNode *hit_node = nullptr;
-	if (root->hitByRay(pos, ray))
-		hit_node = root->raycast(pos, ray, objHitFunc);
-	//else
-		//std::cout << "root box missed" << std::endl;
-	if (!hit_node)
-		return result;
-
-	result.hit = true;
-	result.obj = &(hit_node->obj);
-	result.pos = hit_node->pos;
-	return result;
+void BVH<T>::raycast(const glm::vec3 &pos, const glm::vec3 &ray, std::vector<DataNode*> &hits) {
+	if (root && root->hitByRay(pos, ray))
+		root->raycast(pos, ray, hits);
 }
 
 template <class T>
@@ -161,7 +142,7 @@ BVH<T>::Box::~Box() {
 }
 
 template <class T>
-void BVH<T>::Box::addDataNode(const glm::vec3 &pos, const T &obj) {
+void BVH<T>::Box::createDataNode(const glm::vec3 &pos, const T &obj) {
 	DataNode *node = new DataNode;
 	node->pos = pos;
 	node->obj = obj;
@@ -232,6 +213,8 @@ void BVH<T>::Box::split(int min_data_nodes) {
 
 	childA = new Box(expandToFit);
 	childB = new Box(expandToFit);
+
+	childA->depth = childB->depth = split_depth;
 
 	float splittingPoint = center[longest_axis];
 	DataNode *node = data;
@@ -317,73 +300,19 @@ bool BVH<T>::Box::isMonotonicallyCloser(const glm::vec3 &pos, Box **boxes) {
 }
 
 template <class T>
-auto BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, ObjHitFunc objHit)->DataNode *{
-	DataNode *nearest_hit = nullptr;
+void BVH<T>::Box::raycast(const glm::vec3 &pos, const glm::vec3 &ray, std::vector<DataNode*> &hits) {
 	if (!resized)
-		return nearest_hit;	// don't bother if box hasn't been resized yet (not initialized with data)
+		return;	// don't bother if box hasn't been resized yet (not initialized with data)
 
-	// figure out which children to search and, if both, in which order
-	Box *ranked_children[2]{};
-	bool monotonically_closer = false;
+	for(DataNode *node = data; node != nullptr; node = node->next)
+		hits.push_back(node);
+
 	bool childA_hit = (childA && childA->hitByRay(pos, ray));
 	bool childB_hit = (childB && childB->hitByRay(pos, ray));
-
-	if (childA_hit && !childB_hit) // will only search childA
-		ranked_children[0] = childA;
-
-	else if (!childA_hit && childB_hit) // will only search childB
-		ranked_children[0] = childB;
-
-	else if (childA_hit && childB_hit) { // will be searching both children
-		float distA, distB;
-		distA = glm::length((childA->max - childA->min) - pos);
-		distB = glm::length((childB->max - childB->min) - pos);
-		if (distA < distB) { // childA is closer
-			ranked_children[0] = childA;
-			ranked_children[1] = childB;
-		}
-		else { // childB is closer
-			ranked_children[0] = childB;
-			ranked_children[1] = childA;
-		}
-		monotonically_closer = isMonotonicallyCloser(pos, ranked_children);
-	}
-
-	// find hits from child nodes
-	std::vector<DataNode*> hit_nodes;
-	DataNode *hit = nullptr;
-	for (int i = 0; i < 2; i++) {
-		if (ranked_children[i] && (hit = ranked_children[i]->raycast(pos, ray, objHit))) {
-			hit_nodes.push_back(hit);
-			if (monotonically_closer)
-				break;
-		}
-	}
-
-	// find hits from own nodes
-	DataNode *node = data;
-	while (node) {
-		if (objHit(pos, ray, node->pos, &node->obj))
-			hit_nodes.push_back(node);
-
-		node = node->next;
-	}
-
-	// find nearest hit
-	if (hit_nodes.size()) {
-		int nearest = 0;
-		float nearest_dist = glm::length(hit_nodes[0]->pos - pos);
-		for (int i = 1; i < hit_nodes.size(); i++) {
-			float dist = glm::length(hit_nodes[i]->pos - pos);
-			if (dist < nearest_dist) {
-				nearest = i;
-				nearest_dist = dist;
-			}
-		}
-		nearest_hit = hit_nodes[nearest];
-	}
-
-	return nearest_hit;
+	if(childA_hit)
+		childA->raycast(pos, ray, hits);
+	if(childB_hit)
+		childB->raycast(pos, ray, hits);
 }
 
 #endif

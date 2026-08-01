@@ -61,30 +61,43 @@ void World::update(float dt, Camera *camera, Input *input) {
 		std::cout << "Camera Position reset!" << std::endl;
 	}
 
-	ChunkManager::RaycastResult cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());
-	if(cast.hit) {
-		if ((input->mouse.left.held && !single_mine) || (input->mouse.left.pressed && single_mine)) {
-			//std::cout << "MINING ";
-			//printBlockData(cast.block, cast.chunk);
+	bool has_cast = false;
+	ChunkManager::RaycastResult cast;
+	if ((input->mouse.left.held && !single_mine) || (input->mouse.left.pressed && single_mine)) {
+		//std::cout << "MINING ";
+		//printBlockData(cast.block, cast.chunk);
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(cast.hit)
 			updateBlock(cast.block, cast.chunk, BlockType::AIR);
-		}
-		if ((input->mouse.right.held && !single_mine) || (input->mouse.right.pressed && single_mine)) {
-			//std::cout << "PLACING ";
-			//printBlockData(cast.block, cast.chunk);
+	}
+	if ((input->mouse.right.held && !single_mine) || (input->mouse.right.pressed && single_mine)) {
+		//std::cout << "PLACING ";
+		//printBlockData(cast.block, cast.chunk);
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(cast.hit)
 			placeBlock(cast, BlockType::DIRT);
-		}
-		if((input->mouse.middle.held && !single_mine) || (input->mouse.middle.pressed && single_mine)) {
-			std::cout << "Middle Mouse Pressed!" << std::endl;
+	}
+	if((input->mouse.middle.held && !single_mine) || (input->mouse.middle.pressed && single_mine)) {
+		std::cout << "Middle Mouse Pressed!" << std::endl;
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(cast.hit)
 			blockBrushSphere(cast, 8, BlockType::DIRT);
-		}
-		if (input->keyPressed('E')) {
+	}
+	if (input->keyPressed('E')) {
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(cast.hit) {
 			putMeshWhereLooking(cast, "test_block");
 			std::cout << "Inspect ";
 			printBlockInfo(cast.block, cast.chunk);
 		}
-		if (input->keyPressed('I')) {
+	}
+	if (input->keyPressed('I')) {
+		if(!has_cast) {has_cast = true; cast = chunks.raycast(camera->transform.pos, camera->getLookDirection());}
+		if(cast.hit)
 			traceBVHface(cast.chunk->faces_BVH);
-		}
+	}
+	if(input->keyPressed('C')) {
+		clearDebugGeometry();
 	}
 }
 
