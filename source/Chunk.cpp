@@ -52,10 +52,10 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int z = 0; z < CHUNK_SIZE; z++) {
 			for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
+				int rand_num = std::rand();
 				if (blocks(x, y, z) != BlockType::AIR)
 					continue;
 				
-				int rand_num = std::rand();
 				bool inside_boundaries[6] = {
 					(y != 0), (y != CHUNK_SIZE - 1),
 					(x != 0), (x != CHUNK_SIZE - 1),
