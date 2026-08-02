@@ -26,7 +26,8 @@ public:
 			Button buttons[GLFW_MOUSE_BUTTON_LAST + 1];
 			struct { Button left, right, middle; };
 		};
-
+		double scroll_offset;
+		double scroll;
 	} mouse;
 
 	Input(GLFWwindow *window);
@@ -42,6 +43,7 @@ public:
 
 	static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 	static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+	static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 };
 
 #endif

@@ -20,6 +20,10 @@ public:
 	glm::vec3 sun_dir = glm::vec3(-1);
 
 	ChunkManager chunks;
+	BlockType block_types[3] = {
+		BlockType::DIRT, BlockType::STONE, BlockType::AIR
+	};
+	int block_type_select = 0;
 
 	World(long seed = 0);
 

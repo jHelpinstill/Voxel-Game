@@ -35,11 +35,16 @@ glm::mat4 Decal::getMat(bool with_proj) {
 
 void Decal::drawDefault(Decal *decal, GLFWwindow *window) {
 	decal->shader->use();
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glActiveTexture(GL_TEXTURE0);
 
 	decal->shader->setMat4("projection", decal->getMat());
-	glBindTexture(GL_TEXTURE_2D, decal->texture);
-
 	decal->vao->bind();
+
+	glBindTexture(GL_TEXTURE_2D, decal->texture);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 

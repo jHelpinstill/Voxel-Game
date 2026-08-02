@@ -32,6 +32,7 @@ void Game::setup() {
 	createTexture("crate", ROOT + "textures/crate.jpg");
 	createTexture("chunk_texture", ROOT + "textures/dirt_block.png", true);
 	createTexture("white_square", ROOT + "textures/white_square.png", true);
+	createTexture("icon", ROOT + "textures/icon2.png", true);
 
 	createTexturedBox("box_origin", glm::vec3(1, 1, 1), glm::vec3(0, 3, 0), "smiley");
 	createTexturedBox("crate", glm::vec3(1, 1, 1), glm::vec3(-2, 3, -2), "crate", ROOT + "meshes/box_two_face_UV.txt");
@@ -59,6 +60,28 @@ void Game::setup() {
 	pause_text->texture = 0;
 	pause_text->attached_obj = new Textbox("Game Paused", getFontByName("arial"), getShaderByName("font_shader"), 1.5, glm::vec3(1, 0, 0));
 	
+	Decal *dirt_select = createDecal("dirt_select", "white_square", "decal_shader", glm::vec2(50, 50), glm::vec2(-75, 10), window);
+	dirt_select->origin = glm::vec2(0.5, 0);
+	dirt_select->adjustment = glm::vec2(0.5, 0);
+	dirt_select->drawFunc = Textbox::drawTextbox;
+	dirt_select->attached_obj = new Textbox("DIRT", getFontByName("arial"), getShaderByName("font_shader"), 0.4, glm::vec3(0));
+
+	Decal *air_select = createDecal("air_select", "white_square", "decal_shader", glm::vec2(50, 50), glm::vec2(-25, 10), window);
+	dirt_select->origin = glm::vec2(0.5, 0);
+	dirt_select->adjustment = glm::vec2(0.5, 0);
+	dirt_select->drawFunc = Textbox::drawTextbox;
+	dirt_select->attached_obj = new Textbox("AIR", getFontByName("arial"), getShaderByName("font_shader"), 0.4, glm::vec3(0));
+
+	Decal *stone_select = createDecal("stone_select", "white_square", "decal_shader", glm::vec2(50, 50), glm::vec2(25, 10), window);
+	dirt_select->origin = glm::vec2(0.5, 0);
+	dirt_select->adjustment = glm::vec2(0.5, 0);
+	dirt_select->drawFunc = Textbox::drawTextbox;
+	dirt_select->attached_obj = new Textbox("STONE", getFontByName("arial"), getShaderByName("font_shader"), 0.4, glm::vec3(0));
+
+	dirt_select->awake = false;
+	air_select->awake = false;
+	stone_select->awake = false;
+
 	world.setup();
 }
 

@@ -80,7 +80,7 @@ void World::update(float dt, CameraController *player, Input *input) {
 		std::cout << "Middle Mouse Pressed!" << std::endl;
 		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
 		if(cast.hit)
-			blockBrushSphere(cast, 8, BlockType::DIRT);
+			blockBrushSphere(cast, 8, block_types[block_type_select]);
 	}
 	if (input->keyPressed('E')) {
 		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
@@ -99,6 +99,29 @@ void World::update(float dt, CameraController *player, Input *input) {
 	}
 	if(input->keyPressed('C')) {
 		clearDebugGeometry();
+	}
+	if(input->mouse.scroll) {
+		block_type_select += (int)input->mouse.scroll;
+		int num_types = sizeof(block_types) / sizeof(block_types[0]);
+		if(block_type_select >= num_types) block_type_select = 0;
+		else if(block_type_select < 0) block_type_select = num_types - 1;
+		switch(block_types[block_type_select]) {
+			case BlockType::DIRT: 
+				getDecalByName("dirt_select")->awake = true;
+				getDecalByName("air_select")->awake = false;
+				getDecalByName("stone_select")->awake = false;
+				break;
+			case BlockType::AIR: 
+				getDecalByName("dirt_select")->awake = false;
+				getDecalByName("air_select")->awake = true;
+				getDecalByName("stone_select")->awake = false;
+				break;
+			case BlockType::STONE: 
+				getDecalByName("dirt_select")->awake = false;
+				getDecalByName("air_select")->awake = false;
+				getDecalByName("stone_select")->awake = true;
+				break;
+		}
 	}
 	remeshModifiedChunks();
 }

@@ -6,6 +6,7 @@ Input::Input(GLFWwindow *window) {
 
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+	glfwSetScrollCallback(window, scrollCallback);
 
 	for (Key &key : keys) {
 		key.state = key.prev_state = GLFW_RELEASE;
@@ -31,6 +32,9 @@ void Input::update() {
 		button.released = (button.state == GLFW_RELEASE && button.prev_state == GLFW_PRESS);
 		button.prev_state = button.state;
 	}
+
+	mouse.scroll = mouse.scroll_offset;
+	mouse.scroll_offset = 0;
 
 	double prevx, prevy;
 	prevx = mouse.x;
@@ -81,6 +85,15 @@ void Input::mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 		if (input->window == window) {
 			input->mouse.buttons[button].state = action;
 			break;
+		}
+	}
+}
+
+void Input::scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {
+	std::cout << "scrolled! xoffset: " << xoffset << ", yoffset: " << yoffset << std::endl;
+	for(Input *input : objects) {
+		if(input->window == window) {
+			input->mouse.scroll_offset = yoffset;
 		}
 	}
 }
