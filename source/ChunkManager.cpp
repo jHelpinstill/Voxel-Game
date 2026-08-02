@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <numeric>
 
-bool ChunkManager::add(int x, int y, int z) {
+bool ChunkManager::add(int x, int y, int z, bool rebuild) {
 	Chunk::Key key(x, y, z);
 	if (chunks.find(key) != chunks.end()) {
 		return false;
@@ -10,7 +10,8 @@ bool ChunkManager::add(int x, int y, int z) {
 	Chunk *chunk = new Chunk(x, y, z, std::rand(), shader_info, unit_length);
 	chunks[key] = chunk;
 	bvh.root->createDataNode((glm::vec3(x, y, z) + glm::vec3(0.5)) * (float)CHUNK_SIZE * unit_length, chunk); // position is center of chunk to prevent floating point errors
-	bvh.rebuild();
+	if(rebuild)
+		bvh.rebuild();
 	return true;
 }
 
@@ -30,6 +31,34 @@ Chunk* ChunkManager::get(int x, int y, int z) {
 		return chunks[key];
 
 	return nullptr;
+}
+
+bool ChunkManager::setBlock(const glm::vec3 &pos, BlockType new_type) {
+	glm::vec3 block_pos = (pos / unit_length) + glm::vec3(0.5); // move to center of block to avoid floating point nonsense
+
+	int x_ch, y_ch, z_ch;
+	x_ch = floor(block_pos.x / CHUNK_SIZE);
+	y_ch = floor(block_pos.y / CHUNK_SIZE);
+	z_ch = floor(block_pos.z / CHUNK_SIZE);
+	
+	bool success = false;
+	Chunk *chunk = nullptr;
+	if ((chunk = get(x_ch, y_ch, z_ch))) {
+		int x_b = floor(block_pos.x -= x_ch * CHUNK_SIZE);
+		int y_b = floor(block_pos.y -= y_ch * CHUNK_SIZE);
+		int z_b = floor(block_pos.z -= z_ch * CHUNK_SIZE);
+
+		success = chunk->setBlock(x_b, y_b, z_b, new_type);
+		std::vector<int> faces;
+		if(chunk->blocks.onBoundary(&chunk->blocks(x_b, y_b, z_b), faces)) {
+			for(int face : faces) {
+				Chunk *n = getNeighbor(chunk, face);
+				if(n) n->modified = true;
+			}
+		}
+				
+	}
+	return success;
 }
 
 Chunk* ChunkManager::getNeighbor(Chunk *chunk, int face) {

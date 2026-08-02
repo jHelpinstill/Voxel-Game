@@ -60,7 +60,8 @@ public:
 
 		int getIndex(BlockType *block);
 		bool getCoords(BlockType *block, int &x, int &y, int &z);
-		bool onBoundary(BlockType *block, int *face = nullptr);
+		bool onBoundary(BlockType *block, std::vector<int> &faces);
+		bool isValid(BlockType *block);
 
 		BlockType* getNeighbor(BlockType *block, int face, int dist = 1);
 	} blocks;
@@ -88,8 +89,11 @@ public:
 		glm::vec3 pos;
 	};
 
+	bool modified = false;
+	bool setBlock(BlockType *block, BlockType new_type);
+	bool setBlock(int x, int y, int z, BlockType new_type);
+
 	RaycastResult raycast(const glm::vec3 &pos, const glm::vec3 &ray);
-	RaycastResult last_successful_raycast;
 	
 	Chunk(int x, int y, int z, long seed, ShaderInfo shader_info, float unit_length = 1);
 	

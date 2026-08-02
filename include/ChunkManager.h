@@ -49,9 +49,11 @@ public:
 
 	ChunkManager() : bvh(expandToFitChunk, 1) {}
 
+	bool setBlock(const glm::vec3 &pos, BlockType new_type);
+
 	Chunk* get(const glm::vec3 &pos);
 	Chunk* get(int x, int y, int z);
-	bool add(int x, int y, int z);
+	bool add(int x, int y, int z, bool rebuild = true);
 
 	int size();
 

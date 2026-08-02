@@ -1,6 +1,7 @@
 #include "World.h"
 #include "util.h"
 #include "Debug.h"
+#include <algorithm>
 
 int face_per_chunk;
 
@@ -12,23 +13,24 @@ void World::setup() {
 	std::srand(seed);
 	int layers = 3;
 	for(int y = 0; y < layers; y++) {
-		chunks.add(0, y, 0);// chunks[Key(0, 0, 0)] = new Chunk(glm::ivec3(0, 0, 0));
+		chunks.add(0, y, 0, false);
 		for (int r = 1; r <= chunk_radius; r++) {
 			int x, z;
 			x = z = r;
 			for (z = r; z > -r; z--)
-				chunks.add(x, y, z);
+				chunks.add(x, y, z, false);
 			z = -r;
 			for (x = r; x > -r; x--)
-				chunks.add(x, y, z);
+				chunks.add(x, y, z, false);
 			x = -r;
 			for (z = -r; z < r; z++)
-				chunks.add(x, y, z);
+				chunks.add(x, y, z, false);
 			z = r;
 			for (x = -r; x < r; x++)
-				chunks.add(x, y, z);
+				chunks.add(x, y, z, false);
 		}
 	}
+	chunks.bvh.rebuild();
 
 	traceBVHchunk(chunks.bvh);
 	std::cout << "created " << chunks.size() << " chunks" << std::endl;
@@ -67,7 +69,7 @@ void World::update(float dt, CameraController *player, Input *input) {
 	if ((input->mouse.left.held && !single_mine) || (input->mouse.left.pressed && single_mine)) {
 		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
 		if(cast.hit)
-			updateBlock(cast.block, cast.chunk, BlockType::AIR);
+			chunks.setBlock(cast.pos, BlockType::AIR);
 	}
 	if ((input->mouse.right.held && !single_mine) || (input->mouse.right.pressed && single_mine)) {
 		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
@@ -90,109 +92,34 @@ void World::update(float dt, CameraController *player, Input *input) {
 	}
 	if (input->keyPressed('I')) {
 		if(!has_cast) {has_cast = true; cast = chunks.raycast(player->getPos(), player->getLookDirection());}
-		if(cast.hit)
+		if(cast.hit) {
 			traceBVHface(cast.chunk->faces_BVH);
+			drawChunkBoundaries(cast.chunk, glm::vec3(0, 0, 1));
+		}
 	}
 	if(input->keyPressed('C')) {
 		clearDebugGeometry();
 	}
-}
-
-void World::inspectPos(const glm::vec3 &pos, BlockType **block_out, Chunk **chunk_out) {
-	glm::vec3 block_pos = pos / chunks.unit_length;
-
-	int x_ch, y_ch, z_ch;
-	x_ch = floor(block_pos.x / CHUNK_SIZE);
-	y_ch = floor(block_pos.y / CHUNK_SIZE);
-	z_ch = floor(block_pos.z / CHUNK_SIZE);
-	Chunk *chunk = nullptr;
-	if (!(chunk = chunks.get(x_ch, y_ch, z_ch)))
-		return;
-
-	int x_b = floor(block_pos.x -= x_ch * CHUNK_SIZE);
-	int y_b = floor(block_pos.y -= y_ch * CHUNK_SIZE);
-	int z_b = floor(block_pos.z -= z_ch * CHUNK_SIZE);
-
-	if(block_out)
-		*block_out = &chunk->blocks(x_b, y_b, z_b);
-	if (chunk_out)
-		*chunk_out = chunk;
-}
-
-BlockType* World::inspectPos(const glm::vec3 &pos) {
-	BlockType *block;
-	inspectPos(pos, &block);
-	return block;
-}
-
-void World::updateBlock(BlockType *block, Chunk *chunk, BlockType new_type) {
-	if (!block)
-		return;
-	*block = new_type;
-	remeshChunk(chunk);
-
-	int face = 0;
-	std::cout << "updating block " << std::endl;
-	printBlockInfo(block, chunk);
-
-	if (chunk->blocks.onBoundary(block, &face)) {
-		std::cout << "remeshing neighboring chunk" << std::endl;
-		remeshChunk(chunks.getNeighbor(chunk, face));
-	}
-}
-
-void World::updateBlocks(std::vector<BlockType*> &blocks, Chunk *chunk, BlockType new_type) {
-	std::vector<Chunk*> modified_neighbors;
-	for(BlockType *block : blocks) {
-		*block = new_type;
-		int face;
-		if(chunk->blocks.onBoundary(block, &face)){
-			Chunk *new_neighbor = chunks.getNeighbor(chunk, face);
-			for(Chunk *neighbor : modified_neighbors) {
-				if(new_neighbor == neighbor) {
-					new_neighbor = nullptr;
-					break;
-				}
-			}
-			if(new_neighbor)
-				modified_neighbors.push_back(chunks.getNeighbor(chunk, face));
-		}
-	}
-	remeshChunk(chunk);
-	for(Chunk *neighbor : modified_neighbors) 
-		remeshChunk(neighbor);
+	remeshModifiedChunks();
 }
 
 void World::blockBrushSphere(ChunkManager::RaycastResult cast, float radius, BlockType new_type) {
-	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2);
-	BlockType *block;
-	Chunk *chunk;
-	inspectPos(pos, &block, &chunk);
-	if(block && chunk) {
-		std::cout << "block and chunk valid" << std::endl;
-		std::vector<BlockType*> modified_blocks;
-		int b_x, b_y, b_z;
-		if(chunk->blocks.getCoords(block, b_x, b_y, b_z)) {
-			glm::vec3 center(b_x, b_y, b_z);
-			for(int x = b_x - radius; x < b_x + radius; x++) {
-				for(int y = b_y - radius; y < b_y + radius; y++) {
-					for(int z = b_z - radius; z < b_z + radius; z++) {
-						if(z < 0 || z >= 32 || y < 0 || y >= 32 || x < 0 || x >= 32) {
-							// std::cout << "some dimension out of range: " << x << ", " << y << ", " << z << std::endl;
-							continue;
-						}
-						if(glm::length(glm::vec3(x, y, z) - center) < radius)
-							modified_blocks.push_back(&chunk->blocks(x, y, z));
-					}
-				}
+	glm::vec3 center = cast.pos;
+	float block_radius = radius * chunks.unit_length;
+
+	for(int x = - radius; x < radius; x++) {
+		for(int y = - radius; y < radius; y++) {
+			for(int z = - radius; z < radius; z++) {
+				glm::vec3 pos(x * chunks.unit_length, y * chunks.unit_length, z * chunks.unit_length);
+				if(glm::length(pos) < block_radius)
+					chunks.setBlock(pos + center, new_type);
 			}
-			updateBlocks(modified_blocks, chunk, new_type);
 		}
 	}
 }
 
 void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type) {
-	glm::vec3 pos = cast.pos + glm::vec3(chunks.unit_length / 2); // move to center of block to avoid floating point nonsense
+	glm::vec3 pos = cast.pos;
 	switch (cast.face) {
 		case 0: pos.y += chunks.unit_length; break;
 		case 1: pos.y -= chunks.unit_length; break;
@@ -201,12 +128,7 @@ void World::placeBlock(ChunkManager::RaycastResult cast, BlockType new_type) {
 		case 4: pos.z += chunks.unit_length; break;
 		case 5: pos.z -= chunks.unit_length; break;
 	}
-
-	BlockType *block;
-	Chunk *chunk;
-	inspectPos(pos, &block, &chunk);
-	if (block && chunk)
-		updateBlock(block, chunk, new_type);
+	chunks.setBlock(pos, new_type);
 }
 
 void World::generateMesh() {
@@ -256,6 +178,14 @@ void World::generateMesh() {
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, chunks.pos_SSBO);
 
 	std::cout << "Finished world generation. World contains: " << chunks.size() << " chunks with " << face_counter << " faces" << std::endl;
+}
+
+void World::remeshModifiedChunks() {
+	for(auto &chunk_pair : chunks.chunks) {
+		Chunk *chunk = chunk_pair.second;
+		if(chunk->modified)
+			remeshChunk(chunk);
+	}
 }
 
 void World::remeshChunk(Chunk *chunk) {

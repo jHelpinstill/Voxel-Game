@@ -38,6 +38,24 @@ glm::vec3 Chunk::getPosf() {
 	return glm::vec3(x, y, z) * (float)CHUNK_SIZE * unit_length;
 }
 
+bool Chunk::setBlock(BlockType *block, BlockType new_type) {
+	bool success = false;
+	if(blocks.isValid(block)) {
+		*block = new_type;
+		modified = true;
+		success = true;
+	}
+	return success;
+}
+
+bool Chunk::setBlock(int x, int y, int z, BlockType new_type) {
+	bool success = false;
+	if(x >= 0 && x < 32 && y >= 0 && y < 32 && z >= 0 && z < 32) {
+		success = setBlock(&blocks(x, y, z), new_type);
+	}
+	return success;
+}
+
 /*
 * Checks through every block in the chunk and finds visible faces.
 * Visible faces occur only at the adjoining faces of a transparent block and an
@@ -107,6 +125,7 @@ int Chunk::generateFaceData(std::vector<int> &data, Group neighboring_chunks) {
 		}
 	}
 
+	modified = false;
 	faces_BVH.build();
 	faces = instances;
 	return instances;
@@ -245,11 +264,25 @@ BlockType &Chunk::Blocks::operator()(int x, int y, int z) {
 	return data[x + CHUNK_SIZE * y + CHUNK_AREA * z];
 }
 
+bool Chunk::Blocks::isValid(BlockType *block) {
+	int index = block - data;
+	bool valid = false;
+	if(index >= 0 && index < CHUNK_VOLUME)
+		valid = true;
+	return valid;	
+}
+
 int Chunk::Blocks::getIndex(BlockType *block) {
+	if(!block)
+		return -1;
 	return (block - data);
 }
 
 bool Chunk::Blocks::getCoords(BlockType *block, int &x, int &y, int &z) {
+	x = y = z = -1;
+	if(!block)
+		return false;
+		
 	int i = getIndex(block);
 	if (i < 0 || i >= CHUNK_VOLUME)
 		return false;
@@ -260,43 +293,36 @@ bool Chunk::Blocks::getCoords(BlockType *block, int &x, int &y, int &z) {
 	return true;
 }
 
-bool Chunk::Blocks::onBoundary(BlockType *block, int *face) {
+bool Chunk::Blocks::onBoundary(BlockType *block, std::vector<int> &faces) {
 	int x, y, z;
-	if (!getCoords(block, x, y, z))
-		return true;
-
-	if (y == 31) {
-		if (face)
-			*face = 0;
-		return true;
+	bool on_boundary = false;
+	if (getCoords(block, x, y, z)) {
+		if (y == 31) {
+			faces.push_back(0);
+			on_boundary = true;
+		}
+		if (y == 0) {
+			faces.push_back(1);
+			on_boundary = true;
+		}
+		if (x == 31) {
+			faces.push_back(2);
+			on_boundary = true;
+		}
+		if (x == 0) {
+			faces.push_back(3);
+			on_boundary = true;
+		}
+		if (z == 31) {
+			faces.push_back(4);
+			on_boundary = true;
+		}
+		if (z == 0) {
+			faces.push_back(5);
+			on_boundary = true;
+		}
 	}
-	if (y == 0) {
-		if (face)
-			*face = 1;
-		return true;
-	}
-	if (x == 31) {
-		if (face)
-			*face = 2;
-		return true;
-	}
-	if (x == 0) {
-		if (face)
-			*face = 3;
-		return true;
-	}
-	if (z == 31) {
-		if (face)
-			*face = 4;
-		return true;
-	}
-	if (z == 0) {
-		if (face)
-			*face = 5;
-		return true;
-	}
-
-	return false;
+	return on_boundary;
 }
 
 BlockType *Chunk::Blocks::getNeighbor(BlockType *block, int face, int dist) {

@@ -27,14 +27,10 @@ public:
 	void generateMesh();
 	void addChunkToMesh(Chunk *chunk);
 	void remeshChunk(Chunk *chunk);
+	void remeshModifiedChunks();
 
 	void update(float dt, CameraController *player, Input *input);
 
-	void inspectPos(const glm::vec3 &pos, BlockType **block_out, Chunk **chunk_out = nullptr);
-	BlockType *inspectPos(const glm::vec3 &pos);
-
-	void updateBlock(BlockType *block, Chunk *chunk, BlockType new_type);
-	void updateBlocks(std::vector<BlockType*> &blocks, Chunk *chunk, BlockType new_type);
 	void blockBrushSphere(ChunkManager::RaycastResult cast, float radius, BlockType new_type);
 	void placeBlock(ChunkManager::RaycastResult cast, BlockType new_type);
 

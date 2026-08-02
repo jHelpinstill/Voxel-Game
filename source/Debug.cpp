@@ -178,3 +178,17 @@ void createWireFrameFace(const glm::vec3 &pos, Chunk::Face face, const glm::vec3
 	addDebugGeometry(name);
 	std::cout << "created wf face @ " << vec2string(pos) << std::endl;
 }
+
+void drawChunkBoundaries(Chunk *chunk, const glm::vec3 &color) {
+	static int i = 0;
+	std::string name = "chunk_bounds_box_" + std::to_string(i++);
+	createBox(
+		name,
+		glm::vec3(CHUNK_SIZE * chunk->unit_length),
+		chunk->getPosf(),
+		color,
+		true
+	);
+	addDebugGeometry(name);
+	std::cout << "create chunk bounding box for chunk: " << chunk->ID << std::endl;
+}
